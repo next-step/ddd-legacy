@@ -5,45 +5,77 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
-    private static final String SEPARATOR = ",|:";
-    private static final String DELIMITER = "//(.)\n(.*)";
+
+    private static Parser parser;
+    private static Calculator calculator;
+
+    public StringCalculator() {
+        this.parser = new Parser();
+        this.calculator = new Calculator();
+    }
 
     public int add(final String text) {
-        if (text == null || text.isEmpty()) return 0;
+        if (text == null || text.isEmpty()) {
+            return 0;
+        }
         try {
-            String[] numbers = parse(text);
-            return sumOfNumbers(numbers);
-        } catch (Exception e) {
-            throw new RuntimeException();
+            String[] numbers = parser.parse(text);
+            return calculator.sumOfNumbers(numbers);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("[Error] : ", e);
         }
     }
 
-    private String[] parse(String text) {
-        Matcher m = Pattern.compile(DELIMITER).matcher(text);
-        if (m.find()) {
-            String customDelimiter = m.group(1);
-            return m.group(2).split(Pattern.quote(customDelimiter));
-        } else {
-            return text.split(SEPARATOR);
+}
+
+class PositiveNumber {
+    private final int value;
+
+    public int getValue() {
+        return value;
+    }
+
+    private PositiveNumber(int value) {
+        if (value < 0) {
+            throw new RuntimeException("양의 정수를 입력하세요.");
         }
+        this.value = value;
     }
 
-    private int sumOfNumbers(String[] numbers) {
-        return Arrays.stream(numbers)
-                .mapToInt(this::validate)
-                .sum();
-    }
-
-    private int validate(String number) {
+    public static PositiveNumber toPositiveNumber(String number) {
         try {
-            int num = Integer.parseInt(number);
-            if (num < 0) {
-                throw new RuntimeException("양의 정수를 입력하세요.");
-            }
-            return num;
+            int parseInt = Integer.parseInt(number);
+            return new PositiveNumber(parseInt);
         } catch (NumberFormatException e) {
             throw new RuntimeException("숫자를 입력하세요.");
         }
     }
+}
 
+class Parser {
+    private static final String DEFAULT_DELIMITERS = ",|:";
+    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\\n(.*)");
+
+    public String[] parse(String text) {
+        Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
+        if (matcher.find()) {
+            String customDelimiter = Pattern.quote(matcher.group(1));
+            return matcher.group(2).split(customDelimiter);
+        }
+        return text.split(DEFAULT_DELIMITERS);
+    }
+}
+
+class Calculator {
+
+    public int sumOfNumbers(String[] numbers) {
+        return Arrays.stream(numbers)
+                .mapToInt(this::parseWithPositiveNumber)
+                .sum();
+    }
+
+    private int parseWithPositiveNumber(String number) {
+        PositiveNumber positiveNumber = PositiveNumber.toPositiveNumber(number);
+        return positiveNumber.getValue();
+    }
 }
