@@ -14,6 +14,60 @@ docker compose -p kitchenpos up -d
 
 ## 요구 사항
 
+> 아래는 `mermaid` 로 표현한 ER Diagram 입니다.
+
+```mermaid
+erDiagram
+    MenuGroup {
+        UUID id PK
+        String name
+    }
+    Menu {
+        UUID id PK
+        UUID menu_group_id FK
+        String name
+        BigDecimal price
+        Boolean displayed
+    }
+    MenuProduct {
+        Long seq PK
+        UUID product_id FK
+        UUID menu_id FK
+        Long quantity
+    }
+    Product {
+        UUID id PK
+        String name
+        BigDecimal price
+    }
+    Order {
+        UUID id PK
+        UUID order_table_id FK
+        String type
+        String status
+        LocalDateTime order_date_time
+        String delivery_address
+    }
+    OrderLineItem {
+        Long seq PK
+        UUID menu_id FK
+        Long quantity
+    }
+    OrderTable {
+        UUID id PK
+        String name
+        int number_of_guests
+        Boolean occupied
+    }
+
+    MenuGroup ||--|{ Menu : "id to menu_group_id"
+    Menu ||--|{ MenuProduct : "id to menu_id"
+    MenuProduct }|--|| Product : "product_id to id"
+    Order ||--|{ OrderLineItem : "id to order_id"
+    OrderLineItem }|--|| Menu : "menu_id to id"
+    Order }|--|| OrderTable : "order_table_id to id"
+```
+
 ### 메뉴(Menu)
 
 - **메뉴를 등록했다.**
