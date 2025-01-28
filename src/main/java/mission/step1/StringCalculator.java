@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
 
-    public static final String DELIMITER = "[,:]";
-    public static final int ZERO_VALUE = 0;
+    private static final String DELIMITER = "[,:]";
+    private static final int ZERO_VALUE = 0;
     private static final String CUSTOM_DELIMITER_PATTERN = "//(.*)\n(.*)";
     private static final String PREFIX = "//";
 
