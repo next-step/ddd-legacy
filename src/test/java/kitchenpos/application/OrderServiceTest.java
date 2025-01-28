@@ -55,12 +55,57 @@ public class OrderServiceTest {
     class CreateOrderTest {
 
         @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-        @DisplayName("주문을 정상적으로 생성한다")
+        @DisplayName("배달 주문을 정상적으로 생성한다")
         @Test
-        void create_order_successfully() {
+        void create_delivery_order_successfully() {
             // given
             List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, 2, 후라이드치킨_MENU_DEFAULT_PRICE));
             Order request = createOrder(OrderType.DELIVERY, orderLineItems, "서울시 강남구");
+
+            // when
+            Order order = orderService.create(request);
+
+            // then
+            assertAll(
+                    () -> assertThat(order.getId()).isNotNull(),
+                    () -> assertThat(order.getType()).isEqualTo(request.getType()),
+                    () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
+                    () -> assertThat(order.getOrderLineItems()).hasSize(orderLineItems.size()),
+                    () -> assertThat(order.getDeliveryAddress()).isEqualTo(request.getDeliveryAddress())
+            );
+        }
+
+        @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+        @DisplayName("포장 주문을 정상적으로 생성한다")
+        @Test
+        void create_packing_order_successfully() {
+            // given
+            List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, 2, 후라이드치킨_MENU_DEFAULT_PRICE));
+            Order request = createOrder(OrderType.TAKEOUT, orderLineItems, null);
+
+            // when
+            Order order = orderService.create(request);
+
+            // then
+            assertAll(
+                    () -> assertThat(order.getId()).isNotNull(),
+                    () -> assertThat(order.getType()).isEqualTo(request.getType()),
+                    () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
+                    () -> assertThat(order.getOrderLineItems()).hasSize(orderLineItems.size()),
+                    () -> assertThat(order.getDeliveryAddress()).isEqualTo(request.getDeliveryAddress())
+            );
+        }
+
+        @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+        @DisplayName("매장 식사 주문을 정상적으로 생성한다")
+        @Test
+        void create_eat_in_order_successfully() {
+            // given
+            OrderTable orderTable = createOrderTable(테이블_1_ORDER_TABLE_UUID, "테이블 1", 0, true);
+            orderTableRepository.save(orderTable);
+
+            List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, 2, 후라이드치킨_MENU_DEFAULT_PRICE));
+            Order request = createOrder(OrderType.EAT_IN, orderLineItems, null, 테이블_1_ORDER_TABLE_UUID, orderTable);
 
             // when
             Order order = orderService.create(request);
@@ -179,11 +224,39 @@ public class OrderServiceTest {
     @Nested
     class AcceptOrderTest {
         @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-        @DisplayName("주문을 정상적으로 수락한다")
+        @DisplayName("배달 주문을 정상적으로 수락한다")
         @Test
-        void accept_order_successfully() {
+        void accept_delivery_order_successfully() {
             // given
             Order order = createDeleveryOrder();
+
+            // when
+            Order acceptedOrder = orderService.accept(order.getId());
+
+            // then
+            assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        }
+
+        @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+        @DisplayName("포장 주문을 정상적으로 수락한다")
+        @Test
+        void accept_packing_order_successfully() {
+            // given
+            Order order = createPackingOrder();
+
+            // when
+            Order acceptedOrder = orderService.accept(order.getId());
+
+            // then
+            assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        }
+
+        @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+        @DisplayName("매장 식사 주문을 정상적으로 수락한다")
+        @Test
+        void accept_eat_in_order_successfully() {
+            // given
+            Order order = createEeaInOrder();
 
             // when
             Order acceptedOrder = orderService.accept(order.getId());
@@ -214,11 +287,41 @@ public class OrderServiceTest {
     class ServeOrderTest {
 
         @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-        @DisplayName("주문을 정상적으로 제공한다")
+        @DisplayName("배달 주문을 정상적으로 제공한다")
         @Test
-        void serve_order_successfully() {
+        void serve_delivery_order_successfully() {
             // given
             Order order = createDeleveryOrder();
+            orderService.accept(order.getId());
+
+            // when
+            Order servedOrder = orderService.serve(order.getId());
+
+            // then
+            assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
+        }
+
+        @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+        @DisplayName("포장 주문을 정상적으로 제공한다")
+        @Test
+        void serve_packing_order_successfully() {
+            // given
+            Order order = createPackingOrder();
+            orderService.accept(order.getId());
+
+            // when
+            Order servedOrder = orderService.serve(order.getId());
+
+            // then
+            assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
+        }
+
+        @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+        @DisplayName("매장 식사 주문을 정상적으로 제공한다")
+        @Test
+        void serve_eat_in_order_successfully() {
+            // given
+            Order order = createEeaInOrder();
             orderService.accept(order.getId());
 
             // when
