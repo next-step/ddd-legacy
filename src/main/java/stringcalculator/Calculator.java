@@ -3,7 +3,7 @@ package stringcalculator;
 public class Calculator {
 
     private static final int DEFAULT_RESULT = 0;
-    public static final String MINUS_OPERAND = "-";
+    private static final String MINUS_OPERAND = "-";
 
     public static int calculate(final String operand) {
         if (operand == null || operand.isEmpty()) {
