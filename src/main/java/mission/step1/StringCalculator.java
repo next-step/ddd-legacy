@@ -11,6 +11,7 @@ public class StringCalculator {
     private static final int ZERO_VALUE = 0;
     private static final String CUSTOM_DELIMITER_PATTERN = "//(.*)\n(.*)";
     private static final String PREFIX = "//";
+    private static final Pattern CUSTOM_DELIMITER = Pattern.compile(CUSTOM_DELIMITER_PATTERN);
 
     public String[] splitWithDelimiter(String expression) {
         return expression.split(DELIMITER);
@@ -58,7 +59,7 @@ public class StringCalculator {
     }
 
     public String[] splitWithCustomDelimiter(String expression) {
-        Matcher matcher = Pattern.compile(CUSTOM_DELIMITER_PATTERN).matcher(expression);
+        Matcher matcher = CUSTOM_DELIMITER.matcher(expression);
 
         if (!matcher.matches()) {
             throw new RuntimeException("커스텀 구분자 형식이 올바르지 않습니다");
