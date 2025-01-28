@@ -1,5 +1,7 @@
 package kitchenpos.application;
 
+import static kitchenpos.builder.TestFactory.createMenu;
+import static kitchenpos.builder.TestFactory.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -129,15 +131,5 @@ class ProductServiceTest {
 
     private Product createProductRequest(String name, long price) {
         return new Product(name, BigDecimal.valueOf(price));
-    }
-
-    private Product createProduct(String name, long price) {
-        return new Product(name, BigDecimal.valueOf(price));
-    }
-
-    private Menu createMenu(String name, long price, Product product) {
-        MenuProduct menuProduct = new MenuProduct(1, product, product.getId());
-        MenuGroup menuGroup = new MenuGroup("찌개");
-        return new Menu(name, BigDecimal.valueOf(price), true, List.of(menuProduct), menuGroup, menuGroup.getId());
     }
 }

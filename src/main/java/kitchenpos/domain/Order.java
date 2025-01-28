@@ -12,7 +12,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -37,10 +36,10 @@ public class Order {
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(
-        name = "order_id",
-        nullable = false,
-        columnDefinition = "binary(16)",
-        foreignKey = @ForeignKey(name = "fk_order_line_item_to_orders")
+            name = "order_id",
+            nullable = false,
+            columnDefinition = "binary(16)",
+            foreignKey = @ForeignKey(name = "fk_order_line_item_to_orders")
     )
     private List<OrderLineItem> orderLineItems;
 
@@ -49,9 +48,9 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(
-        name = "order_table_id",
-        columnDefinition = "binary(16)",
-        foreignKey = @ForeignKey(name = "fk_orders_to_order_table")
+            name = "order_table_id",
+            columnDefinition = "binary(16)",
+            foreignKey = @ForeignKey(name = "fk_orders_to_order_table")
     )
     private OrderTable orderTable;
 
@@ -59,6 +58,23 @@ public class Order {
     private UUID orderTableId;
 
     public Order() {
+    }
+
+    public Order(UUID id, OrderType type, OrderStatus status, LocalDateTime orderDateTime,
+                 List<OrderLineItem> orderLineItems, String deliveryAddress, OrderTable orderTable, UUID orderTableId) {
+        this.id = id;
+        this.type = type;
+        this.status = status;
+        this.orderDateTime = orderDateTime;
+        this.orderLineItems = orderLineItems;
+        this.deliveryAddress = deliveryAddress;
+        this.orderTable = orderTable;
+        this.orderTableId = orderTableId;
+    }
+
+    public Order(OrderType type, OrderStatus status, LocalDateTime orderDateTime,
+                 List<OrderLineItem> orderLineItems, String deliveryAddress, OrderTable orderTable, UUID orderTableId) {
+        this(UUID.randomUUID(), type, status, orderDateTime, orderLineItems, deliveryAddress, orderTable, orderTableId);
     }
 
     public UUID getId() {

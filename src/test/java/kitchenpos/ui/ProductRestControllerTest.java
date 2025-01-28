@@ -1,5 +1,6 @@
 package kitchenpos.ui;
 
+import static kitchenpos.builder.TestFactory.createProduct;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -9,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
-import java.util.UUID;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -94,7 +94,7 @@ class ProductRestControllerTest {
     }
 
     private Product createAndSaveProduct(String name, int price) {
-        Product product = new Product(name, BigDecimal.valueOf(price));
+        Product product = createProduct(name, price);
         return productRepository.save(product);
     }
 }

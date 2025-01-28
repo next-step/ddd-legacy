@@ -1,5 +1,8 @@
 package kitchenpos.ui;
 
+import static kitchenpos.builder.TestFactory.createMenu;
+import static kitchenpos.builder.TestFactory.createMenuGroup;
+import static kitchenpos.builder.TestFactory.createProduct;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -168,20 +171,18 @@ class MenuRestControllerTest {
                 .andExpect(jsonPath("$.length()").value(2));
     }
 
-    private MenuGroup createAndSaveMenuGroup() {
-        MenuGroup menuGroup = new MenuGroup("한식");
-        return menuGroupRepository.save(menuGroup);
-    }
-
-    private Product createAndSaveProduct() {
-        Product product = new Product("김치", BigDecimal.valueOf(5000));
-        return productRepository.save(product);
-    }
-
     private Menu createMenuRequest(MenuGroup menuGroup, Product product) {
         MenuProduct menuProduct = new MenuProduct(1, product, product.getId());
         return new Menu("김치찌개", BigDecimal.valueOf(8000), true, List.of(menuProduct), menuGroup,
                 menuGroup.getId());
+    }
+
+    private MenuGroup createAndSaveMenuGroup() {
+        return menuGroupRepository.save(createMenuGroup());
+    }
+
+    private Product createAndSaveProduct() {
+        return productRepository.save(createProduct("김치", 5000));
     }
 
     private Menu createAndSaveMenu(boolean displayed) {

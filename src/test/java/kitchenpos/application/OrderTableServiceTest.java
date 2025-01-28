@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import static kitchenpos.builder.TestFactory.createOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -169,9 +170,5 @@ class OrderTableServiceTest {
 
     private OrderTable createOrderTableRequest() {
         return new OrderTable("1번 테이블", 0, false);
-    }
-
-    private OrderTable createOrderTable(String name, int numberOfGuests, boolean occupied) {
-        return new OrderTable(name, numberOfGuests, occupied);
     }
 }

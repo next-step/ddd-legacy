@@ -1,5 +1,6 @@
 package kitchenpos.ui;
 
+import static kitchenpos.builder.TestFactory.createOrderTable;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -125,11 +126,11 @@ class OrderTableRestControllerTest {
     }
 
     private OrderTable createOrderTableRequest(int numberOfGuests) {
-        return new OrderTable("1번 테이블", numberOfGuests, false);
+        return createOrderTable("1번 테이블", numberOfGuests, false);
     }
 
     private OrderTable createAndSaveOrderTable(int numberOfGuests) {
-        OrderTable orderTable = new OrderTable("1번 테이블", numberOfGuests, false);
+        OrderTable orderTable = createOrderTable("1번 테이블", numberOfGuests, false);
         return orderTableRepository.save(orderTable);
     }
 }
