@@ -6,19 +6,19 @@ public class Car {
     private int position;
 
     public Car(String name) {
-        if(name.length() > 5){
+        if (name.length() > 5) {
             throw new IllegalArgumentException("name is invalid");
         }
         this.name = name;
     }
 
-    public int getPosition() {
-        return position;
-    }
-
-    public void move(MovingStrategy movingStrategy){
+    public void move(MovingStrategy movingStrategy) {
         if (movingStrategy.movable()) {
             position++;
         }
+    }
+
+    public int getPosition() {
+        return position;
     }
 }
