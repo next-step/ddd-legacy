@@ -41,7 +41,8 @@ public class OrderTableServiceTest {
         @Test
         void create_order_table_successfully() {
             // given
-            OrderTable request = createOrderTable("테이블 1", 0, false);
+            OrderTable request = new OrderTable();
+            request.setName("테이블 1");
 
             // when
             OrderTable orderTable = orderTableService.create(request);
@@ -50,7 +51,7 @@ public class OrderTableServiceTest {
             assertAll(
                     () -> assertThat(orderTable.getId()).isNotNull(),
                     () -> assertThat(orderTable.getName()).isEqualTo(request.getName()),
-                    () -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(request.getNumberOfGuests()),
+                    () -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(0),
                     () -> assertThat(orderTable.isOccupied()).isFalse()
             );
         }
