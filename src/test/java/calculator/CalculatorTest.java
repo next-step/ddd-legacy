@@ -40,7 +40,7 @@ class CalculatorTest {
         assertThat(calculator.add(text)).isEqualTo(answer);
     }
 
-    @DisplayName(value = "쉼표와 콜론이 포함된 문자열을 계산할 수 있다.")
+    @DisplayName(value = "콤마와 콜론이 포함된 문자열을 계산할 수 있다.")
     @ParameterizedTest
     @CsvSource({
         "'1,2:3',6",
