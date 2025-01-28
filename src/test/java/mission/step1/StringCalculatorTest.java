@@ -17,11 +17,13 @@ class StringCalculatorTest {
 
     private ParserStrategy parser;
     private StringCalculator stringCalculator;
+    private CalculateStrategy calculator;
 
     @BeforeEach
     void setUp() {
         parser = new Parser();
-        stringCalculator = new StringCalculator(parser);
+        calculator = new Calculator();
+        stringCalculator = new StringCalculator(parser, calculator);
     }
 
     @ParameterizedTest

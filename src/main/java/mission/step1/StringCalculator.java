@@ -8,9 +8,11 @@ import java.util.regex.Pattern;
 public class StringCalculator {
 
     private final ParserStrategy parser;
+    private final CalculateStrategy calculator;
 
-    public StringCalculator(ParserStrategy parser) {
+    public StringCalculator(ParserStrategy parser, CalculateStrategy calculator) {
         this.parser = parser;
+        this.calculator = calculator;
     }
 
     private static final int ZERO_VALUE = 0;
@@ -19,7 +21,6 @@ public class StringCalculator {
     private static final Pattern CUSTOM_DELIMITER = Pattern.compile(CUSTOM_DELIMITER_PATTERN);
 
     public int add(String expression) {
-        int result = 0;
 
         if (!StringUtils.hasText(expression)) {
             return ZERO_VALUE;
@@ -27,16 +28,16 @@ public class StringCalculator {
 
         if (isCustomDelimiter(expression)) {
             for (String string : splitWithCustomDelimiter(expression)) {
-                result += PositiveNumber.from(string).getValue();
+                calculator.calculate(PositiveNumber.from(string));
             }
-            return result;
+            return calculator.getResult();
         }
 
         for (String string : parser.splitWithDelimiter(expression)) {
-            result += PositiveNumber.from(string).getValue();
+            calculator.calculate(PositiveNumber.from(string));
         }
 
-        return result;
+        return calculator.getResult();
     }
 
     private static boolean isCustomDelimiter(String expression) {
