@@ -26,9 +26,9 @@
 | menu_group<br>(메뉴 그룹)      | 여러 menu들의 그룹                                           |                                                              |
 | menu_product<br>(구성 상품)    | menu와 product를 연결 (예: 나혼자 후라이드 메뉴 <- 샐러드 Product + 후라이드치킨 Product) |                                                              |
 |                            |                                                              |                                                              |
-| orders<br>(주문)             | 주문 정보 (예: 21년7월27일 진행중인 배달 건, 21년 7월 26일 7번 테이블 매장 식사 완료 ) | 주문 진행 상태 (WAITING / COMPLETED)<br />주문 타입 (EAT_IN / DELIVERY) |
+| orders<br>(주문)             | 주문 정보 (예: 21년7월27일 진행중인 배달 건, 21년 7월 26일 7번 테이블 매장 식사 완료 ) | |
 | order_line_item<br>(주문 항목) | 주문된 메뉴 항목과 수량 (예: 특정 주문에서 후라이드치킨 1개 포함) |                                                              |
-| order_table<br>(매장 테이블)    | 매장 테이블 정보 (예: 1번 테이블)                            | 1~8번 테이블 존재                                            |
+| order_table<br>(매장 테이블)    | 매장 테이블 정보 (예: 1번 테이블)                            | |
 
 
 
