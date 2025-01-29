@@ -17,7 +17,7 @@ class CarTest {
         assertThatIllegalArgumentException().isThrownBy(() -> new Car("동해물과백두산이"));
     }
 
-    @DisplayName("무작위 값이 4 이상이면 자동차가 움직인다.")
+    @DisplayName("숫자가 4 이상이면 자동차가 움직인다.")
     @ParameterizedTest
     @ValueSource(ints = {4, 5, 6, 7, 8, 9})
     void move(final int condition) {
@@ -26,7 +26,7 @@ class CarTest {
         assertThat(car.getPosition()).isEqualTo(1);
     }
 
-    @DisplayName("무작위 값이 4 미만이면 자동차가 정지한다.")
+    @DisplayName("숫자가 4 미만이면 자동차가 정지한다.")
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2, 3})
     void stop(final int condition) {
