@@ -9,6 +9,10 @@ docker compose -p kitchenpos up -d
 
 ## 요구 사항
 - 상품과 메뉴를 등록하고 주문하는 키친포스 시스템을 구현합니다.
+
+### 주문 상태 순서도
+![img.png](src/main/resources/img.png)
+
 ### 상품
 > 상품이란 판매될 수 있는 물건이나 음식등을 의미합니다.
 > 
