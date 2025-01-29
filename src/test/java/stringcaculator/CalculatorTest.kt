@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -23,17 +24,18 @@ class CalculatorTest {
 
     @DisplayName("숫자 하나를 입력한 경우 해당 숫자를 반환한다.")
     @ParameterizedTest
-    @ValueSource(strings = ["1", "7", "8"])
-    fun 숫자하나입력(input: String) {
+    @CsvSource("1 | 1", "7 | 7", "8 | 8", delimiter = '|')
+    fun 숫자하나입력(input: String, expected: Int) {
         val result = calculator.add(input)
         assertThat(result).isEqualTo(input.toInt())
     }
 
     @DisplayName("숫자 사이에 컴마 또는 콜론 구분자 입력할 경우 숫자의 합을 반환한다.")
-    @Test
-    fun 문자열을_컴마_또는_콜론으로_구분하여_합을_반환() {
-        val result = calculator.add("1,2:3,4")
-        assertThat(result).isEqualTo(10)
+    @ParameterizedTest
+    @CsvSource("1,2:3,4 | 10", "1,2 | 3", "2:3,4 | 9", delimiter = '|')
+    fun 문자열을_컴마_또는_콜론으로_구분하여_합을_반환(input: String, expected: Int) {
+        val result = calculator.add(input)
+        assertThat(result).isEqualTo(expected)
     }
 
     @DisplayName("커스텀 문자 구문자를 사용할 수 있다.")
@@ -50,9 +52,9 @@ class CalculatorTest {
             .isThrownBy { calculator.add("-1") }
     }
 
-    @DisplayName("문자열에 음수가 전달되면 RuntimeException을 throw 한다.")
+    @DisplayName("문자열에 숫자가 아닌 값이 전달되면 RuntimeException을 throw 한다.")
     @Test
-    fun 문자열에_숫자이외의값_전달시_RuntimeException_throw() {
+    fun 문자열에_숫자가_아닌_값이_전달시_RuntimeException_throw() {
         assertThatExceptionOfType(RuntimeException::class.java)
             .isThrownBy { calculator.add("1:232:$:3") }
     }
