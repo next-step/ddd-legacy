@@ -1,12 +1,10 @@
 package racingcar;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 
 class CarTest {
@@ -17,21 +15,19 @@ class CarTest {
         assertThatIllegalArgumentException().isThrownBy(() -> new Car("동해물과백두산이"));
     }
 
-    @DisplayName("숫자가 4 이상이면 자동차가 움직인다.")
-    @ParameterizedTest
-    @ValueSource(ints = {4, 5, 6, 7, 8, 9})
-    void move(final int condition) {
+    @DisplayName("자동차는 움직인다.")
+    @Test
+    void move() {
         Car car = new Car("lim");
-        car.move(condition);
-        assertThat(car.getPosition()).isEqualTo(1);
+        car.move(() -> true);
+        Assertions.assertThat(car.getPosition()).isEqualTo(1);
     }
 
-    @DisplayName("숫자가 4 미만이면 자동차가 정지한다.")
-    @ParameterizedTest
-    @ValueSource(ints = {0, 1, 2, 3})
-    void stop(final int condition) {
+    @DisplayName("자동차는 멈춘다..")
+    @Test
+    void stop() {
         Car car = new Car("lim");
-        car.move(condition);
-        assertThat(car.getPosition()).isEqualTo(0);
+        car.move(() -> false);
+        Assertions.assertThat(car.getPosition()).isEqualTo(0);
     }
 }
