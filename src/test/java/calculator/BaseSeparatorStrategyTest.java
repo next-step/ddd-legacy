@@ -8,14 +8,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DefaultCalculateStrategyTest {
+class BaseSeparatorStrategyTest {
 
-    private CalculateStrategy calculateStrategy;
-
-    @BeforeEach
-    void setCalculator() {
-        calculateStrategy = new DefaultCalculateStrategy();
-    }
+    private final CalculateStrategy calculateStrategy = new BaseSeparatorStrategy();
 
     @DisplayName("숫자 두개를 컴마 구분자의 합을 반환한다.")
     @CsvSource(value = {"1,1-2", "2,2-4", "3,33-36"}, delimiter = '-')

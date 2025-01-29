@@ -1,6 +1,6 @@
 package calculator;
 
-public class EmptyCalculateStrategy implements CalculateStrategy {
+public class NoSeparatorStrategy implements CalculateStrategy {
     @Override
     public int calculate(String input) {
         return 0;
@@ -12,6 +12,6 @@ public class EmptyCalculateStrategy implements CalculateStrategy {
     }
 
     private boolean isEmpty(String input) {
-        return input == null || input.isEmpty();
+        return input == null || input.isBlank();
     }
 }

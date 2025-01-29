@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CustomCalculateStrategy implements CalculateStrategy {
-    public static final Pattern CUSTOM_SEPARATOR_PATTERN = Pattern.compile("//(.)\\\\n(.*)");
+public class CustomSeparatorStrategy implements CalculateStrategy {
+    private static final Pattern CUSTOM_SEPARATOR_PATTERN = Pattern.compile("//(.)\\\\n(.*)");
 
     @Override
     public int calculate(String input) {
@@ -46,7 +46,7 @@ public class CustomCalculateStrategy implements CalculateStrategy {
     private int convertToPositiveNumber(String a) {
         int number = Integer.parseInt(a);
         if (number < 0) {
-            throw new RuntimeException("음수는 들어올 수 없습니다.");
+            throw new IllegalArgumentException("음수는 들어올 수 없습니다.");
         }
         return number;
     }

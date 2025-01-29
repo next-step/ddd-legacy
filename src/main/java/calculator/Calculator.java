@@ -8,9 +8,9 @@ public class Calculator {
 
     public Calculator() {
         this.calculationStrategies = List.of(
-                new EmptyCalculateStrategy(),
-                new CustomCalculateStrategy(),
-                new DefaultCalculateStrategy()
+                new NoSeparatorStrategy(),
+                new CustomSeparatorStrategy(),
+                new BaseSeparatorStrategy()
         );
     }
 

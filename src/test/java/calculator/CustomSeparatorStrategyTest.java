@@ -1,6 +1,5 @@
 package calculator;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -9,14 +8,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class CustomCalculateStrategyTest {
+class CustomSeparatorStrategyTest {
 
-    private CalculateStrategy calculateStrategy;
-
-    @BeforeEach
-    void setCalculator() {
-        calculateStrategy = new CustomCalculateStrategy();
-    }
+    private final CalculateStrategy calculateStrategy = new CustomSeparatorStrategy();
 
     @DisplayName("계산 값은 구분자를 기준으로 숫자간의 합을 반환한다")
     @CsvSource(value = {"//;\\n1;2;3-6", "//;\\n1;;2;;3-6", "//_\\n1_2_11-14"}, delimiter = '-')

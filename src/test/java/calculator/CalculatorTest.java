@@ -1,10 +1,7 @@
 package calculator;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,20 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class CalculatorTest {
 
-    private Calculator calculator;
-
-    // 전체 생성하는거 추가
-    @BeforeEach
-    void setCalculator() {
-        calculator = new Calculator();
-    }
-
-    @DisplayName("빈 문자열이나 Null을 입력 시에 0을 반환한다.")
-    @NullAndEmptySource
-    @ParameterizedTest
-    void nullCheck(String input) {
-        assertThat(calculator.calculate(input)).isEqualTo(0);
-    }
+    private final Calculator calculator = new Calculator();
 
     @DisplayName("문자열이 숫자하나만 들어왔을 경우 숫자를 반환한다.")
     @ValueSource(strings = {"1", "22", "333"})
@@ -38,36 +22,17 @@ public class CalculatorTest {
     @ValueSource(strings = {"a", "aa", "a1a"})
     @ParameterizedTest
     void onlyNumberExceptionCheck(String input) {
-        assertThatThrownBy(() -> calculator.calculate(input)).isInstanceOf(RuntimeException.class);
-    }
-
-    @DisplayName("숫자 두개를 컴마 구분자의 합을 반환한다.")
-    @CsvSource(value = {"1,1-2", "2,2-4", "3,33-36"}, delimiter = '-')
-    @ParameterizedTest
-    void separateCommaCheck(String input, int expected) {
-        assertThat(calculator.calculate(input)).isEqualTo(expected);
-    }
-
-    @DisplayName("구분자를 컴마(,) 이외에 콜론(:)을 사용할 수 있다.")
-    @CsvSource(value = {"1,,1-2", "1,2:3-6", "2:123-125", "3,11-14"}, delimiter = '-')
-    @ParameterizedTest
-    void pluralSeparateCheck(String input, int expected) {
-        assertThat(calculator.calculate(input)).isEqualTo(expected);
-    }
-
-    @DisplayName("\"//\"와 \"\\n\" 문자 사이에 커스텀 구분자를 지정할 수 있다.")
-    @CsvSource(value = {"//;\\n1;2;3-6", "//;\\n1;;2;;3-6", "//_\\n1_2_11-14"}, delimiter = '-')
-    @ParameterizedTest
-    void customSeparateCheck(String input, int expected) {
-        assertThat(calculator.calculate(input)).isEqualTo(expected);
-    }
-
-    @DisplayName("음수를 전달할 경우 RuntimeException 예외가 발생해야 한다.")
-    @CsvSource(value = {"-1,,1=2", "1,-2:3=6", "//;\\n1;;2;;-3=6"}, delimiter = '=')
-    @ParameterizedTest
-    void minusNumberCheck(String input, int expected) {
         assertThatThrownBy(() -> calculator.calculate(input))
                 .isInstanceOf(RuntimeException.class)
+                .hasMessage("숫자의 형태가 아닙니다.");
+    }
+
+    @DisplayName("음수를 전달할 경우 IllegalArgumentException 예외가 발생해야 한다.")
+    @ValueSource(strings = {"-1,,1", "1,-2:3", "//;\\n1;;2;;-3"})
+    @ParameterizedTest
+    void minusNumberCheck(String input) {
+        assertThatThrownBy(() -> calculator.calculate(input))
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("음수는 들어올 수 없습니다.");
     }
 
