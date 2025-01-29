@@ -1,7 +1,5 @@
 package calculator;
 
-import calculator.exception.PositiveNumbers;
-
 import java.util.List;
 
 /**

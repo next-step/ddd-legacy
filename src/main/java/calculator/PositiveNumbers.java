@@ -1,4 +1,4 @@
-package calculator.exception;
+package calculator;
 
 import calculator.PositiveNumber;
 
@@ -15,7 +15,7 @@ public class PositiveNumbers {
     public PositiveNumbers(final List<String> numberToStrings) {
         this.numbers = numberToStrings.stream()
             .map(PositiveNumber::new)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public int sum() {
