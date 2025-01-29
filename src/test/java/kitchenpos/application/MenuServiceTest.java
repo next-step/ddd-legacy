@@ -91,20 +91,145 @@ class MenuServiceTest {
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"-1"})
-    void throwExceptionWhenPriceIsNullOrZero(String value){
+    void throwExceptionWhenPriceIsNullOrZero(String price){
         MenuGroup menuGroup = MenuGroupFixture.setMenuGroup("메인메뉴그룹");
-
         MenuProduct menuProduct =
                 MenuProductFixture.setMenuProduct(
                         ProductFixture.setProduct("음식1", "10000")
                         , 1, 1
                 );
-        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", value, List.of(menuProduct));
+        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", price, List.of(menuProduct));
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴의 이름(name)은 필수로 입력되어야 한다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    void throwExceptionWhenNameIsEmptyOrNull(String name){
+        MenuGroup menuGroup = MenuGroupFixture.setMenuGroup("메인메뉴그룹");
+        MenuProduct menuProduct =
+                MenuProductFixture.setMenuProduct(
+                        ProductFixture.setProduct("음식1", "10000")
+                        , 1, 1
+                );
+        Menu menu = MenuFixture.setMenuGroup(menuGroup, name, "10000", List.of(menuProduct));
 
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(productRepository.findAllByIdIn(any())).willReturn(List.of(menuProduct.getProduct()));
+        given(productRepository.findById(any())).willReturn(Optional.of(menuProduct.getProduct()));
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴의 이름(name)은 필수로 입력되어야 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"비속어"})
+    void throwExceptionWhenNameIsProfanity(String name){
+        MenuGroup menuGroup = MenuGroupFixture.setMenuGroup("메인메뉴그룹");
+        MenuProduct menuProduct =
+                MenuProductFixture.setMenuProduct(
+                        ProductFixture.setProduct("음식1", "10000")
+                        , 1, 1
+                );
+        Menu menu = MenuFixture.setMenuGroup(menuGroup, name, "10000", List.of(menuProduct));
+
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(productRepository.findAllByIdIn(any())).willReturn(List.of(menuProduct.getProduct()));
+        given(productRepository.findById(any())).willReturn(Optional.of(menuProduct.getProduct()));
+        given(purgomalumClient.containsProfanity(any())).willReturn(true);
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴의 가격 변경시 0 이상의 양수값 이어야 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"-1","-2000","-1000"})
+    void throwExceptionWhenPriceIsNegative(String price){
+        MenuGroup menuGroup = MenuGroupFixture.setMenuGroup("메인메뉴그룹");
+        MenuProduct menuProduct =
+                MenuProductFixture.setMenuProduct(
+                        ProductFixture.setProduct("음식1", "10000")
+                        , 1, 1
+                );
+        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", price, List.of(menuProduct));
+
+        assertThatThrownBy(() -> menuService.changePrice(UUID.randomUUID(), menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴의 가격은 변경이 가능하나, 포함한 메뉴 상품의 가격의 합보다 클수 없다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"15000","20000","30000"})
+    void menuPriceShouldBeSmallerThanProductPrice(String price){
+        MenuGroup menuGroup = MenuGroupFixture.setMenuGroup("메인메뉴그룹");
+        MenuProduct menuProduct =
+                MenuProductFixture.setMenuProduct(
+                        ProductFixture.setProduct("음식1", "10000")
+                        , 1, 1
+                );
+        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", price, List.of(menuProduct));
+
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+        assertThatThrownBy(() -> menuService.changePrice(UUID.randomUUID(), menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("메뉴를 화면에 나타낸다.")
+    void showMenu(){
+        MenuGroup menuGroup = MenuGroupFixture.setMenuGroup("메인메뉴그룹");
+        MenuProduct menuProduct =
+                MenuProductFixture.setMenuProduct(
+                        ProductFixture.setProduct("음식1", "10000")
+                        , 1, 1
+                );
+        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", "10000", List.of(menuProduct));
+        menu.setDisplayed(false);
+
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+        Menu menuResult = menuService.display(UUID.randomUUID());
+
+        assertThat(menuResult.isDisplayed()).isTrue();
+    }
+
+    @Test
+    @DisplayName("메뉴를 화면에 나타낼때 메뉴의 가격은 메뉴상품의 가격보다 클수 없다..")
+    void cannotShowMenu(){
+        MenuGroup menuGroup = MenuGroupFixture.setMenuGroup("메인메뉴그룹");
+        MenuProduct menuProduct =
+                MenuProductFixture.setMenuProduct(
+                        ProductFixture.setProduct("음식1", "10000")
+                        , 1, 1
+                );
+        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", "20000", List.of(menuProduct));
+
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+        assertThatThrownBy(() -> menuService.display(UUID.randomUUID()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("메뉴를 화면에 숨긴다.")
+    void hideMenu(){
+        MenuGroup menuGroup = MenuGroupFixture.setMenuGroup("메인메뉴그룹");
+        MenuProduct menuProduct =
+                MenuProductFixture.setMenuProduct(
+                        ProductFixture.setProduct("음식1", "10000")
+                        , 1, 1
+                );
+        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", "10000", List.of(menuProduct));
+        menu.setDisplayed(true);
+
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+        Menu menuResult = menuService.hide(UUID.randomUUID());
+
+        assertThat(menuResult.isDisplayed()).isFalse();
+    }
 
 }
