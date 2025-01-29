@@ -132,3 +132,4 @@ docker compose -p kitchenpos up -d
 | 주문 테이블정보  | OrderTableInfo | 주문 테이블명, 주문 테이블상태, 주문 테이블 인원, 주문 테이블 id로 구성되어 저장하는 주문의 정보들의 집합        |
 
 ## 모델링
+![ERD_force.png](docs/ERD_force.png)
