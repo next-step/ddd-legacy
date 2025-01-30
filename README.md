@@ -27,7 +27,7 @@ docker compose -p kitchenpos up -d
 ****
 ### 2. 메뉴 그룹 (menu group)
   - [x] 메뉴 그룹은 그룹명을 필수로 가진다.
-  - [x] 그룹명에 대한 유효성 확인필요
+  - [x] 그룹명은 의미있는 값이어야 한다. 공란일 수 없다.
   
 
   - API
