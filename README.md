@@ -94,6 +94,5 @@
   - [ ] 주문 테이블을 조회할 수 있다.
 
 ### 모델링
-
-
+![kitchen pos](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/min-queue/ddd-legacy/step-2/class-diagram.puml)
 
