@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import kitchenpos.builder.TestFixtureFactory;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -175,7 +174,7 @@ class MenuServiceTest {
     @DisplayName("메뉴의 가격을 변경할 수 있다")
     void change_price() {
         // given
-        Menu menu = TestFixtureFactory.createMenuWithProductAndGroup();
+        Menu menu = createMenuWithProductAndGroup();
         Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(12000));
 
@@ -192,7 +191,7 @@ class MenuServiceTest {
     @DisplayName("변경하려는 가격이 재료 가격의 총합보다 낮으면 예외가 발생한다")
     void change_price_with_menuPrice_andTotalPrice_exception() {
         // given
-        Menu menu = TestFixtureFactory.createMenuWithProductAndGroup();
+        Menu menu = createMenuWithProductAndGroup();
         Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(4000));
 
@@ -207,7 +206,7 @@ class MenuServiceTest {
     @DisplayName("메뉴를 표시 상태로 변경할 수 있다")
     void display() {
         // given
-        Menu menu = TestFixtureFactory.createMenuWithProductAndGroup();
+        Menu menu = createMenuWithProductAndGroup();
         when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
         // when
@@ -221,7 +220,7 @@ class MenuServiceTest {
     @DisplayName("메뉴를 숨김 상태로 변경할 수 있다")
     void hide() {
         // given
-        Menu menu = TestFixtureFactory.createMenuWithProductAndGroup();
+        Menu menu = createMenuWithProductAndGroup();
         menu.setDisplayed(true);
         when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
@@ -238,7 +237,7 @@ class MenuServiceTest {
     void find_allMenus() {
         // given
         List<Menu> menus = List.of(
-                TestFixtureFactory.createMenuWithProductAndGroup(), TestFixtureFactory.createMenuWithProductAndGroup());
+                createMenuWithProductAndGroup(), createMenuWithProductAndGroup());
         when(menuRepository.findAll()).thenReturn(menus);
 
         // when

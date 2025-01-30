@@ -65,7 +65,7 @@ class OrderRestControllerTest {
     @DisplayName("주문을 생성한다.")
     void create_success() throws Exception {
         // given
-        Order request = createOrderRequest();
+        Order request = createOrderRequestWithDeliveryType();
 
         // when
         ResultActions result = mockMvc.perform(post("/api/orders")
@@ -84,7 +84,7 @@ class OrderRestControllerTest {
     @DisplayName("주문 상태가 주문 대기 중이라면 주문을 수락할 수 있다.")
     void accept_success() throws Exception {
         // given
-        Order savedOrder = createAndSaveOrder();
+        Order savedOrder = createAndSaveOrderWithDeliveryType();
 
         // when
         ResultActions result = mockMvc.perform(put("/api/orders/{orderId}/accept", savedOrder.getId()));
@@ -99,7 +99,7 @@ class OrderRestControllerTest {
     @DisplayName("주문 상태가 접수 완료라면 서빙할 수 있다.")
     void serve_success() throws Exception {
         // given
-        Order savedOrder = createAndSaveOrder();
+        Order savedOrder = createAndSaveOrderWithDeliveryType();
         savedOrder.setStatus(OrderStatus.ACCEPTED);
 
         // when
@@ -115,7 +115,7 @@ class OrderRestControllerTest {
     @DisplayName("주문 상태가 서빙 완료라면 배달을 시작할 수 있다.")
     void startDelivery_success() throws Exception {
         // given
-        Order savedOrder = createAndSaveOrder();
+        Order savedOrder = createAndSaveOrderWithDeliveryType();
         savedOrder.setStatus(OrderStatus.SERVED);
 
         // when
@@ -131,7 +131,7 @@ class OrderRestControllerTest {
     @DisplayName("주문 상태가 배달 중이라면 배달을 완료할 수 있다.")
     void completeDelivery_success() throws Exception {
         // given
-        Order savedOrder = createAndSaveOrder();
+        Order savedOrder = createAndSaveOrderWithDeliveryType();
         savedOrder.setStatus(OrderStatus.DELIVERING);
 
         // when
@@ -152,7 +152,7 @@ class OrderRestControllerTest {
     @DisplayName("주문 종류와 상태에 따라 주문을 완료할 수 있다.")
     void complete_success(OrderType orderType, OrderStatus orderStatus, OrderStatus expected) throws Exception {
         // given
-        Order savedOrder = createAndSaveOrder();
+        Order savedOrder = createAndSaveOrderWithDeliveryType();
         savedOrder.setType(orderType);
         savedOrder.setStatus(orderStatus);
 
@@ -169,8 +169,8 @@ class OrderRestControllerTest {
     @DisplayName("전체 주문을 조회한다.")
     void findAll_success() throws Exception {
         // given
-        createAndSaveOrder();
-        createAndSaveOrder();
+        createAndSaveOrderWithDeliveryType();
+        createAndSaveOrderWithDeliveryType();
 
         // when
         ResultActions result = mockMvc.perform(get("/api/orders"));
@@ -181,30 +181,30 @@ class OrderRestControllerTest {
                 .andExpect(jsonPath("$.length()").value(2));
     }
 
-    private Order createOrderRequest() {
+    private Order createOrderRequestWithDeliveryType() {
         MenuGroup menuGroup = createAndSaveMenuGroup();
         Product product = createAndSaveProduct();
         Menu menu = createAndSaveMenu(menuGroup, product);
 
         OrderLineItem orderLineItem = createOrderLineItem(menu);
-        OrderTable orderTable = createAndSaveOrderTable();
+        OrderTable orderTable = createAndSaveOrderWithDeliveryTypeTable();
 
-        return createOrderWithDeliveryType(orderLineItem, orderTable);
+        return createOrderWithDeliveryType(orderLineItem, orderTable, OrderStatus.WAITING);
     }
 
-    private Order createAndSaveOrder() {
+    private Order createAndSaveOrderWithDeliveryType() {
         MenuGroup menuGroup = createAndSaveMenuGroup();
         Product product = createAndSaveProduct();
         Menu menu = createAndSaveMenu(menuGroup, product);
 
         OrderLineItem orderLineItem = createOrderLineItem(menu);
-        OrderTable orderTable = createAndSaveOrderTable();
+        OrderTable orderTable = createAndSaveOrderWithDeliveryTypeTable();
 
-        Order order = createOrderWithDeliveryType(orderLineItem, orderTable);
+        Order order = createOrderWithDeliveryType(orderLineItem, orderTable, OrderStatus.WAITING);
         return orderRepository.save(order);
     }
 
-    private OrderTable createAndSaveOrderTable() {
+    private OrderTable createAndSaveOrderWithDeliveryTypeTable() {
         OrderTable orderTable = createEmptyOrderTable();
         orderTableRepository.save(orderTable);
         return orderTable;
