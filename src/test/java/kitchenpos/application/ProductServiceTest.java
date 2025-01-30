@@ -1,0 +1,57 @@
+package kitchenpos.application;
+
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
+import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.AdditionalAnswers;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
+import static kitchenpos.fixture.ProductFixture.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@SpringBootTest
+@ExtendWith(MockitoExtension.class)
+class ProductServiceTest {
+
+    @Autowired
+    @MockBean
+    private ProductRepository productRepository;
+
+    @Autowired
+    @MockBean
+    private MenuRepository menuRepository;
+
+    @Autowired
+    @MockBean
+    private PurgomalumClient purgomalumClient;
+
+    @Autowired
+    private ProductService productService;
+
+    @DisplayName("상품을 등록할 수 있다.")
+    @Test
+    void create() {
+        final Product product = product(null, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
+        when(purgomalumClient.containsProfanity(DEFAULT_PRODUCT_NAME)).thenReturn(false);
+        when(productRepository.save(any(Product.class))).then(AdditionalAnswers.returnsFirstArg());
+
+        final Product actual = productService.create(product);
+
+        assertAll(
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getName()).isEqualTo(DEFAULT_PRODUCT_NAME),
+                () -> assertThat(actual.getPrice()).isEqualByComparingTo(DEFAULT_PRODUCT_PRICE)
+        );
+    }
+}
