@@ -1,6 +1,5 @@
 package kitchenpos.ui;
 
-import static kitchenpos.builder.TestFixtureFactory.createMenuWithProductAndGroup;
 import static kitchenpos.builder.TestFixtureFactory.createMenuGroup;
 import static kitchenpos.builder.TestFixtureFactory.createProduct;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

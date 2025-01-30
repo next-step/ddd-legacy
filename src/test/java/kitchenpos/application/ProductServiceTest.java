@@ -1,6 +1,5 @@
 package kitchenpos.application;
 
-import static kitchenpos.builder.TestFixtureFactory.createMenuWithProductAndGroup;
 import static kitchenpos.builder.TestFixtureFactory.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
