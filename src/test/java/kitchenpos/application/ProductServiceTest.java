@@ -94,4 +94,14 @@ class ProductServiceTest {
         assertThatThrownBy(() -> productService.create(product))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @DisplayName("상품 가격이 비어있으면 예외가 발생합니다.")
+    @Test
+    void createWithEmptyPrice() {
+        final Product product = product(null, DEFAULT_PRODUCT_NAME, null);
+        when(purgomalumClient.containsProfanity(DEFAULT_PRODUCT_NAME)).thenReturn(false);
+
+        assertThatThrownBy(() -> productService.create(product))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
