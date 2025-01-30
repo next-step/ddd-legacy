@@ -6,31 +6,32 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Input {
-  private static final String SEPERATOR = "[,:]";
-  private static final Pattern CUSTOM_SEPERATOR_PATTERN = Pattern.compile("//(.)\n(.*)");
 
-  private final PositiveNumbers positiveNumbers;
+	private static final String SEPERATOR = "[,:]";
+	private static final Pattern CUSTOM_SEPERATOR_PATTERN = Pattern.compile("//(.)\n(.*)");
 
-  public Input(String inputString) {
-    String[] values = split(inputString);
-    List<PositiveNumber> positiveNumberList = new ArrayList<>();
-    for (String value : values) {
-      positiveNumberList.add(new PositiveNumber(value));
-    }
-    positiveNumbers = new PositiveNumbers(positiveNumberList);
-  }
+	private final PositiveNumbers positiveNumbers;
 
-  public int getSum() {
-    return positiveNumbers.getSum();
-  }
+	public Input(String inputString) {
+		String[] values = split(inputString);
+		List<PositiveNumber> positiveNumberList = new ArrayList<>();
+		for (String value : values) {
+			positiveNumberList.add(new PositiveNumber(value));
+		}
+		positiveNumbers = new PositiveNumbers(positiveNumberList);
+	}
 
-  private String[] split(String input) {
-    Matcher matcher = CUSTOM_SEPERATOR_PATTERN.matcher(input);
-    if (matcher.find()) {
-      String customSeperator = Pattern.quote(matcher.group(1));
-      String numberString = matcher.group(2);
-      return numberString.split(customSeperator);
-    }
-    return input.split(SEPERATOR);
-  }
+	public int getSum() {
+		return positiveNumbers.getSum();
+	}
+
+	private String[] split(String input) {
+		Matcher matcher = CUSTOM_SEPERATOR_PATTERN.matcher(input);
+		if (matcher.find()) {
+			String customSeperator = Pattern.quote(matcher.group(1));
+			String numberString = matcher.group(2);
+			return numberString.split(customSeperator);
+		}
+		return input.split(SEPERATOR);
+	}
 }
