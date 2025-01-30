@@ -58,7 +58,7 @@ class OrderServiceTest {
         void create_order() {
             // given
             Menu menu = createMenu();
-            Order request = createOrderRequest(false, OrderType.DELIVERY, OrderStatus.WAITING, menu, "서울");
+            Order request = createOrderRequestWithEmptyTable(OrderType.DELIVERY, OrderStatus.WAITING, menu, "서울");
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
             when(orderRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -75,7 +75,7 @@ class OrderServiceTest {
         void menu_name_exception() {
             // given
             Menu menu = createMenu(false);
-            Order request = createOrderRequest(false, OrderType.DELIVERY, OrderStatus.WAITING, menu, "서울");
+            Order request = createOrderRequestWithEmptyTable(OrderType.DELIVERY, OrderStatus.WAITING, menu, "서울");
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
@@ -89,7 +89,7 @@ class OrderServiceTest {
         void delivery_address_exception() {
             // given
             Menu menu = createMenu();
-            Order request = createOrderRequest(false, OrderType.DELIVERY, OrderStatus.SERVED, menu, null);
+            Order request = createOrderRequestWithEmptyTable(OrderType.DELIVERY, OrderStatus.SERVED, menu, null);
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
             when(menuRepository.findById(any(UUID.class))).thenReturn(Optional.of(menu));
 
@@ -104,7 +104,7 @@ class OrderServiceTest {
             // given
             Menu menu = createMenu();
             OrderTable orderTable = createOrderTable("테이블1", 0, false);
-            Order request = createOrderRequest(true, OrderType.EAT_IN, OrderStatus.WAITING, menu, "서울");
+            Order request = createOrderRequestWithOccupiedTable(OrderType.EAT_IN, OrderStatus.WAITING, menu, "서울");
             request.setOrderTable(orderTable);
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -206,13 +206,15 @@ class OrderServiceTest {
         }
     }
 
-    private Order createOrderRequest(boolean occupied, OrderType type, OrderStatus orderStatus, Menu menu,
-                                     String address) {
-        if (occupied) {
-            OrderTable orderTable = createOrderTable("테이블1", 3, true);
-            return createOrder(createOrderLineItem(menu), orderTable, type,
-                    orderStatus, address);
-        }
+    private Order createOrderRequestWithOccupiedTable(OrderType type, OrderStatus orderStatus, Menu menu,
+                                                      String address) {
+        OrderTable orderTable = createOrderTable("테이블1", 3, true);
+        return createOrder(createOrderLineItem(menu), orderTable, type,
+                orderStatus, address);
+    }
+
+    private Order createOrderRequestWithEmptyTable(OrderType type, OrderStatus orderStatus, Menu menu,
+                                                   String address) {
         OrderTable orderTable = createOrderTable("테이블1", 0, false);
         return createOrder(createOrderLineItem(menu), orderTable, type,
                 orderStatus, address);
