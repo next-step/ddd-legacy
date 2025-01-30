@@ -21,7 +21,6 @@ public class StringCalculator {
         // 3. 연산 - 숫자들의 합 구하기
         result = Arrays.stream(splitNums)
                 .map(Number::convertNumber)
-                .filter(Objects::nonNull)
                 .mapToInt(Integer::intValue)
                 .sum();
 
