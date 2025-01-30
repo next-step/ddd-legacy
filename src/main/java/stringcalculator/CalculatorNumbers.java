@@ -6,11 +6,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CalculatorNumbers {
-    public static final String DEFAULT_DELIMETER = ":|,";
-    private static final String CUSTOM_DELIMETER = "//(.)\n(.*)";
-    private static final Pattern CUSTOM_PATTERN = Pattern.compile(CUSTOM_DELIMETER);
-    public static final int DELIMETER_INDEX = 1;
-    public static final int PURE_OPERAND_INDEX = 2;
+    private static final String DEFAULT_DELIMITER = ":|,";
+    private static final String CUSTOM_DELIMITER = "//(.)\n(.*)";
+    private static final Pattern CUSTOM_PATTERN = Pattern.compile(CUSTOM_DELIMITER);
+    private static final int DELIMITER_INDEX = 1;
+    private static final int PURE_OPERAND_INDEX = 2;
 
     private final List<Integer> calculatorNumbers;
 
@@ -24,9 +24,9 @@ public class CalculatorNumbers {
 
     private static List<Integer> convertOperandToNumbers(String operand) {
         Matcher matcher = CUSTOM_PATTERN.matcher(operand);
-        String delimeter = DEFAULT_DELIMETER;
+        String delimeter = DEFAULT_DELIMITER;
         if (matcher.find()) {
-            delimeter = matcher.group(DELIMETER_INDEX);
+            delimeter = matcher.group(DELIMITER_INDEX);
             operand = matcher.group(PURE_OPERAND_INDEX);
         }
         return Arrays.stream(operand.split(delimeter))
@@ -35,8 +35,8 @@ public class CalculatorNumbers {
     }
 
     public int sum() {
-        return calculatorNumbers.stream().
-                mapToInt(Integer::intValue)
+        return calculatorNumbers.stream()
+                .mapToInt(Integer::intValue)
                 .sum();
     }
 }
