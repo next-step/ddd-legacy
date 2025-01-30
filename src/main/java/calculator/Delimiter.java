@@ -5,22 +5,23 @@ import java.util.regex.Pattern;
 
 public class Delimiter {
 
-    private static String delimiter = ",:";
+    private static String basicDelimiter = ",:";
+    private static String customPattern = "//(.*?)\\n";
+    private static Pattern regex = Pattern.compile(customPattern);
 
     /* split : 구분자를 기준으로 문자열 분리 */
     public static String[] split(String input) {
 
-        String custom = Delimiter.customise(input, "//(.*?)\\n");
+        String custom = Delimiter.customise(input);
         if (custom != null) {
-            input = input.replaceAll("//(.*?)\\n", "");
+            input = input.replaceAll(customPattern, "");
         }
 
-        return input.split("[" + delimiter + custom + "]");
+        return input.split("[" + basicDelimiter + custom + "]");
     }
 
     /* customise : 커스텀 구분자 찾기 */
-    public static String customise(String input, String pattern) {
-        Pattern regex = Pattern.compile(pattern);
+    public static String customise(String input) {
         Matcher matcher = regex.matcher(input);
 
         if (matcher.find()) {
