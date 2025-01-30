@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
-import static kitchenpos.builder.TestFactory.createOrderTable;
+import static kitchenpos.builder.TestFixtureFactory.createEmptyOrderTable;
+import static kitchenpos.builder.TestFixtureFactory.createUsingOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -68,8 +69,8 @@ class OrderTableServiceTest {
     void find_all() {
         // given
         List<OrderTable> orderTables = List.of(
-                createOrderTable("1번 테이블", 0, false),
-                createOrderTable("2번 테이블", 2, true)
+                createEmptyOrderTable(),
+                createUsingOrderTable()
         );
         when(orderTableRepository.findAll()).thenReturn(orderTables);
 
@@ -84,7 +85,7 @@ class OrderTableServiceTest {
     @DisplayName("빈 테이블을 이용할 수 있다")
     void sit() {
         // given
-        OrderTable orderTable = createOrderTable("1번 테이블", 0, false);
+        OrderTable orderTable = createEmptyOrderTable();
         when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
 
         // when
@@ -98,7 +99,7 @@ class OrderTableServiceTest {
     @DisplayName("모든 주문이 완료되면 테이블을 정리할 수 있다")
     void clear() {
         // given
-        OrderTable orderTable = createOrderTable("1번 테이블", 4, true);
+        OrderTable orderTable = createUsingOrderTable();
 
         when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
         when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(false);
@@ -115,7 +116,7 @@ class OrderTableServiceTest {
     @DisplayName("주문이 완료되지 않은 테이블을 정리할 시 예외가 발생한다.")
     void orderTable_occupied_exception() {
         // given
-        OrderTable orderTable = createOrderTable("1번 테이블", 6, true);
+        OrderTable orderTable = createUsingOrderTable();
         when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
         when(orderRepository.existsByOrderTableAndStatusNot(any(), eq(OrderStatus.COMPLETED))).thenReturn(true);
 
@@ -128,7 +129,7 @@ class OrderTableServiceTest {
     @DisplayName("테이블에 손님이 있는 경우에만 앉아 있는 손님의 수를 변경할 수 있다")
     void change_numberOfGuests() {
         // given
-        OrderTable orderTable = createOrderTable("1번 테이블", 2, true);
+        OrderTable orderTable = createUsingOrderTable();
         orderTable.setNumberOfGuests(4);
 
         when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
@@ -144,7 +145,7 @@ class OrderTableServiceTest {
     @DisplayName("빈 테이블의 손님 수 변경 시 예외가 발생한다.")
     void change_numberOfGuests_not_occupied_exception() {
         // given
-        OrderTable orderTable = createOrderTable("1번 테이블", 0, false);
+        OrderTable orderTable = createEmptyOrderTable();
         orderTable.setNumberOfGuests(4);
 
         when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
@@ -158,7 +159,7 @@ class OrderTableServiceTest {
     @DisplayName("손님 수를 음수로 변경하면 예외가 발생한다..")
     void change_numberOfGuests_negative_number_exception() {
         // given
-        OrderTable orderTable = createOrderTable("1번 테이블", 1, true);
+        OrderTable orderTable = createUsingOrderTable();
         orderTable.setNumberOfGuests(-1);
 
         when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));

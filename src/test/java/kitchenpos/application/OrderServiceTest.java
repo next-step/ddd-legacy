@@ -1,9 +1,10 @@
 package kitchenpos.application;
 
-import static kitchenpos.builder.TestFactory.createMenu;
-import static kitchenpos.builder.TestFactory.createOrder;
-import static kitchenpos.builder.TestFactory.createOrderLineItem;
-import static kitchenpos.builder.TestFactory.createOrderTable;
+import static kitchenpos.builder.TestFixtureFactory.createEmptyOrderTable;
+import static kitchenpos.builder.TestFixtureFactory.createMenuWithProductAndGroup;
+import static kitchenpos.builder.TestFixtureFactory.createOrder;
+import static kitchenpos.builder.TestFixtureFactory.createOrderLineItem;
+import static kitchenpos.builder.TestFixtureFactory.createUsingOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,6 +16,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import kitchenpos.builder.TestFixtureFactory;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
@@ -57,7 +59,7 @@ class OrderServiceTest {
         @DisplayName("주문은 하나 이상의 주문 내역으로 생성할 수 있다")
         void create_order() {
             // given
-            Menu menu = createMenu();
+            Menu menu = TestFixtureFactory.createMenuWithProductAndGroup();
             Order request = createOrderRequestWithEmptyTable(OrderType.DELIVERY, OrderStatus.WAITING, menu, "서울");
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -74,7 +76,7 @@ class OrderServiceTest {
         @DisplayName("게시되지 않은 메뉴 주문 시 예외가 발생한다.")
         void menu_name_exception() {
             // given
-            Menu menu = createMenu(false);
+            Menu menu = createMenuWithProductAndGroup(false);
             Order request = createOrderRequestWithEmptyTable(OrderType.DELIVERY, OrderStatus.WAITING, menu, "서울");
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -88,7 +90,7 @@ class OrderServiceTest {
         @DisplayName("배달 주문 시 주소가 없으면 예외가 발생한다.")
         void delivery_address_exception() {
             // given
-            Menu menu = createMenu();
+            Menu menu = TestFixtureFactory.createMenuWithProductAndGroup();
             Order request = createOrderRequestWithEmptyTable(OrderType.DELIVERY, OrderStatus.SERVED, menu, null);
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
             when(menuRepository.findById(any(UUID.class))).thenReturn(Optional.of(menu));
@@ -102,8 +104,8 @@ class OrderServiceTest {
         @DisplayName("이용 중이지 않은 테이블에서 주문 시 예외가 발생한다.")
         void not_occupied_table_order_exception() {
             // given
-            Menu menu = createMenu();
-            OrderTable orderTable = createOrderTable("테이블1", 0, false);
+            Menu menu = TestFixtureFactory.createMenuWithProductAndGroup();
+            OrderTable orderTable = createEmptyOrderTable();
             Order request = createOrderRequestWithOccupiedTable(OrderType.EAT_IN, OrderStatus.WAITING, menu, "서울");
             request.setOrderTable(orderTable);
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
@@ -123,8 +125,9 @@ class OrderServiceTest {
         @DisplayName("대기 중인 주문만 접수할 수 있다")
         void accept_success() {
             // given
-            OrderTable orderTable = createOrderTable("테이블1", 3, true);
-            Order order = createOrder(createOrderLineItem(createMenu()), orderTable, OrderType.DELIVERY,
+            OrderTable orderTable = createUsingOrderTable();
+            Order order = createOrder(createOrderLineItem(TestFixtureFactory.createMenuWithProductAndGroup()),
+                    orderTable, OrderType.DELIVERY,
                     OrderStatus.WAITING, "서울");
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -140,8 +143,9 @@ class OrderServiceTest {
         @DisplayName("대기 중이 아닌 주문 시 예외가 발생한다.")
         void accept_exception(OrderStatus status) {
             // given
-            OrderTable orderTable = createOrderTable("테이블1", 3, true);
-            Order order = createOrder(createOrderLineItem(createMenu()), orderTable, OrderType.DELIVERY, status, "서울");
+            OrderTable orderTable = createUsingOrderTable();
+            Order order = createOrder(createOrderLineItem(TestFixtureFactory.createMenuWithProductAndGroup()),
+                    orderTable, OrderType.DELIVERY, status, "서울");
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
             // when // then
@@ -153,8 +157,9 @@ class OrderServiceTest {
         @DisplayName("배달 주문 접수 시 배달 요청을 한다")
         void delivery_success() {
             // given
-            OrderTable orderTable = createOrderTable("테이블1", 3, true);
-            Order order = createOrder(createOrderLineItem(createMenu()), orderTable, OrderType.DELIVERY,
+            OrderTable orderTable = createUsingOrderTable();
+            Order order = createOrder(createOrderLineItem(TestFixtureFactory.createMenuWithProductAndGroup()),
+                    orderTable, OrderType.DELIVERY,
                     OrderStatus.WAITING, "서울");
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -174,8 +179,9 @@ class OrderServiceTest {
         @DisplayName("주문 유형별 완료 조건이 맞으면 주문을 완료할 수 있다")
         void complete_order(OrderType type, OrderStatus status, OrderStatus expected) {
             // given
-            OrderTable orderTable = createOrderTable("테이블1", 3, true);
-            Order order = createOrder(createOrderLineItem(createMenu()), orderTable, type, status, "서울");
+            OrderTable orderTable = createUsingOrderTable();
+            Order order = createOrder(createOrderLineItem(TestFixtureFactory.createMenuWithProductAndGroup()),
+                    orderTable, type, status, "서울");
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
             // when
@@ -189,8 +195,9 @@ class OrderServiceTest {
         @DisplayName("매장 식사 주문 완료 시 다른 주문이 없으면 테이블을 비운다")
         void clear_table_with_complete_status() {
             // given
-            OrderTable orderTable = createOrderTable("테이블1", 3, true);
-            Order order = createOrder(createOrderLineItem(createMenu()), orderTable, OrderType.EAT_IN,
+            OrderTable orderTable = createUsingOrderTable();
+            Order order = createOrder(createOrderLineItem(TestFixtureFactory.createMenuWithProductAndGroup()),
+                    orderTable, OrderType.EAT_IN,
                     OrderStatus.SERVED, "서울");
             order.setOrderTable(orderTable);
 
@@ -208,14 +215,14 @@ class OrderServiceTest {
 
     private Order createOrderRequestWithOccupiedTable(OrderType type, OrderStatus orderStatus, Menu menu,
                                                       String address) {
-        OrderTable orderTable = createOrderTable("테이블1", 3, true);
+        OrderTable orderTable = createUsingOrderTable();
         return createOrder(createOrderLineItem(menu), orderTable, type,
                 orderStatus, address);
     }
 
     private Order createOrderRequestWithEmptyTable(OrderType type, OrderStatus orderStatus, Menu menu,
                                                    String address) {
-        OrderTable orderTable = createOrderTable("테이블1", 0, false);
+        OrderTable orderTable = createEmptyOrderTable();
         return createOrder(createOrderLineItem(menu), orderTable, type,
                 orderStatus, address);
     }

@@ -1,6 +1,6 @@
 package kitchenpos.application;
 
-import static kitchenpos.builder.TestFactory.createMenu;
+import static kitchenpos.builder.TestFixtureFactory.createMenuWithProductAndGroup;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import kitchenpos.builder.TestFixtureFactory;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -174,7 +175,7 @@ class MenuServiceTest {
     @DisplayName("메뉴의 가격을 변경할 수 있다")
     void change_price() {
         // given
-        Menu menu = createMenu();
+        Menu menu = TestFixtureFactory.createMenuWithProductAndGroup();
         Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(12000));
 
@@ -191,7 +192,7 @@ class MenuServiceTest {
     @DisplayName("변경하려는 가격이 재료 가격의 총합보다 낮으면 예외가 발생한다")
     void change_price_with_menuPrice_andTotalPrice_exception() {
         // given
-        Menu menu = createMenu();
+        Menu menu = TestFixtureFactory.createMenuWithProductAndGroup();
         Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(4000));
 
@@ -206,7 +207,7 @@ class MenuServiceTest {
     @DisplayName("메뉴를 표시 상태로 변경할 수 있다")
     void display() {
         // given
-        Menu menu = createMenu();
+        Menu menu = TestFixtureFactory.createMenuWithProductAndGroup();
         when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
         // when
@@ -220,7 +221,7 @@ class MenuServiceTest {
     @DisplayName("메뉴를 숨김 상태로 변경할 수 있다")
     void hide() {
         // given
-        Menu menu = createMenu();
+        Menu menu = TestFixtureFactory.createMenuWithProductAndGroup();
         menu.setDisplayed(true);
         when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
@@ -236,7 +237,8 @@ class MenuServiceTest {
     @DisplayName("전체 메뉴를 조회할 수 있다")
     void find_allMenus() {
         // given
-        List<Menu> menus = List.of(createMenu(), createMenu());
+        List<Menu> menus = List.of(
+                TestFixtureFactory.createMenuWithProductAndGroup(), TestFixtureFactory.createMenuWithProductAndGroup());
         when(menuRepository.findAll()).thenReturn(menus);
 
         // when

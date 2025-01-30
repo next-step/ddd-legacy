@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
-import static kitchenpos.builder.TestFactory.createMenu;
-import static kitchenpos.builder.TestFactory.createProduct;
+import static kitchenpos.builder.TestFixtureFactory.createMenuWithProductAndGroup;
+import static kitchenpos.builder.TestFixtureFactory.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,10 +11,8 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import kitchenpos.builder.TestFixtureFactory;
 import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
@@ -99,7 +97,7 @@ class ProductServiceTest {
     void change_price_exception() {
         // given
         Product product = createProduct("김치", 5000);
-        Menu menu = createMenu("김치찌개", 7000, product);
+        Menu menu = TestFixtureFactory.createMenuWithProductAndGroup("김치찌개", 7000, product);
         Product request = createProductRequest("김치", 8000);
 
         when(productRepository.findById(any())).thenReturn(Optional.of(product));

@@ -1,11 +1,11 @@
 package kitchenpos.ui;
 
-import static kitchenpos.builder.TestFactory.createDefaultOrder;
-import static kitchenpos.builder.TestFactory.createMenuGroup;
-import static kitchenpos.builder.TestFactory.createOrderLineItem;
-import static kitchenpos.builder.TestFactory.createOrderTable;
-import static kitchenpos.builder.TestFactory.createProduct;
-import static kitchenpos.builder.TestFactory.createPureMenu;
+import static kitchenpos.builder.TestFixtureFactory.createEmptyOrderTable;
+import static kitchenpos.builder.TestFixtureFactory.createMenu;
+import static kitchenpos.builder.TestFixtureFactory.createMenuGroup;
+import static kitchenpos.builder.TestFixtureFactory.createOrderLineItem;
+import static kitchenpos.builder.TestFixtureFactory.createOrderWithDeliveryType;
+import static kitchenpos.builder.TestFixtureFactory.createProduct;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -189,7 +189,7 @@ class OrderRestControllerTest {
         OrderLineItem orderLineItem = createOrderLineItem(menu);
         OrderTable orderTable = createAndSaveOrderTable();
 
-        return createDefaultOrder(orderLineItem, orderTable);
+        return createOrderWithDeliveryType(orderLineItem, orderTable);
     }
 
     private Order createAndSaveOrder() {
@@ -200,18 +200,18 @@ class OrderRestControllerTest {
         OrderLineItem orderLineItem = createOrderLineItem(menu);
         OrderTable orderTable = createAndSaveOrderTable();
 
-        Order order = createDefaultOrder(orderLineItem, orderTable);
+        Order order = createOrderWithDeliveryType(orderLineItem, orderTable);
         return orderRepository.save(order);
     }
 
     private OrderTable createAndSaveOrderTable() {
-        OrderTable orderTable = createOrderTable("1번 테이블", 0, false);
+        OrderTable orderTable = createEmptyOrderTable();
         orderTableRepository.save(orderTable);
         return orderTable;
     }
 
     private Menu createAndSaveMenu(MenuGroup menuGroup, Product product) {
-        Menu menu = createPureMenu(menuGroup, product);
+        Menu menu = createMenu(menuGroup, product);
         menuRepository.save(menu);
         return menu;
     }

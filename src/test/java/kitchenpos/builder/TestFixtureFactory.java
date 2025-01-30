@@ -13,7 +13,7 @@ import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderType;
 import kitchenpos.domain.Product;
 
-public class TestFactory {
+public class TestFixtureFactory {
 
     public static MenuGroup createMenuGroup() {
         return new MenuGroup("한식");
@@ -23,45 +23,47 @@ public class TestFactory {
         return new Product("김치", price);
     }
 
-    public static Menu createMenu() {
+    public static Menu createMenuWithProductAndGroup() {
         MenuGroup menuGroup = createMenuGroup();
         Product product = createProduct(BigDecimal.valueOf(5000));
         MenuProduct menuProduct = new MenuProduct(1, product, product.getId());
-
         return new Menu("김치찌개", BigDecimal.valueOf(8000), true, List.of(menuProduct), menuGroup,
                 menuGroup.getId());
     }
 
-    public static Menu createMenu(boolean displayed) {
+    public static Menu createMenuWithProductAndGroup(boolean displayed) {
         MenuGroup menuGroup = createMenuGroup();
         Product product = createProduct(BigDecimal.valueOf(5000));
         MenuProduct menuProduct = new MenuProduct(1, product, product.getId());
-
         return new Menu("김치찌개", BigDecimal.valueOf(8000), displayed, List.of(menuProduct), menuGroup,
                 menuGroup.getId());
     }
 
-    public static Menu createPureMenu(MenuGroup menuGroup, Product product) {
+    public static Menu createMenu(MenuGroup menuGroup, Product product) {
         MenuProduct menuProduct = new MenuProduct(1, product, product.getId());
         return new Menu("김치찌개", BigDecimal.valueOf(8000), true, List.of(menuProduct), menuGroup,
                 menuGroup.getId());
     }
 
-    public static Menu createMenu(String name, long price, Product product) {
+    public static Menu createMenuWithProductAndGroup(String name, long price, Product product) {
         MenuProduct menuProduct = new MenuProduct(1, product, product.getId());
         MenuGroup menuGroup = new MenuGroup("찌개");
         return new Menu(name, BigDecimal.valueOf(price), true, List.of(menuProduct), menuGroup, menuGroup.getId());
     }
 
-    public static OrderTable createOrderTable(String name, int numberOfGuests, boolean occupied) {
-        return new OrderTable(name, numberOfGuests, occupied);
+    public static OrderTable createEmptyOrderTable() {
+        return new OrderTable("비어 있는 테이블", 0, false);
+    }
+
+    public static OrderTable createUsingOrderTable() {
+        return new OrderTable("사용 중인 테이블", 4, true);
     }
 
     public static Product createProduct(String name, long price) {
         return new Product(name, BigDecimal.valueOf(price));
     }
 
-    public static Order createDefaultOrder(OrderLineItem orderLineItem, OrderTable orderTable) {
+    public static Order createOrderWithDeliveryType(OrderLineItem orderLineItem, OrderTable orderTable) {
         return new Order(OrderType.DELIVERY, OrderStatus.WAITING, LocalDateTime.now(), List.of(orderLineItem),
                 "주소", orderTable, orderTable.getId());
     }
