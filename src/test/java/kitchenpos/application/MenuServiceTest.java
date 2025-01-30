@@ -79,12 +79,6 @@ class MenuServiceTest {
         Menu request = createMenuRequest("김치찌개", -1000, menuGroup,
                 product);
 
-        when(menuGroupRepository.findById(any(UUID.class))).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(product));
-        when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
-        when(purgomalumClient.containsProfanity(any())).thenReturn(false);
-        when(menuRepository.save(any(Menu.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
         // when // then
         assertThatThrownBy(() -> menuService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -103,8 +97,6 @@ class MenuServiceTest {
         when(menuGroupRepository.findById(any(UUID.class))).thenReturn(Optional.of(menuGroup));
         when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(product));
         when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
-        when(purgomalumClient.containsProfanity(any())).thenReturn(false);
-        when(menuRepository.save(any(Menu.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when // then
         assertThatThrownBy(() -> menuService.create(request))
@@ -124,7 +116,6 @@ class MenuServiceTest {
         when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(product));
         when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
         when(purgomalumClient.containsProfanity(any())).thenReturn(true);
-        when(menuRepository.save(any(Menu.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when // then
         assertThatThrownBy(() -> menuService.create(request))
@@ -140,12 +131,7 @@ class MenuServiceTest {
         MenuProduct menuProduct = new MenuProduct(1, product, product.getId());
         Menu request = new Menu("김치찌개", BigDecimal.valueOf(8000), true, List.of(menuProduct), menuGroup,
                 null);
-
         when(menuGroupRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(menuGroup));
-        when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(product));
-        when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
-        when(purgomalumClient.containsProfanity(any())).thenReturn(false);
-        when(menuRepository.save(any(Menu.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when // then
         assertThatThrownBy(() -> menuService.create(request))
