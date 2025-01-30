@@ -13,16 +13,6 @@ class CarTest {
     fun constructor() {
         assertThatIllegalArgumentException().isThrownBy { Car("안녕") }
     }
-
-    /*    @DisplayName("숫자가 4 이상이면 자동차는 움직인다. ")
-        @ValueSource(ints = [4, 5, 6, 7, 8, 9])
-        @ParameterizedTest
-        fun move(condition: Int) {
-            val car = Car("hwandoli")
-            car.move(condition)
-            assertThat(car.position).isEqualTo(1)
-        }*/
-
     @DisplayName("이동 조건에 부합하면 자동차는 움직인다.")
     @Test
     fun move() {
@@ -32,9 +22,8 @@ class CarTest {
     }
 
     @DisplayName("숫자가 4 미만이면 자동차는 정지한다. ")
-    @ValueSource(ints = [0, 1, 2, 3])
-    @ParameterizedTest
-    fun stop(condition: Int) {
+    @Test
+    fun stop() {
         val car = Car("hwandoli")
         car.move(StopStrategy())
         assertThat(car.position).isEqualTo(0)
