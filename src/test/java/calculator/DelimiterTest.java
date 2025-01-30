@@ -5,7 +5,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class DelimiterTest {
 
@@ -27,7 +26,7 @@ class DelimiterTest {
     @ParameterizedTest
     @ValueSource(strings = {"//?\n1?2?3"})
     void findCustomDelimiter(final String text) {
-        assertThat(Delimiter.customise(text)).isEqualTo("?");
+        assertThat(Delimiter.customize(text)).isEqualTo("?");
     }
 
 }

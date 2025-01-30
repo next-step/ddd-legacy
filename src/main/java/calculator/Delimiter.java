@@ -1,27 +1,31 @@
 package calculator;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Delimiter {
 
-    private static String basicDelimiter = ",:";
+    private static final String BASIC_DELIMITER = ",:";
     private static String customPattern = "//(.*?)\\n";
     private static Pattern regex = Pattern.compile(customPattern);
 
-    /* split : 구분자를 기준으로 문자열 분리 */
-    public static String[] split(String input) {
+    private Delimiter() {
+    }
 
-        String custom = Delimiter.customise(input);
+    /* split : 구분자를 기준으로 문자열 분리 */
+    public static List<String> split(String input) {
+
+        String custom = Delimiter.customize(input);
         if (custom != null) {
             input = input.replaceAll(customPattern, "");
         }
 
-        return input.split("[" + basicDelimiter + custom + "]");
+        return List.of(input.split("[" + BASIC_DELIMITER + custom + "]"));
     }
 
     /* customise : 커스텀 구분자 찾기 */
-    public static String customise(String input) {
+    public static String customize(String input) {
         Matcher matcher = regex.matcher(input);
 
         if (matcher.find()) {
