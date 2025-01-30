@@ -1,5 +1,9 @@
 package calculator
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatRuntimeException
 import org.junit.jupiter.api.Test
@@ -12,15 +16,34 @@ import kotlin.random.Random
 class InputStringTest {
 
     @Test
-    fun `기본 구분자와 숫자가 있는 정상 패턴`() = repeat(100) {
-        val target = RandomFixtureGenerator.generateBy(10, useCustomDelimiter = false)
-        assertThat(InputString.of(target).src).isEqualTo(target)
+    fun `기본 구분자와 숫자가 있는 정상 패턴`() = runBlocking {
+        
+        val deferredJobs = List(100) {
+            async(Dispatchers.Default) {
+                val target = RandomFixtureGenerator.generateBy(10, useCustomDelimiter = false)
+                target to InputString.of(target).src
+            }
+        }
+
+        deferredJobs.awaitAll()
+            .forEach { (expected, actual) ->
+                assertThat(actual).isEqualTo(expected)
+            }
     }
 
     @Test
-    fun `커스텀 구분자와 숫자가 있는 정상 패턴`() = repeat(100) {
-        val target = RandomFixtureGenerator.generateBy(10, useCustomDelimiter = true)
-        assertThat(InputString.of(target).src).isEqualTo(target)
+    fun `커스텀 구분자와 숫자가 있는 정상 패턴`() = runBlocking {
+        val deferredJobs = List(100) {
+            async(Dispatchers.Default) {
+                val target = RandomFixtureGenerator.generateBy(10, useCustomDelimiter = true)
+                target to InputString.of(target).src
+            }
+        }
+
+        deferredJobs.awaitAll()
+            .forEach { (expected, actual) ->
+                assertThat(actual).isEqualTo(expected)
+            }
     }
 
     @ParameterizedTest
@@ -32,7 +55,6 @@ class InputStringTest {
     @ParameterizedTest
     @ValueSource(strings = ["a", "a,b,c", "a,b:c", "//;\na;b;c"])
     fun `숫자가 아닌 문자를 입력하면 예외 발생`(target: String) {
-        InputString.of(target)
         assertThatRuntimeException().isThrownBy { InputString.of(target) }
     }
 
