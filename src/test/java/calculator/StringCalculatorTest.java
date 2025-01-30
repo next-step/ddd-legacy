@@ -1,6 +1,6 @@
-package racingcar;
+package calculator;
 
-import calculator.StringCalculator;
+import exception.NegativeNumberException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ class StringCalculatorTest {
     @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
     @Test
     void negative() {
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(NegativeNumberException.class)
                 .isThrownBy(() -> calculator.add("-1"));
     }
 
