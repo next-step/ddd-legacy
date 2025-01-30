@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.AdditionalAnswers;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,8 +64,19 @@ class ProductServiceTest {
     @NullAndEmptySource
     void createWithEmptyName(final String name) {
         final Product product = product(null, name, DEFAULT_PRODUCT_PRICE);
-        when(purgomalumClient.containsProfanity(DEFAULT_PRODUCT_NAME)).thenReturn(false);
+        when(purgomalumClient.containsProfanity(name)).thenReturn(false);
         when(productRepository.save(any(Product.class))).then(AdditionalAnswers.returnsFirstArg());
+
+        assertThatThrownBy(() -> productService.create(product))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품명에는 비속어나 욕설을 사용할 수 없습니다.")
+    @ParameterizedTest(name = "입력값 `{0}`")
+    @ValueSource(strings = {"비속어", "욕설", "그XX"})
+    void createWithProfanity(final String name) {
+        final Product product = product(null, name, DEFAULT_PRODUCT_PRICE);
+        when(purgomalumClient.containsProfanity(name)).thenReturn(true);
 
         assertThatThrownBy(() -> productService.create(product))
                 .isInstanceOf(IllegalArgumentException.class);
