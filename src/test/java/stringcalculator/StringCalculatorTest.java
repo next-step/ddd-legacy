@@ -29,6 +29,16 @@ class StringCalculatorTest {
         assertThat(sut).isZero();
     }
 
+    @DisplayName(value = "입력값이 빈 공간 문자열이면 RuntimeException을 발생시킨다.")
+    @ParameterizedTest
+    @ValueSource(strings = {" "})
+    void emptySpace(final String input) {
+        // when
+        // then
+        assertThatRuntimeException()
+            .isThrownBy(() -> stringCalculator.calculate(input));
+    }
+
     @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
     @ParameterizedTest
     @ValueSource(strings = {"1", "11"})
