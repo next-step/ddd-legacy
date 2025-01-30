@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.math.BigDecimal;
+
 import static kitchenpos.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -77,6 +79,17 @@ class ProductServiceTest {
     void createWithProfanity(final String name) {
         final Product product = product(null, name, DEFAULT_PRODUCT_PRICE);
         when(purgomalumClient.containsProfanity(name)).thenReturn(true);
+
+        assertThatThrownBy(() -> productService.create(product))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품 가격은 0원 이상이어야 합니다.")
+    @ParameterizedTest(name = "입력값 `{0}`")
+    @ValueSource(strings = {"-1", "-1000", "-10000"})
+    void createWithNegativePrice(final String price) {
+        final Product product = product(null, DEFAULT_PRODUCT_NAME, new BigDecimal(price));
+        when(purgomalumClient.containsProfanity(DEFAULT_PRODUCT_NAME)).thenReturn(false);
 
         assertThatThrownBy(() -> productService.create(product))
                 .isInstanceOf(IllegalArgumentException.class);
