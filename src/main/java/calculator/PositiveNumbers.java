@@ -1,16 +1,15 @@
 package calculator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PositiveNumbers {
-  private final List<PositiveNumber> positiveNumbers = new ArrayList<>();
+  private final List<PositiveNumber> positiveNumbers;
 
-  public void add(PositiveNumber positiveNumber) {
-    positiveNumbers.add(positiveNumber);
+  public PositiveNumbers(List<PositiveNumber> positiveNumbers) {
+    this.positiveNumbers = positiveNumbers;
   }
 
-  public List<PositiveNumber> get() {
-    return positiveNumbers;
+  public int getSum() {
+    return this.positiveNumbers.stream().mapToInt(PositiveNumber::getValue).sum();
   }
 }

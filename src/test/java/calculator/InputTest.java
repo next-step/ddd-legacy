@@ -12,7 +12,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 class InputTest {
 
-  @DisplayName("문자열을 구분자로 분리해 양수 리스트를 가져올 수 있다.")
+  @DisplayName("문자열을 구분자로 분리해 숫자의 합을 가져올 수 있다.")
   @CsvSource({"'1,1:2'", "'//;\n1;1;2'", "'//!\n1!1!2'", "'//@\n1@1@2'"})
   @ParameterizedTest
   void getPositiveNumbers(String inputValue) {
@@ -20,13 +20,10 @@ class InputTest {
     final Input input = new Input(inputValue);
 
     // when
-    List<PositiveNumber> positiveNumbers = input.getPositiveNumbers();
+    int sum = input.getSum();
 
     // then
-    assertThat(positiveNumbers.size()).isEqualTo(3);
-    assertThat(positiveNumbers.getFirst().getValue()).isEqualTo(1);
-    assertThat(positiveNumbers.get(1).getValue()).isEqualTo(1);
-    assertThat(positiveNumbers.get(2).getValue()).isEqualTo(2);
+    assertThat(sum).isEqualTo(4);
   }
 
   @DisplayName("숫자가 아니거나, 음수인 문자열을 입력하면 예외를 발생시킨다.")
