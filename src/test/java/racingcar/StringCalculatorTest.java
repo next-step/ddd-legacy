@@ -60,4 +60,12 @@ class StringCalculatorTest {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> calculator.add("-1"));
     }
+
+    @DisplayName(value = "숫자 외 입력 값 수신 시, 오류 발생")
+    @ParameterizedTest
+    @ValueSource(strings = {"1ㅁ2"})
+    void invalidInput(final String text) {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> calculator.add(text));
+    }
 }
