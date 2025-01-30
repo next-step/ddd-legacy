@@ -7,6 +7,8 @@ import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.AdditionalAnswers;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static kitchenpos.fixture.ProductFixture.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,7 +41,7 @@ class ProductServiceTest {
     @Autowired
     private ProductService productService;
 
-    @DisplayName("상품을 등록할 수 있다.")
+    @DisplayName("상품을 등록할 수 있습니다.")
     @Test
     void create() {
         final Product product = product(null, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
@@ -53,5 +56,17 @@ class ProductServiceTest {
                 () -> assertThat(actual.getName()).isEqualTo(DEFAULT_PRODUCT_NAME),
                 () -> assertThat(actual.getPrice()).isEqualByComparingTo(DEFAULT_PRODUCT_PRICE)
         );
+    }
+
+    @DisplayName("상품명은 1자 이상이어야 합니다.")
+    @ParameterizedTest(name = "입력값 `{0}`")
+    @NullAndEmptySource
+    void createWithEmptyName(final String name) {
+        final Product product = product(null, name, DEFAULT_PRODUCT_PRICE);
+        when(purgomalumClient.containsProfanity(DEFAULT_PRODUCT_NAME)).thenReturn(false);
+        when(productRepository.save(any(Product.class))).then(AdditionalAnswers.returnsFirstArg());
+
+        assertThatThrownBy(() -> productService.create(product))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
