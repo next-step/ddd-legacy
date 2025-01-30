@@ -1,33 +1,15 @@
 package calculator;
 
-import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class StringCalculator {
-    public int add(String numbers) {
-        if (numbers == null || numbers.isEmpty()) {
-            return 0;
+    private static final Integer DEFAULT_RESULT = 0;
+
+    public int add(String numbersString) {
+        if (!InputValidator.isValid(numbersString)) {
+            return DEFAULT_RESULT;
         }
 
-        String delimiter = "[,:\\n]";
-        String numbersToCalculate = numbers;
+        String[] numbersArray = DelimiterParser.parse(numbersString);
 
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(numbers);
-        if (m.find()) {
-            delimiter = m.group(1);
-            numbersToCalculate = m.group(2);
-        }
-
-        String[] numbersArray = numbersToCalculate.split(delimiter);
-
-        return Arrays.stream(numbersArray)
-                .mapToInt(Integer::parseInt)
-                .peek(num -> {
-                    if (num < 0) {
-                        throw new RuntimeException("음수는 허용되지 않습니다.");
-                    }
-                })
-                .sum();
+        return NumbersParser.parse(numbersArray);
     }
 }
