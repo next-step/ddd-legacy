@@ -1,0 +1,89 @@
+@startuml
+
+class Menu {
+-UUID id
+-String name
+-BigDecimal price
+-boolean displayed
++isDisplayed()
++getPrice()
++getMenuProducts()
+}
+
+class MenuGroup {
+-UUID id
+-String name
++getName()
+}
+
+class MenuProduct {
+-Long seq
+-long quantity
++getProduct()
++getQuantity()
+}
+
+class Product {
+-UUID id
+-String name
+-BigDecimal price
++getPrice()
++getName()
+}
+
+class Order {
+-UUID id
+-OrderType type
+-OrderStatus status
+-LocalDateTime orderDateTime
+-String deliveryAddress
++getStatus()
++getType()
++getOrderLineItems()
+}
+
+class OrderLineItem {
+-Long seq
+-long quantity
+-BigDecimal price
++getMenu()
++getQuantity()
+}
+
+class OrderTable {
+-UUID id
+-String name
+-int numberOfGuests
+-boolean occupied
++isOccupied()
++getNumberOfGuests()
+}
+
+enum OrderStatus {
+WAITING
+ACCEPTED
+SERVED
+DELIVERING
+DELIVERED
+COMPLETED
+}
+
+enum OrderType {
+DELIVERY
+TAKEOUT
+EAT_IN
+}
+
+' 관계 정의
+Menu "1" *-- "*" MenuProduct : contains >
+Menu "*" -- "1" MenuGroup : belongs to >
+MenuProduct "*" -- "1" Product : references >
+
+Order "1" *-- "*" OrderLineItem : contains >
+Order "*" -- "1" OrderTable : placed at >
+OrderLineItem "*" -- "1" Menu : references >
+
+Order -- OrderStatus : has >
+Order -- OrderType : has >
+
+@enduml
