@@ -14,7 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,6 +35,9 @@ class ProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
+
+    @Mock
+    private MenuRepository menuRepository;
 
     @Mock
     private PurgomalumClient purgomalumClient;
@@ -109,19 +114,29 @@ class ProductServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품 가격 변경시 해당 상품을 쓴 메뉴의 가격보다 해당 메뉴상품의 가격이 크다면 메뉴를 숨긴다.")
+    @DisplayName("상품 가격 변경시 해당 상품을 쓴 메뉴의 가격이 해당 메뉴상품의 가격보다 크다면 메뉴를 숨긴다.")
     @ParameterizedTest
     @ValueSource(strings = {"10000","20000"})
-    void hideMenuWhenMenuProductTotalPriceBiggerThanMenuPrice(String price){
-        Product product = ProductFixture.setProduct("제품", "5000");
+    void hideMenuWhenMenuProductTotalPriceBiggerThanMenuPrice(String priceStr){
+        Product product = ProductFixture.setProduct("제품", "30000");
         MenuProduct menuProduct = MenuProductFixture.setMenuProduct(product, 1, 1);
         Menu menu = MenuFixture.setMenuGroup(
                 MenuGroupFixture.setMenuGroup("메인디쉬"),
-                "메인디쉬", "5000",      List.of(menuProduct)
+                "메인디쉬", "30000",      List.of(menuProduct)
         );
 
-        given(productRepository.findById(any())).willReturn()
 
+        given(productRepository.findById(any())).willReturn(Optional.of(product));
+        given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
+
+        BigDecimal price = BigDecimal.valueOf(Double.parseDouble(priceStr));
+        product.setPrice(price);
+        Product productResult = productService.changePrice(UUID.randomUUID(), product);
+
+        assertAll(
+                () -> assertThat(productResult.getPrice()).isEqualTo(price),
+                () -> assertThat(menu.isDisplayed()).isFalse()
+        );
 
     }
 }
