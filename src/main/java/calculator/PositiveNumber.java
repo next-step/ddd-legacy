@@ -1,6 +1,6 @@
 package calculator;
 
-record PositiveNumber(Integer value) {
+public record PositiveNumber(Integer value) {
 
     public PositiveNumber(String value) {
         this(Integer.parseInt(value));
@@ -8,7 +8,7 @@ record PositiveNumber(Integer value) {
 
     public PositiveNumber {
         if (value < 0) {
-            throw new RuntimeException("음수는 입력할 수 없습니다.");
+            throw new NegativeNotAllowedException();
         }
     }
 
