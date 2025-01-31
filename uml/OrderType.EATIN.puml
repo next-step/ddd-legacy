@@ -1,0 +1,32 @@
+@startuml
+title 매장식사 주문 상태 다이어그램
+
+[*] --> WAITING
+WAITING: 주문 생성 검증
+WAITING: - 테이블 존재 확인
+WAITING: - 테이블 사용중 상태 확인
+WAITING: - 메뉴 전시 상태 확인
+WAITING: - 메뉴 가격 일치 확인
+
+WAITING -> ACCEPTED : accept()
+ACCEPTED: 주문 접수
+ACCEPTED: - 주문 금액 확인
+ACCEPTED: - 메뉴 준비 시작
+ACCEPTED: - 테이블 주문 등록
+
+ACCEPTED -> SERVED : serve()
+SERVED: 서빙 완료
+SERVED: - 메뉴 준비 완료
+SERVED: - 테이블 서빙 완료
+
+SERVED -> COMPLETED : complete()
+COMPLETED: 주문 완료
+COMPLETED: - 결제 완료 확인
+COMPLETED: 테이블 상태 처리
+COMPLETED: - 진행중인 주문 확인
+COMPLETED: - 테이블 손님 수 초기화
+COMPLETED: - 테이블 사용 해제
+
+COMPLETED --> [*]
+
+@enduml

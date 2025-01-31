@@ -1,0 +1,38 @@
+@startuml
+title 배달 주문 상태 다이어그램
+
+[*] --> WAITING
+WAITING: 주문 생성 검증
+WAITING: - 배달 주소 필수
+WAITING: - 수량 0 이상
+WAITING: - 메뉴 전시 상태 확인
+WAITING: - 메뉴 가격 일치 확인
+
+WAITING -> ACCEPTED : accept()
+ACCEPTED: 배달 서비스 요청
+ACCEPTED: - 주문 금액 계산
+ACCEPTED: - 배달 요청 발송
+
+ACCEPTED -> SERVED : serve()
+SERVED: 배달 준비 완료
+SERVED: - 메뉴 준비 완료
+SERVED: - 배달 시작 가능 상태
+
+SERVED -> DELIVERING : startDelivery()
+DELIVERING: 배달 진행중
+DELIVERING: - 배달원 배정
+DELIVERING: - 배달 시작
+
+DELIVERING -> DELIVERED : completeDelivery()
+DELIVERED: 배달 완료
+DELIVERED: - 배송지 도착
+DELIVERED: - 고객 전달 완료
+
+DELIVERED -> COMPLETED : complete()
+COMPLETED: 주문 완료
+COMPLETED: - 결제 완료 확인
+COMPLETED: - 주문 종료
+
+COMPLETED --> [*]
+
+@enduml
