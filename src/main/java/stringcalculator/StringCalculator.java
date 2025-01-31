@@ -35,12 +35,16 @@ public class StringCalculator {
     private String[] checkNegativeNumbers(String[] numbers) {
         for(String number : numbers){
             int num = Integer.parseInt(number);
-            if(num < 0){
-                throw new RuntimeException();
-            }
+            checkNegativeNumber(num);
         }
 
         return numbers;
+    }
+
+    private void checkNegativeNumber(int num) {
+        if(num < 0){
+            throw new RuntimeException();
+        }
     }
 
     private int sum (String[] numbers) {
