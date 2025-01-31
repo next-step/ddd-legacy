@@ -3,13 +3,11 @@ package calculator;
 import exception.InvalidNumberFormatException;
 import exception.NotPositiveNumberException;
 
-public class StringValidator {
+public class PositiveNumber {
 
-    private StringValidator() {
-        
-    }
+    private final int value;
 
-    public static int validateNumberAndPositive(final String element) {
+    public PositiveNumber(final String element) {
         if (!element.matches("-?\\d+")) {
             throw new InvalidNumberFormatException();
         }
@@ -19,6 +17,10 @@ public class StringValidator {
             throw new NotPositiveNumberException();
         }
 
-        return intValue;
+        this.value = intValue;
+    }
+
+    public int getValue() {
+        return this.value;
     }
 }

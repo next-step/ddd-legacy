@@ -10,7 +10,8 @@ public class StringCalculator {
         }
 
         String[] numberString = StringParser.splitNumbers(text);
-        return Arrays.stream(numberString).mapToInt(StringValidator::validateNumberAndPositive)
+        return Arrays.stream(numberString)
+            .mapToInt(element -> new PositiveNumber(element).getValue())
             .sum();
     }
 }
