@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
-import static kitchenpos.builder.TestFixtureFactory.createEmptyOrderTable;
-import static kitchenpos.builder.TestFixtureFactory.createUsingOrderTable;
+import static kitchenpos.test.TestFixtureFactory.createEmptyOrderTable;
+import static kitchenpos.test.TestFixtureFactory.createUsingOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

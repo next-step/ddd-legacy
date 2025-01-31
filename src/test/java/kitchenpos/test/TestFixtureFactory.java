@@ -1,4 +1,4 @@
-package kitchenpos.builder;
+package kitchenpos.test;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

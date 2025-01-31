@@ -1,11 +1,11 @@
 package kitchenpos.ui;
 
-import static kitchenpos.builder.TestFixtureFactory.createEmptyOrderTable;
-import static kitchenpos.builder.TestFixtureFactory.createMenu;
-import static kitchenpos.builder.TestFixtureFactory.createMenuGroup;
-import static kitchenpos.builder.TestFixtureFactory.createOrderLineItem;
-import static kitchenpos.builder.TestFixtureFactory.createOrderWithDeliveryType;
-import static kitchenpos.builder.TestFixtureFactory.createProduct;
+import static kitchenpos.test.TestFixtureFactory.createEmptyOrderTable;
+import static kitchenpos.test.TestFixtureFactory.createMenu;
+import static kitchenpos.test.TestFixtureFactory.createMenuGroup;
+import static kitchenpos.test.TestFixtureFactory.createOrderLineItem;
+import static kitchenpos.test.TestFixtureFactory.createOrderWithDeliveryType;
+import static kitchenpos.test.TestFixtureFactory.createProduct;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.JpaMenuRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;

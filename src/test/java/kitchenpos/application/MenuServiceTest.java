@@ -1,19 +1,13 @@
 package kitchenpos.application;
 
-import static kitchenpos.builder.TestFixtureFactory.createMenuWithProductAndGroup;
+import static kitchenpos.test.TestFixtureFactory.createMenuWithProductAndGroup;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -21,7 +15,11 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.infra.ProfanityChecker;
+import kitchenpos.test.FakeMenuGroupRepository;
+import kitchenpos.test.FakeMenuRepository;
+import kitchenpos.test.FakeProductRepository;
+import kitchenpos.test.FakePurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,15 +32,15 @@ class MenuServiceTest {
     private MenuRepository menuRepository;
     private MenuGroupRepository menuGroupRepository;
     private ProductRepository productRepository;
-    private PurgomalumClient purgomalumClient;
+    private ProfanityChecker profanityChecker;
 
     @BeforeEach
     void setUp() {
-        menuRepository = mock(MenuRepository.class);
-        menuGroupRepository = mock(MenuGroupRepository.class);
-        productRepository = mock(ProductRepository.class);
-        purgomalumClient = mock(PurgomalumClient.class);
-        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+        menuRepository = new FakeMenuRepository(new HashMap<>());
+        menuGroupRepository = new FakeMenuGroupRepository(new HashMap<>());
+        productRepository = new FakeProductRepository(new HashMap<>());
+        profanityChecker = new FakePurgomalumClient();
+        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, profanityChecker);
     }
 
     @Test
@@ -50,14 +48,10 @@ class MenuServiceTest {
     void create_menu() {
         // given
         MenuGroup menuGroup = createMenuGroup();
+        menuGroupRepository.save(menuGroup);
         Product product = createProduct(BigDecimal.valueOf(5000));
+        productRepository.save(product);
         Menu request = createMenuRequest("김치찌개", 8000, menuGroup, product);
-
-        when(menuGroupRepository.findById(any(UUID.class))).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(product));
-        when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
-        when(purgomalumClient.containsProfanity(any())).thenReturn(false);
-        when(menuRepository.save(any(Menu.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when
         Menu created = menuService.create(request);
@@ -66,8 +60,9 @@ class MenuServiceTest {
         assertThat(created.getId()).isNotNull();
         assertThat(created.getName()).isEqualTo("김치찌개");
         assertThat(created.getPrice()).isEqualTo(BigDecimal.valueOf(8000));
-        assertThat(created.getMenuGroup()).isEqualTo(menuGroup);
-        verify(menuRepository).save(any(Menu.class));
+        MenuGroup actualMenuGroup = created.getMenuGroup();
+        assertThat(actualMenuGroup.getName()).isEqualTo("한식");
+        assertThat(menuRepository.findAll().size()).isEqualTo(1);
     }
 
     @Test
@@ -90,13 +85,11 @@ class MenuServiceTest {
     void menu_name_exists_exception(String name) {
         // given
         MenuGroup menuGroup = createMenuGroup();
+        menuGroupRepository.save(menuGroup);
         Product product = createProduct(BigDecimal.valueOf(5000));
+        productRepository.save(product);
         Menu request = createMenuRequest(name, 8000, menuGroup,
                 product);
-
-        when(menuGroupRepository.findById(any(UUID.class))).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(product));
-        when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
 
         // when // then
         assertThatThrownBy(() -> menuService.create(request))
@@ -108,14 +101,15 @@ class MenuServiceTest {
     void menu_name_profanity_exception() {
         // given
         MenuGroup menuGroup = createMenuGroup();
+        menuGroupRepository.save(menuGroup);
         Product product = createProduct(BigDecimal.valueOf(5000));
+        productRepository.save(product);
         Menu request = createMenuRequest("fuck", 8000, menuGroup,
                 product);
 
-        when(menuGroupRepository.findById(any(UUID.class))).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(product));
-        when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
-        when(purgomalumClient.containsProfanity(any())).thenReturn(true);
+        // 다운 캐스팅해서 강제로 메소드 호출
+        FakePurgomalumClient fakePurgomalumClient = (FakePurgomalumClient) profanityChecker;
+        fakePurgomalumClient.setProfanity(true);
 
         // when // then
         assertThatThrownBy(() -> menuService.create(request))
@@ -131,7 +125,6 @@ class MenuServiceTest {
         MenuProduct menuProduct = new MenuProduct(1, product, product.getId());
         Menu request = new Menu("김치찌개", BigDecimal.valueOf(8000), true, List.of(menuProduct), menuGroup,
                 null);
-        when(menuGroupRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(menuGroup));
 
         // when // then
         assertThatThrownBy(() -> menuService.create(request))
@@ -143,13 +136,11 @@ class MenuServiceTest {
     void create_menu_with_menuPrice_andTotalPrice_exception() {
         // given
         MenuGroup menuGroup = createMenuGroup();
+        menuGroupRepository.save(menuGroup);
         Product product = createProduct(BigDecimal.valueOf(10000));
+        productRepository.save(product);
         Menu request = createMenuRequest("김치찌개", 8000, menuGroup, product);
         request.setPrice(BigDecimal.valueOf(8000));
-
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(product));
-        when(productRepository.findById(any())).thenReturn(Optional.of(product));
 
         // when // then
         assertThatThrownBy(() -> menuService.create(request))
@@ -161,10 +152,9 @@ class MenuServiceTest {
     void change_price() {
         // given
         Menu menu = createMenuWithProductAndGroup();
+        menuRepository.save(menu);
         Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(12000));
-
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
         // when
         Menu updated = menuService.changePrice(menu.getId(), request);
@@ -178,10 +168,9 @@ class MenuServiceTest {
     void change_price_with_menuPrice_andTotalPrice_exception() {
         // given
         Menu menu = createMenuWithProductAndGroup();
+        menuRepository.save(menu);
         Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(4000));
-
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
         // when // then
         assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
@@ -193,7 +182,7 @@ class MenuServiceTest {
     void display() {
         // given
         Menu menu = createMenuWithProductAndGroup();
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+        menuRepository.save(menu);
 
         // when
         Menu displayed = menuService.display(menu.getId());
@@ -208,7 +197,7 @@ class MenuServiceTest {
         // given
         Menu menu = createMenuWithProductAndGroup();
         menu.setDisplayed(true);
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+        menuRepository.save(menu);
 
         // when
         Menu hidden = menuService.hide(menu.getId());
@@ -224,7 +213,9 @@ class MenuServiceTest {
         // given
         List<Menu> menus = List.of(
                 createMenuWithProductAndGroup(), createMenuWithProductAndGroup());
-        when(menuRepository.findAll()).thenReturn(menus);
+        for (Menu menu : menus) {
+            menuRepository.save(menu);
+        }
 
         // when
         List<Menu> found = menuService.findAll();
