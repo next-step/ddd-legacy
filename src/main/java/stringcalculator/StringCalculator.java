@@ -5,18 +5,19 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
 
-
     public int add(String text) {
         if(text == null || text.isEmpty()) {
             return 0;
         }
 
-        String[] numbers = StringSplit(text);
+        String[] numbers = stringSplit(text);
 
-        return sum(numbers);
+        String[] checkedNumbers = checkNegativeNumbers(numbers);
+
+        return sum(checkedNumbers);
     }
 
-    private String[] StringSplit(String text) {
+    private String[] stringSplit(String text) {
 
         Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
         if (m.find()) {
@@ -25,6 +26,17 @@ public class StringCalculator {
         }
 
         return text.split("[,:]");
+    }
+
+    private String[] checkNegativeNumbers(String[] numbers) {
+        for(String number : numbers){
+            int num = Integer.parseInt(number);
+            if(num < 0){
+                throw new RuntimeException();
+            }
+        }
+
+        return numbers;
     }
 
     private int sum (String[] numbers) {
