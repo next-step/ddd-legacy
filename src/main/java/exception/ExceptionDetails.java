@@ -2,9 +2,8 @@ package exception;
 
 public enum ExceptionDetails {
 
-    INVALID_NUMBER_FORMAT_EXCEPTION("숫자만 입력해주세요.")
-    , NOT_POSITIVE_NUMBER_EXCEPTION("양의 숫자만 입력해주세요.")
-    ;
+    INVALID_NUMBER_FORMAT_EXCEPTION("숫자만 입력해주세요."),
+    NOT_POSITIVE_NUMBER_EXCEPTION("양의 숫자만 입력해주세요.");
 
     private final String message;
 
@@ -15,5 +14,4 @@ public enum ExceptionDetails {
     public String getMessage() {
         return this.message;
     }
-
 }
