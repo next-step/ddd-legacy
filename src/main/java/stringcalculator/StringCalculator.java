@@ -5,6 +5,8 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
 
+    private final String COMMON_SPLITTER = "[,:]";
+
     public int add(String text) {
         if(isEmptyOrNull(text)) {
             return 0;
@@ -29,7 +31,7 @@ public class StringCalculator {
             return m.group(2).split(customDelimiter);
         }
 
-        return text.split("[,:]");
+        return text.split(COMMON_SPLITTER);
     }
 
     private String[] checkNegativeNumbers(String[] numbers) {
