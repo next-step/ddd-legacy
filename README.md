@@ -116,7 +116,7 @@ docker compose -p kitchenpos up -d
    
 ****
 ### 7. 주문 아이템 (order line item)
-  - [x] 주문 수량 및 메뉴와 주문에 필수로 속해 있어야 한다.
+  - [x] 주문 수량 및 메뉴와 주문 정보를 필수로 가진다.
   
   
 ****
