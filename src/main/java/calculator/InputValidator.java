@@ -1,7 +1,7 @@
 package calculator;
 
 public class InputValidator {
-    public static boolean isValid(String input) {
+    public boolean isValid(final String input) {
         return input != null && !input.isEmpty();
     }
 }

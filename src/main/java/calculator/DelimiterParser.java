@@ -8,7 +8,7 @@ public class DelimiterParser {
     private static final String DEFAULT_DELIMITER = "[,:\\n]";
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
-    public static String[] parse(String input) {
+    public Numbers parse(final String input) {
         String delimiter = DEFAULT_DELIMITER;
         String numbersToCalculate = input;
 
@@ -18,6 +18,6 @@ public class DelimiterParser {
             numbersToCalculate = m.group(2);
         }
 
-        return numbersToCalculate.split(delimiter);
+        return Numbers.from(numbersToCalculate.split(delimiter));
     }
 }

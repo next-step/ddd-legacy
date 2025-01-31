@@ -17,7 +17,7 @@ class StringCalculatorTest {
 
     @BeforeEach
     void setUp() {
-        calculator = new StringCalculator();
+        calculator = new StringCalculator(new InputValidator(), new DelimiterParser());
     }
 
     @DisplayName(value = "빈 문자열 또는 null 값을 입력할 경우 0을 반환해야 한다.")
