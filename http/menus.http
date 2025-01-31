@@ -8,6 +8,7 @@ Content-Type: application/json
   "menuGroupId": "f1860abc-2ea1-411b-bd4a-baa44f0d5580",
   "displayed": true,
   "menuProducts": [
+
     {
       "productId": "3b528244-34f7-406b-bb7e-690912f66b10",
       "quantity": 2
