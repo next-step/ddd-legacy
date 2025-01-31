@@ -7,14 +7,14 @@ import org.junit.jupiter.api.Test;
 
 class StringValidatorTest {
 
-    @DisplayName(value = "음수 문자열을 전달하는 경우 RuntimeException 예외 처리를 한다.")
+    @DisplayName("음수 문자열을 전달하는 경우 RuntimeException 예외 처리를 한다.")
     @Test
     void negative() {
         assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> StringValidator.validateNumberAndPositive("-1"));
     }
 
-    @DisplayName(value = "숫자가 아닌 문자열을 전달하는 경우 RuntimeException 예외 처리를 한다.")
+    @DisplayName("숫자가 아닌 문자열을 전달하는 경우 RuntimeException 예외 처리를 한다.")
     @Test
     void notNumber() {
         assertThatExceptionOfType(RuntimeException.class)
