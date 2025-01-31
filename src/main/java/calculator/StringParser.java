@@ -5,12 +5,14 @@ import java.util.regex.Pattern;
 
 public class StringParser {
 
+    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\\\\n(.*)");
+
     private StringParser() {
 
     }
 
     public static String[] splitNumbers(String text) {
-        Matcher m = Pattern.compile("//(.)\\\\n(.*)").matcher(text);
+        Matcher m = CUSTOM_DELIMITER_PATTERN.matcher(text);
         String delimiters = ",|:";
 
         if (m.find()) {
