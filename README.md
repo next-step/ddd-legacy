@@ -38,15 +38,13 @@
 
 ### 상품
 - 상품을 등록한다.
-  - [ ] 상품은 상품 그룹에 속해야 한다.
   - [ ] 상품 가격은 0원 이상이어야 한다.
   - [ ] 상품 이름에는 비속어가 포함될 수 없다 (profanity).
-- 상품을 수정한다.
+- 상품을 가격을 수정한다.
   - [ ] 상품 가격은 있어야 하고, 0원 이상이어야 한다.
-  - [ ] 상품 가격 변경시 해당 상품을 포함한 메뉴의 가격도 변경된다.
-  - [ ] 상품 가격에 영향 받은 메뉴들 중 메뉴 가격이 새로운 가격보다 높은 경우 자동으로 노출을 해제한다.
-- 상품을 조회한다.
-  - [ ] 상품을 조회할 수 있다.
+  - [ ] 메뉴 가격이 상품의 합산 가격보다 클때. 노출을 해제한다.
+- [ ] 상품을 조회한다.
+  
 
 ### 주문 
 - 주문을 생성한다.
@@ -63,17 +61,18 @@
     - [ ] 배달 주문(DELIVERY)의 경우 배달 서비스에 배달 요청을 한다.
     - [ ] 주문 접수 시 주문 상태는 접수(ACCEPTED)로 변경된다.
   - 주문을 서빙한다.
-    - [ ] 접수된 주문만 서빙할 수 있다.
+    - [ ] 주문 상태가 접수(ACCEPTED)인 주문만 서빙할 수 있다.
     - [ ] 주문 서빙 시 주문 상태는 서빙(SERVED)로 변경된다.
   - 주문을 배달한다.
     - [ ] 배달 주문만 배달할 수 있다.
     - [ ] 주문 배달 시 주문 상태는 배달(DELIVERING)로 변경된다.
+  - 배달을 완료한다.
+    - [ ] 주문 상태가 배달 중(DELIVERING)인 주문만 배달 완료(DELIVERED)할 수 있다.
   - 주문을 완료한다.
-    - [ ] 주문 상태가 배달 완료(DELIVERED)된 주문만 완료할 수 있다.
-    - [ ] 주문 타입이 매장식사(EAT_IN)와 테이크아웃(TAKEOUT)인 경우 주문 상태가 완료(COMPLETED)인 경우만 완료할 수 있다.
+    - [ ] 주문 타입이 배달(DELIVERY)인 경우, 주문 상태가 배달 완료(DELIVERED)된 주문만 완료할 수 있다.
+    - [ ] 주문 타입이 매장식사(EAT_IN)와 테이크아웃(TAKEOUT)인 경우 주문 상태가 서빙 완료(SERVED)인 경우만 완료할 수 있다.
     - [ ] 매장식사 주문이 완료되면 해당 테이블의 주문이 모두 완료된 경우 테이블을 초기화한다
-- 주문을 조회한다.
-  - [ ] 주문을 조회할 수 있다.
+- [ ] 상품을 조회한다.
   
 ### 주문 테이블
 - 주문 테이블을 등록한다.
@@ -90,9 +89,19 @@
     - [ ] 주문 테이블이 존재해야 한다.
     - [ ] 주문 테이블의 손님수는 0명 이상이어야 한다.
     - [ ] 사용중인(occupied=true) 테이블의 손님 수만 변경할 수 있다/
-- 주문 테이블을 조회한다.
-  - [ ] 주문 테이블을 조회할 수 있다.
+- [ ] 상품을 조회한다.
 
 ### 모델링
-![kitchen pos](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/min-queue/ddd-legacy/step-2/class-diagram.puml)
+
+#### 도메인 모델
+![kitchen pos](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/min-queue/ddd-legacy/step-2/uml/class-diagram.puml)
+
+#### 배달 주문 상태 다이어그램
+![배달 주문 상태 다이어그램](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/min-queue/ddd-legacy/step-2/uml/OrderType.DELIVERY.puml)
+
+#### 매장식사 주문 상태 다이어그램
+![매장식사 주문 상태 다이어그램](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/min-queue/ddd-legacy/step-2/uml/OrderType.EATIN.puml)
+
+#### 테이크아웃 주문 상태 다이어그램
+![테이크아웃 주문 상태 다이어그램](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/min-queue/ddd-legacy/step-2/uml/OrderType.TAKEOUT.puml)
 
