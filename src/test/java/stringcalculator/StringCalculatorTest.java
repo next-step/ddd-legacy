@@ -83,9 +83,19 @@ class StringCalculatorTest {
         assertThat(sut).isEqualTo(6);
     }
 
+    @DisplayName(value = "숫자 여러개 중에, 문자가 섞여 있으면 RuntimeException이 발생한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"1:b,3"})
+    void invalidNumber(final String input) {
+        // when
+        // then
+        assertThatRuntimeException()
+            .isThrownBy(() -> stringCalculator.calculate(input));
+    }
+
     @DisplayName(value = "//와 \n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
     @ParameterizedTest
-    @ValueSource(strings = {"//asdf\n1asdf2asdf3"})
+    @ValueSource(strings = {"//;\n1;2;3"})
     void customSeparatorNumber(final String input) {
         // when
         Integer sut = stringCalculator.calculate(input);
