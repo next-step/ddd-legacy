@@ -46,7 +46,7 @@ class StringParserTest {
     @DisplayName("//와 \\n 문자 사이의 커스텀 구분자를 통해 문자열을 파싱할 수 있다.")
     @ParameterizedTest
     @CsvSource(delimiter = '|', textBlock = """
-        //;\n1;2;3 | 1,2,3
+        //;\\n1;2;3 | 1,2,3
     """)
     void customDelimiter(final String text, final String expected) {
         String[] expectedArray = expected.split(",");
@@ -56,7 +56,7 @@ class StringParserTest {
     @DisplayName("콤마, 콜론과 커스텀 구분자가 포함된 문자열을 파싱할 수 있다.")
     @ParameterizedTest
     @CsvSource(delimiter = '|', textBlock = """
-        //;\n1,2:3;4 | 1,2,3,4
+        //;\\n1,2:3;4 | 1,2,3,4
     """)
     void commaAndColonAndCustomDelimiter(final String text, final String expected) {
         String[] expectedArray = expected.split(",");

@@ -10,7 +10,7 @@ public class StringParser {
     }
 
     public static String[] splitNumbers(String text) {
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
+        Matcher m = Pattern.compile("//(.)\\\\n(.*)").matcher(text);
         String delimiters = ",|:";
 
         if (m.find()) {

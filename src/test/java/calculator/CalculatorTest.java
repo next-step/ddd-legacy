@@ -54,14 +54,14 @@ class CalculatorTest {
 
     @DisplayName("//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
     @ParameterizedTest
-    @ValueSource(strings = {"//;\n1;2;3"})
+    @ValueSource(strings = {"//;\\n1;2;3"})
     void customDelimiter(final String text) {
         assertThat(calculator.add(text)).isSameAs(6);
     }
 
     @DisplayName("콤마, 콜론과 커스텀 구분자가 포함된 문자열을 계산할 수 있다.")
     @ParameterizedTest
-    @ValueSource(strings = {"//;\n1,2:3;4"})
+    @ValueSource(strings = {"//;\\n1,2:3;4"})
     void commaAndSemicolonAndCustomDelimiter(final String text) {
         assertThat(calculator.add(text)).isSameAs(10);
     }

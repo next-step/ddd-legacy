@@ -20,5 +20,4 @@ class StringValidatorTest {
         assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> StringValidator.validateNumberAndPositive("notNumber"));
     }
-
 }
