@@ -23,9 +23,9 @@ class CalculatorTest {
     @DisplayName("콤마가 포함된 문자열을 계산한다")
     @ParameterizedTest
     @CsvSource(delimiter = '|', textBlock = """
-        1,2 | 3
-        1,2,3 | 6
-    """)
+            1,2 | 3
+            1,2,3 | 6
+        """)
     void comma(String text, int answer) {
         assertThat(calculator.add(text)).isEqualTo(answer);
     }
@@ -33,9 +33,9 @@ class CalculatorTest {
     @DisplayName("콜론이 포함된 문자열을 계산할 수 있다.")
     @ParameterizedTest
     @CsvSource(delimiter = '|', textBlock = """
-        1:2 | 3
-        1:2:3 | 6
-    """)
+            1:2 | 3
+            1:2:3 | 6
+        """)
     void colon(String text, int answer) {
         assertThat(calculator.add(text)).isEqualTo(answer);
     }
@@ -43,11 +43,11 @@ class CalculatorTest {
     @DisplayName("콤마와 콜론이 포함된 문자열을 계산할 수 있다.")
     @ParameterizedTest
     @CsvSource(delimiter = '|', textBlock = """
-        1,2:3 | 6
-        1:2,3 | 6
-        1,2:3,4 | 10
-        1:2,3:4 | 10
-    """)
+            1,2:3 | 6
+            1:2,3 | 6
+            1,2:3,4 | 10
+            1:2,3:4 | 10
+        """)
     void colonsAndColons(final String text, final int answer) {
         assertThat(calculator.add(text)).isEqualTo(answer);
     }
