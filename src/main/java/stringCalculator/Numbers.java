@@ -1,37 +1,34 @@
 package stringCalculator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Numbers {
-    private final List<Integer> numbers;
+    private final List<Number> numbers;
 
-    private Numbers(List<Integer> numbers) {
-        this.numbers = new ArrayList<>(numbers);
+    private Numbers(List<Number> numbers) {
+        this.numbers = Collections.unmodifiableList(numbers);
     }
 
     public static Numbers from(List<String> numbers) {
-        try {
-            return new Numbers(numbers.stream().map(Integer::parseInt).toList());
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("Invalid number format");
-        }
+       return  new Numbers(numbers.stream().map(Number::from).toList());
     }
 
     public static Numbers empty() {
         return new Numbers(new ArrayList<>());
     }
 
-    public boolean isContainMinus() {
-        return numbers.stream().anyMatch(number -> number < 0);
+    public boolean isNegative() {
+        return numbers.stream().anyMatch(Number::isNegative);
     }
 
-    public boolean emptyOrNull() {
+    public boolean isEmpty() {
         return numbers.isEmpty();
     }
 
     public Integer sum() {
-        return numbers.stream().mapToInt(Integer::intValue).sum();
+        return numbers.stream().mapToInt(Number::getNumber).sum();
     }
 }
 
