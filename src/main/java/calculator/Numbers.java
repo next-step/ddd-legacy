@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class Numbers {
 
-    private List<Integer> numbers = new ArrayList<>();
+    private List<Number> numbers = new ArrayList<>();
 
     public Numbers() {
     }
@@ -22,11 +22,11 @@ public class Numbers {
     }
 
     public boolean hasNegativeNumber() {
-        return numbers.stream().anyMatch(n -> n < 0);
+        return numbers.stream().anyMatch(n -> n.intValue() < 0);
     }
 
     public int sum() {
-        return numbers.stream().mapToInt(Integer::intValue).sum();
+        return numbers.stream().mapToInt(Number::intValue).sum();
     }
 
     /* convertNumber : String > Integer 변환 */
@@ -34,11 +34,11 @@ public class Numbers {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            throw new RuntimeException("non-numeric found : " + input);
+            throw new NumberFormatException("non-numeric found : " + input);
         }
     }
 
-    public List<Integer> getNumbers() {
+    public List<Number> getNumbers() {
         return numbers;
     }
 }
