@@ -76,22 +76,22 @@ docker compose -p kitchenpos up -d
 
 #### 주문 상태 정보
 
-1. WAITING
-2. ACCEPTED
-3. SERVED
-4. DELIVERING
-5. DELIVERED
-6. COMPLETED
+1. 대기
+2. 수락됨
+3. 제공됨
+4. 배달중
+5. 배달됨
+6. 완료됨
 
 <br/>
 
 #### 테이크아웃, 매장식사 주문 상태 정보
 
-1. WAITING → 2. ACCEPTED → 3. SERVED → 6. COMPLETED
+1. 대기 → 2. 수락됨 → 3. 제공됨 → 6. 완료됨
 
 #### 배달 주문 상태 정보
 
-1. WAITING → 2. ACCEPTED → 3. SERVED → 4. DELIVERING → 5. DELIVERED → 6. COMPLETED
+1. 대기 → 2. 수락됨 → 3. 제공됨 → 4. 배달중 → 5. 배달됨 → 6. 완료됨
 
 ---
 
