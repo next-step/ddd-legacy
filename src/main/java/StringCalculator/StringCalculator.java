@@ -10,7 +10,7 @@ public class StringCalculator {
             return 0;
         }
 
-        String delimiter = ",|:";
+        String delimiter = "[,:]";
         String numbers = text;
 
         Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(text);
