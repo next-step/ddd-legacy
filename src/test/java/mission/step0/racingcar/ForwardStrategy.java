@@ -1,4 +1,4 @@
-package racingcar;
+package mission.step0.racingcar;
 
 public class ForwardStrategy implements MovingStrategy {
     @Override

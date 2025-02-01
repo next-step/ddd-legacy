@@ -1,4 +1,4 @@
-package racingcar;
+package mission.step0.racingcar;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

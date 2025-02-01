@@ -1,6 +1,4 @@
-package racingcar;
-
-import java.util.Random;
+package mission.step0.racingcar;
 
 public class Car {
     private final String name;
