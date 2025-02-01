@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,10 +18,12 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.menu;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
 import static kitchenpos.fixture.MenuProductFixture.menuProduct;
+import static kitchenpos.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
@@ -103,6 +106,42 @@ class MenuServiceTest {
         );
         when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
         when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of());
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("매뉴 상품의 수량이 0보다 작으면 메뉴를 등록할 수 없습니다.")
+    @Test
+    void createWithNegativeMenuProductQuantity() {
+        final MenuGroup menuGroup = menuGroup();
+        final Product product = product();
+        final Menu menu = menu(null, "양념 후라이드 세트", new BigDecimal("30000"),
+                menuGroup, List.of(menuProduct(1L, -1L, product)), true
+        );
+        when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+        when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(product));
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴의 가격이 메뉴 상품의 가격 합보다 크면 메뉴를 등록할 수 없습니다.")
+    @Test
+    void createWithPriceLessThanSumOfMenuProductPrice() {
+        final MenuGroup menuGroup = menuGroup();
+        final Product firstProduct = product(UUID.randomUUID(), "후라이드 치킨", new BigDecimal("16000"));
+        final Product secondProduct = product(UUID.randomUUID(), "양념 치킨", new BigDecimal("16000"));
+        final Menu menu = menu(null, "양념 후라이드 세트", new BigDecimal("32010"),
+                menuGroup, List.of(
+                        menuProduct(1L, 1L, firstProduct),
+                        menuProduct(2L, 1L, secondProduct)
+                ), true
+        );
+        when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+        when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
+        when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
+        when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
