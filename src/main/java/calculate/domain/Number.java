@@ -8,21 +8,9 @@ public class Number {
 
     private final int value;
 
-    public Number(final String value) {
-        this.value = makeNumber(value);
-        validateNonNegativeValue(this.value);
-    }
-
     public Number(final int value) {
         validateNonNegativeValue(value);
         this.value = value;
-    }
-
-    private int makeNumber(final String value) {
-        if(value == null || value.isEmpty()) {
-            return 0;
-        }
-        return Integer.parseInt(value);
     }
 
     private void validateNonNegativeValue(int value) {

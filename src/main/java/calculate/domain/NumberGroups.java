@@ -11,7 +11,7 @@ public class NumberGroups {
     }
 
     public NumberGroups(final String sentence) {
-        this.numbers = NumberGroupsParser.parse(sentence);
+        this.numbers = StringNumberParser.extractNumbersFrom(sentence);
     }
 
     public NumberGroups(final int...numbers) {
