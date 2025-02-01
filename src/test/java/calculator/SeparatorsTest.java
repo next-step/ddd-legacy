@@ -17,7 +17,7 @@ class SeparatorsTest {
         final var separators = Separators.of(Set.of(":", ","));
 
         assertThat(separators.separate("1:2,3"))
-                .contains(1, 2, 3);
+            .contains(1, 2, 3);
     }
 
     @Test
@@ -27,13 +27,13 @@ class SeparatorsTest {
 
         separators.addSeparator(";");
         assertThat(separators.separate("1:2,3;4"))
-                .contains(1, 2, 3, 4);
+            .contains(1, 2, 3, 4);
     }
 
     @Test
     @DisplayName("구분자없이 생성하면 에러")
     void emptySeparator() {
         Assertions.assertThatIllegalArgumentException()
-                .isThrownBy(() -> Separators.of(Set.of()));
+            .isThrownBy(() -> Separators.of(Set.of()));
     }
 }

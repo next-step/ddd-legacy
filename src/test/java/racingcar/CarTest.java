@@ -13,7 +13,7 @@ class CarTest {
     @Test
     void constructor() {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new Car("123456"));
+            .isThrownBy(() -> new Car("123456"));
     }
 
     @Test

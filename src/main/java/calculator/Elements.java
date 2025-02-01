@@ -7,14 +7,14 @@ public class Elements {
 
     public Elements(final List<Integer> elements) {
         this.elements = elements
-                .stream()
-                .map(Element::of)
-                .toList();
+            .stream()
+            .map(Element::of)
+            .toList();
     }
 
     public int sum() {
         return elements.stream()
-                .mapToInt(Element::getElement)
-                .sum();
+            .mapToInt(Element::getElement)
+            .sum();
     }
 }

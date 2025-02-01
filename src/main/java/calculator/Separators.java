@@ -1,6 +1,10 @@
 package calculator;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public class Separators {
@@ -20,8 +24,8 @@ public class Separators {
     public List<Integer> separate(String text) {
         String regex = String.join("|", separators);
         return Stream.of(text.split(regex))
-                .map(this::extractInteger)
-                .toList();
+            .map(this::extractInteger)
+            .toList();
     }
 
 

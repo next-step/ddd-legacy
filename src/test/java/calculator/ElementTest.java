@@ -26,13 +26,13 @@ class ElementTest {
     @DisplayName("음수 입력 시 IllegalArgumentException 발생")
     void negative() {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> Element.of(-1));
+            .isThrownBy(() -> Element.of(-1));
     }
 
     @Test
     @DisplayName("두 자리 수 이상 입력 시 IllegalArgumentException 발생")
     void moreThanOneDigit() {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> Element.of(10));
+            .isThrownBy(() -> Element.of(10));
     }
 }

@@ -1,0 +1,36 @@
+# EditorConfig 파일
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.java]
+indent_style = space
+indent_size = 4
+continuation_indent_size = 4
+tab_width = 4
+max_line_length = 100
+insert_final_newline = true
+
+# Import 정렬을 위한 규칙 (자동 정렬 시 사용)
+[*.java]
+# Google Java Style에서 요구하는 공백 한 줄
+import_order = java,javax,org,com
+sort_imports = true
+ij_java_class_count_to_use_import_on_demand = 9999
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.gradle]
+indent_style = space
+indent_size = 4
+
+[*.xml]
+indent_style = space
+indent_size = 2
+
+
