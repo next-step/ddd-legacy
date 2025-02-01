@@ -1,7 +1,7 @@
 package racingcar
 
 class Car(
-    private val name: String = ""
+    private val name: String
 ) {
     var position: Int = 0
         private set

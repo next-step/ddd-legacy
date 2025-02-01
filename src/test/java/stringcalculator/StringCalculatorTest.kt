@@ -54,4 +54,11 @@ class StringCalculatorTest {
     fun negative(text: String) {
         assertThrows<RuntimeException> { StringCalculator(text).sum() }
     }
+
+    @DisplayName("구분자만 있다면 (형식에 맞지 않는 인풋이라면) NumberFormatException 에러가 발생한다")
+    @ValueSource(strings = [":", ":;"])
+    @ParameterizedTest
+    fun delimiter(text: String) {
+        assertThrows<NumberFormatException>{StringCalculator(text).sum()}
+    }
 }
