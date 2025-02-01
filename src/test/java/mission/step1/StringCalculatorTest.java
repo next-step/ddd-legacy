@@ -15,13 +15,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class StringCalculatorTest {
 
-    private ParserStrategy parser;
+    private CompositeParser parser;
     private StringCalculator stringCalculator;
     private CalculateStrategy calculator;
 
     @BeforeEach
     void setUp() {
-        parser = new Parser();
+        parser = new CompositeParser(new Parser(), new CustomParser());
         calculator = new Calculator();
         stringCalculator = new StringCalculator(parser, calculator);
     }
@@ -107,7 +107,7 @@ class StringCalculatorTest {
     })
     void throwExceptionWhenInvalidFormat(String input) {
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> stringCalculator.splitWithCustomDelimiter(input));
+                () -> stringCalculator.add(input));
 
         assertEquals("커스텀 구분자 형식이 올바르지 않습니다", exception.getMessage());
     }
@@ -118,11 +118,7 @@ class StringCalculatorTest {
         String input = "//;\n1;2;3";
 
         assertAll(
-                () -> assertDoesNotThrow(() -> stringCalculator.splitWithCustomDelimiter(input)),
-                () -> assertArrayEquals(
-                        new String[]{"1", "2", "3"},
-                        stringCalculator.splitWithCustomDelimiter(input)
-                )
+                () -> assertDoesNotThrow(() -> stringCalculator.add(input))
         );
     }
 
@@ -131,16 +127,16 @@ class StringCalculatorTest {
     void customDelimiterTest() {
 
         assertAll(
-                () -> assertDoesNotThrow(() -> stringCalculator.splitWithCustomDelimiter("//;\n1;2;3")),
+                () -> assertDoesNotThrow(() -> stringCalculator.add("//;\n1;2;3")),
 
                 () -> assertThrows(RuntimeException.class,
-                        () -> stringCalculator.splitWithCustomDelimiter("//;;\n1;2;3")),
+                        () -> stringCalculator.add("//;;\n1;2;3")),
 
                 () -> assertThrows(RuntimeException.class,
-                        () -> stringCalculator.splitWithCustomDelimiter("//;1;2;3")),
+                        () -> stringCalculator.add("//;1;2;3")),
 
                 () -> assertThrows(RuntimeException.class,
-                        () -> stringCalculator.splitWithCustomDelimiter("/;1;2;3"))
+                        () -> stringCalculator.add("/;1;2;3"))
         );
     }
 
@@ -154,7 +150,7 @@ class StringCalculatorTest {
     })
     void throwExceptionWhenDelimiterTooLong(String input) {
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> stringCalculator.splitWithCustomDelimiter(input));
+                () -> stringCalculator.add(input));
 
         assertEquals("커스텀 구분자의 길이는 2를 넘을 수 없습니다", exception.getMessage());
     }
@@ -171,19 +167,10 @@ class StringCalculatorTest {
     }
 
     @Test
-    @DisplayName("구분자 길이가 2 이상일 때 예외 발생")
-    void throwExceptionWhenLengthMoreThanOne() {
-        RuntimeException e = assertThrows(RuntimeException.class,
-                () -> stringCalculator.validateCustomDelimiterLength(";;", 2));
-
-        assertEquals("커스텀 구분자의 길이는 2를 넘을 수 없습니다", e.getMessage());
-    }
-
-    @Test
     @DisplayName("빈 구분자일 때 예외 발생")
     void throwExceptionWhenEmpty() {
         RuntimeException e = assertThrows(RuntimeException.class,
-                () -> stringCalculator.validateCustomDelimiterLength("", 2));
+                () -> stringCalculator.add("//\n1;;2;;3"));
 
         assertEquals("커스텀 구분자의 길이는 1보다 작을 수 없습니다.", e.getMessage());
     }
