@@ -84,6 +84,7 @@ public class Menu {
 
     public void setMenuGroup(final MenuGroup menuGroup) {
         this.menuGroup = menuGroup;
+        setMenuGroupId(menuGroup.getId());
     }
 
     public boolean isDisplayed() {

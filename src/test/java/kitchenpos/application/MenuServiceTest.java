@@ -1,7 +1,6 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.AdditionalAnswers;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,8 +23,11 @@ import java.util.UUID;
 import static kitchenpos.fixture.MenuFixture.menu;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
 import static kitchenpos.fixture.MenuProductFixture.menuProduct;
-import static kitchenpos.fixture.ProductFixture.*;
+import static kitchenpos.fixture.ProductFixture.product;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
@@ -54,9 +57,34 @@ class MenuServiceTest {
     @DisplayName("메뉴를 등록할 수 있습니다.")
     @Test
     void crate() {
-        final Menu menu = menu();
+        final String menuName = "양념 후라이드 세트";
+        final MenuGroup menuGroup = menuGroup();
+        final Product firstProduct = product(UUID.randomUUID(), "후라이드 치킨", new BigDecimal("16000"));
+        final Product secondProduct = product(UUID.randomUUID(), "양념 치킨", new BigDecimal("16000"));
+        final Menu menu = menu(null, menuName, new BigDecimal("30000"),
+                menuGroup, List.of(
+                        menuProduct(1L, 1L, firstProduct),
+                        menuProduct(2L, 1L, secondProduct)
+                ), true
+        );
+        when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+        when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+        when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
+        when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
+        when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
+        when(purgomalumClient.containsProfanity(menuName)).thenReturn(false);
+        when(menuRepository.save(any(Menu.class))).then(AdditionalAnswers.returnsFirstArg());
 
-        menuService.create(menu);
+        final Menu actual = menuService.create(menu);
+        assertAll(
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getName()).isEqualTo(menuName),
+                () -> assertThat(actual.getPrice()).isEqualByComparingTo(new BigDecimal("30000")),
+                () -> assertThat(actual.getMenuGroup()).isEqualTo(menuGroup),
+                () -> assertThat(actual.getMenuProducts()).hasSize(2),
+                () -> assertThat(actual.isDisplayed()).isTrue()
+        );
     }
 
     @DisplayName("메뉴 가격은 0원 이상이어야 합니다.")
