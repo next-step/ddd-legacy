@@ -21,4 +21,9 @@ public class SeparatorParser {
 
         return new CustomSeparator();
     }
+
+    public boolean hasCustomSeparator(String input) {
+        Matcher matcher = separatorPattern.matcher(input);
+        return matcher.find();
+    }
 }

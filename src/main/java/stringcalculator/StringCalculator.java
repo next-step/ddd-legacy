@@ -21,9 +21,9 @@ public class StringCalculator {
 
         List<String> separators = new ArrayList<>(this.defaultSeparators);
         SeparatorParser separatorParser = new SeparatorParser(this.customSeparatorPattern);
-        CustomSeparator customSeparator = separatorParser.parseSeparator(input);
 
-        if (customSeparator.isParsedStatus()) {
+        if (separatorParser.hasCustomSeparator(input)) {
+            CustomSeparator customSeparator = separatorParser.parseSeparator(input);
             input = customSeparator.getParsedInput();
             separators.add(customSeparator.getSeparator());
         }
