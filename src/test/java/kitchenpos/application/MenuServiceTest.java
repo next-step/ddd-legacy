@@ -1,9 +1,6 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.fixture.MenuFixture;
-import kitchenpos.fixture.MenuGroupFixture;
-import kitchenpos.fixture.MenuProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,10 +18,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static kitchenpos.fixture.MenuFixture.*;
-import static kitchenpos.fixture.MenuGroupFixture.*;
-import static kitchenpos.fixture.MenuProductFixture.*;
+import static kitchenpos.fixture.MenuFixture.menu;
+import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
+import static kitchenpos.fixture.MenuProductFixture.menuProduct;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -91,6 +89,20 @@ class MenuServiceTest {
                 menuGroup, menuProducts, true
         );
         when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("매뉴 상품의 갯수와 상품의 갯수가 다르면 메뉴를 등록할 수 없습니다.")
+    @Test
+    void createWithDifferentMenuProductSize() {
+        final MenuGroup menuGroup = menuGroup();
+        final Menu menu = menu(null, "양념 후라이드 세트", new BigDecimal("30000"),
+                menuGroup, List.of(menuProduct()), true
+        );
+        when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+        when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of());
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
