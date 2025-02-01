@@ -3,6 +3,7 @@ package stringcalculator;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -29,35 +30,14 @@ public class StringCalculator {
         }
 
         String[] splitInputNumbers = input.split(getJoinedSeparatorsString(separators));
-        int calculatedNumber = 0;
+        PositiveStringNumbers positiveStringNumbers = new PositiveStringNumbers(splitInputNumbers);
 
-        for (String stringNumber : splitInputNumbers) {
-            int addedNumber = parseInteger(stringNumber);
-            calculatedNumber += addedNumber;
-        }
-
-
-        return calculatedNumber;
+        return positiveStringNumbers.addAllNumber();
     }
 
     private String getJoinedSeparatorsString(List<String> separators) {
         return separators.stream()
             .map(Pattern::quote)
             .collect(Collectors.joining("|"));
-    }
-
-    private int parseInteger(String stringNumber) {
-        int number = 0;
-        try {
-            number = Integer.parseInt(stringNumber);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("invalid integer value: " + stringNumber);
-        }
-
-        if (number < 0) {
-            throw new RuntimeException("negative number is not allowed.");
-        }
-
-        return number;
     }
 }
