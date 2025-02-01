@@ -28,6 +28,6 @@ class CarTest {
     void stop() {
         final var car = new Car("dowon");
         car.move(new StopStrategy());
-        assertThat(car.getPosition()).isEqualTo(0);
+        assertThat(car.getPosition()).isZero();
     }
 }
