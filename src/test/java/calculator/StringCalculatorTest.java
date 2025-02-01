@@ -60,4 +60,11 @@ public class StringCalculatorTest {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> stringCalculator.add(text));
     }
+
+    @DisplayName(value = "구분자만 있는 경우 0을 반환한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {":"})
+    void onlyDelimiter(final String text) {
+        assertThat(stringCalculator.add(text)).isEqualTo(0);
+    }
 }
