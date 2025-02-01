@@ -10,7 +10,14 @@ import java.util.List;
 import java.util.UUID;
 
 public class MenuFixture {
-    public static Menu setMenuGroup(MenuGroup menuGroup, String name, String price, List<MenuProduct> products) {
+    public static final Menu DEFAULT_MENU = setMenu(
+            MenuGroupFixture.DEFAULT_MENUGROUP,
+            "기본메뉴",
+            "10000",
+            MenuProductFixture.DEFAULT_MENU_PRODUCTS
+    );
+
+    public static Menu setMenu(MenuGroup menuGroup, String name, String price, List<MenuProduct> products) {
         Menu menu = new Menu();
 
         menu.setMenuGroup(menuGroup);

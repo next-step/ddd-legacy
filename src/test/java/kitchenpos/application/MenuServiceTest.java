@@ -57,7 +57,7 @@ class MenuServiceTest {
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(menuProduct.getProduct()));
         given(productRepository.findById(any())).willReturn(Optional.of(menuProduct.getProduct()));
 
-        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", "10000", List.of(menuProduct));
+        Menu menu = MenuFixture.setMenu(menuGroup, "메인디쉬", "10000", List.of(menuProduct));
 
         given(menuRepository.save(any())).willReturn(menu);
 
@@ -80,7 +80,7 @@ class MenuServiceTest {
                         , 1, 1
                 );
 
-        Menu menu = MenuFixture.setMenuGroup(null, "메인디쉬", "10000", List.of(menuProduct));
+        Menu menu = MenuFixture.setMenu(null, "메인디쉬", "10000", List.of(menuProduct));
 
         assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(NoSuchElementException.class);
     }
@@ -96,7 +96,7 @@ class MenuServiceTest {
                         ProductFixture.setProduct("음식1", "10000")
                         , 1, 1
                 );
-        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", price, List.of(menuProduct));
+        Menu menu = MenuFixture.setMenu(menuGroup, "메인디쉬", price, List.of(menuProduct));
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -112,7 +112,7 @@ class MenuServiceTest {
                         ProductFixture.setProduct("음식1", "10000")
                         , 1, 1
                 );
-        Menu menu = MenuFixture.setMenuGroup(menuGroup, name, "10000", List.of(menuProduct));
+        Menu menu = MenuFixture.setMenu(menuGroup, name, "10000", List.of(menuProduct));
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(menuProduct.getProduct()));
@@ -132,7 +132,7 @@ class MenuServiceTest {
                         ProductFixture.setProduct("음식1", "10000")
                         , 1, 1
                 );
-        Menu menu = MenuFixture.setMenuGroup(menuGroup, name, "10000", List.of(menuProduct));
+        Menu menu = MenuFixture.setMenu(menuGroup, name, "10000", List.of(menuProduct));
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(menuProduct.getProduct()));
@@ -153,7 +153,7 @@ class MenuServiceTest {
                         ProductFixture.setProduct("음식1", "10000")
                         , 1, 1
                 );
-        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", price, List.of(menuProduct));
+        Menu menu = MenuFixture.setMenu(menuGroup, "메인디쉬", price, List.of(menuProduct));
 
         assertThatThrownBy(() -> menuService.changePrice(UUID.randomUUID(), menu))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -169,7 +169,7 @@ class MenuServiceTest {
                         ProductFixture.setProduct("음식1", "10000")
                         , 1, 1
                 );
-        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", price, List.of(menuProduct));
+        Menu menu = MenuFixture.setMenu(menuGroup, "메인디쉬", price, List.of(menuProduct));
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -186,7 +186,7 @@ class MenuServiceTest {
                         ProductFixture.setProduct("음식1", "10000")
                         , 1, 1
                 );
-        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", "10000", List.of(menuProduct));
+        Menu menu = MenuFixture.setMenu(menuGroup, "메인디쉬", "10000", List.of(menuProduct));
         menu.setDisplayed(false);
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -204,7 +204,7 @@ class MenuServiceTest {
                         ProductFixture.setProduct("음식1", "10000")
                         , 1, 1
                 );
-        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", "20000", List.of(menuProduct));
+        Menu menu = MenuFixture.setMenu(menuGroup, "메인디쉬", "20000", List.of(menuProduct));
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -221,7 +221,7 @@ class MenuServiceTest {
                         ProductFixture.setProduct("음식1", "10000")
                         , 1, 1
                 );
-        Menu menu = MenuFixture.setMenuGroup(menuGroup, "메인디쉬", "10000", List.of(menuProduct));
+        Menu menu = MenuFixture.setMenu(menuGroup, "메인디쉬", "10000", List.of(menuProduct));
         menu.setDisplayed(true);
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));

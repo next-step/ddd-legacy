@@ -120,7 +120,7 @@ class ProductServiceTest {
     void hideMenuWhenMenuProductTotalPriceBiggerThanMenuPrice(String priceStr){
         Product product = ProductFixture.setProduct("제품", "30000");
         MenuProduct menuProduct = MenuProductFixture.setMenuProduct(product, 1, 1);
-        Menu menu = MenuFixture.setMenuGroup(
+        Menu menu = MenuFixture.setMenu(
                 MenuGroupFixture.setMenuGroup("메인디쉬"),
                 "메인디쉬", "30000",      List.of(menuProduct)
         );
