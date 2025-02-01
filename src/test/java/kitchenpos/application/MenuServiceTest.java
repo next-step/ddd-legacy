@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.AdditionalAnswers;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -247,5 +248,53 @@ class MenuServiceTest {
                 () -> assertThat(actual.getId()).isEqualTo(existedMenu.getId()),
                 () -> assertThat(actual.getPrice()).isEqualByComparingTo(changePrice)
         );
+    }
+
+    @DisplayName("메뉴 가격이 0원 이하이면 메뉴 가격을 수정할 수 없습니다.")
+    @ParameterizedTest(name = "입력값 `{0}`")
+    @ValueSource(strings = {"-1", "-1000", "-10000"})
+    void changePriceWithNegativePrice(final String price) {
+        final UUID menuId = UUID.randomUUID();
+        final MenuGroup menuGroup = menuGroup();
+        final MenuProduct firstMenuProduct = menuProduct(1L, 1L,
+                product(UUID.randomUUID(), "후라이드 치킨", new BigDecimal("16000"))
+        );
+        final MenuProduct secondMenuProduct = menuProduct(2L, 1L,
+                product(UUID.randomUUID(), "양념 치킨", new BigDecimal("16000"))
+        );
+        final Menu changedMenu = menu(menuId, "양념 후라이드 세트", new BigDecimal(price),
+                menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+        );
+        final Menu existedMenu = menu(menuId, "양념 후라이드 세트", new BigDecimal("30000"),
+                menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+        );
+        when(menuRepository.findById(existedMenu.getId())).thenReturn(Optional.of(existedMenu));
+
+        assertThatThrownBy(() -> menuService.changePrice(existedMenu.getId(), changedMenu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴 가격이 없으면 메뉴 가격을 수정할 수 없습니다.")
+    @ParameterizedTest(name = "입력값 `{0}`")
+    @NullSource
+    void changePriceWithNullPrice(final BigDecimal nullPrice) {
+        final UUID menuId = UUID.randomUUID();
+        final MenuGroup menuGroup = menuGroup();
+        final MenuProduct firstMenuProduct = menuProduct(1L, 1L,
+                product(UUID.randomUUID(), "후라이드 치킨", new BigDecimal("16000"))
+        );
+        final MenuProduct secondMenuProduct = menuProduct(2L, 1L,
+                product(UUID.randomUUID(), "양념 치킨", new BigDecimal("16000"))
+        );
+        final Menu changedMenu = menu(menuId, "양념 후라이드 세트", nullPrice,
+                menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+        );
+        final Menu existedMenu = menu(menuId, "양념 후라이드 세트", new BigDecimal("30000"),
+                menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+        );
+        when(menuRepository.findById(existedMenu.getId())).thenReturn(Optional.of(existedMenu));
+
+        assertThatThrownBy(() -> menuService.changePrice(existedMenu.getId(), changedMenu))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
