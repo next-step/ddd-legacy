@@ -29,15 +29,9 @@ public class StringCalculator {
             separators.add(customSeparator.getSeparator());
         }
 
-        String[] splitInputNumbers = input.split(getJoinedSeparatorsString(separators));
+        String[] splitInputNumbers = StringNumberParser.parse(input, separators);;
         PositiveStringNumbers positiveStringNumbers = new PositiveStringNumbers(splitInputNumbers);
 
         return positiveStringNumbers.addAllNumber();
-    }
-
-    private String getJoinedSeparatorsString(List<String> separators) {
-        return separators.stream()
-            .map(Pattern::quote)
-            .collect(Collectors.joining("|"));
     }
 }
