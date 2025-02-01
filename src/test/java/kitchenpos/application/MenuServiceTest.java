@@ -297,4 +297,24 @@ class MenuServiceTest {
         assertThatThrownBy(() -> menuService.changePrice(existedMenu.getId(), changedMenu))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @DisplayName("메뉴가 존재하지 않으면 메뉴 가격을 수정할 수 없습니다.")
+    @Test
+    void changePriceWithNotExistsMenu() {
+        final UUID menuId = UUID.randomUUID();
+        final MenuGroup menuGroup = menuGroup();
+        final MenuProduct firstMenuProduct = menuProduct(1L, 1L,
+                product(UUID.randomUUID(), "후라이드 치킨", new BigDecimal("16000"))
+        );
+        final MenuProduct secondMenuProduct = menuProduct(2L, 1L,
+                product(UUID.randomUUID(), "양념 치킨", new BigDecimal("16000"))
+        );
+        final Menu changedMenu = menu(menuId, "양념 후라이드 세트", new BigDecimal("31990"),
+                menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+        );
+        when(menuRepository.findById(changedMenu.getId())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> menuService.changePrice(changedMenu.getId(), changedMenu))
+                .isInstanceOf(NoSuchElementException.class);
+    }
 }
