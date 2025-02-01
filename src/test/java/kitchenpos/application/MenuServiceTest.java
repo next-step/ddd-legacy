@@ -146,4 +146,28 @@ class MenuServiceTest {
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @DisplayName("메뉴의 이름이 욕설이 포함되어 있으면 메뉴를 등록할 수 없습니다.")
+    @ParameterizedTest(name = "입력값 `{0}`")
+    @ValueSource(strings = {"비속어", "욕설", "그XX"})
+    void createWithEmptyOrProfanityMenuName(final String name) {
+        final MenuGroup menuGroup = menuGroup();
+        final Product firstProduct = product(UUID.randomUUID(), "후라이드 치킨", new BigDecimal("16000"));
+        final Product secondProduct = product(UUID.randomUUID(), "양념 치킨", new BigDecimal("16000"));
+        final Menu menu = menu(null, name, new BigDecimal("30000"),
+                menuGroup, List.of(
+                        menuProduct(1L, 1L, firstProduct),
+                        menuProduct(2L, 1L, secondProduct)
+                ), true
+        );
+        when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+        when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+        when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
+        when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
+        when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
+        when(purgomalumClient.containsProfanity(name)).thenReturn(true);
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
