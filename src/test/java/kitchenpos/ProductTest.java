@@ -97,19 +97,20 @@ public class ProductTest {
     @Nested
     class ProductPriceChangeTest {
 
-        private static final BigDecimal 후라이드치킨_MENU_PRODUCT_PRICE = new BigDecimal(20000);
+        private static final BigDecimal 후라이드치킨_DEFAULT_PRICE = new BigDecimal(20000);
         private static final String 후라이드치킨_MENU_NAME = "후라이드 치킨메뉴";
-        public static final UUID 후라이드치킨_MENU_UUID = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
+        public static final UUID 후라이드치킨_MENU_UUID = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
+        public static final UUID 후라이드치킨_MENU_GROUP_UUID = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
         private static final String 한마리메뉴_MENU_GROUP_NAME = "한마리메뉴";
 
         @BeforeEach
         void initialize() {
-            Product product = Product(ProductTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_MENU_PRODUCT_PRICE);
+            Product product = Product(ProductTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
             productRepository.save(product);
-            MenuGroup menuGroup = MenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_UUID);
+            MenuGroup menuGroup = MenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_GROUP_UUID);
             menuGroupRepository.save(menuGroup);
             List<MenuProduct> menuProducts = List.of(MenuProduct(product, 1));
-            Menu menu = Menu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_MENU_PRODUCT_PRICE, menuGroup, menuProducts);
+            Menu menu = Menu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
             menuRepository.save(menu);
         }
 
@@ -190,12 +191,13 @@ public class ProductTest {
         return menuGroup;
     }
 
-    private static Menu Menu(UUID id, String name, BigDecimal price, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
+    private static Menu Menu(UUID id, String name, BigDecimal price, MenuGroup menuGroup, List<MenuProduct> menuProducts, UUID menuGroupId) {
         Menu menu = new Menu();
         menu.setId(id);
         menu.setName(name);
         menu.setPrice(price);
         menu.setMenuGroup(menuGroup);
+        menu.setMenuGroupId(menuGroupId);
         menu.setDisplayed(true);
         menu.setMenuProducts(menuProducts);
         return menu;
