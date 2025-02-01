@@ -1,9 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.MenuProductFixture;
@@ -12,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +21,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static kitchenpos.fixture.MenuFixture.*;
 import static kitchenpos.fixture.MenuGroupFixture.*;
 import static kitchenpos.fixture.MenuProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -54,7 +53,7 @@ class MenuServiceTest {
     @DisplayName("메뉴를 등록할 수 있습니다.")
     @Test
     void crate() {
-        final Menu menu = MenuFixture.menu();
+        final Menu menu = menu();
 
         menuService.create(menu);
     }
@@ -63,7 +62,7 @@ class MenuServiceTest {
     @ParameterizedTest(name = "입력값 `{0}`")
     @ValueSource(strings = {"-1", "-1000", "-100000"})
     void createWithNegativePrice(String price) {
-        final Menu menu = MenuFixture.menu(null, "양념 후라이드 세트", new BigDecimal(price),
+        final Menu menu = menu(null, "양념 후라이드 세트", new BigDecimal(price),
                 menuGroup(), List.of(menuProduct()), true
         );
         assertThatThrownBy(() -> menuService.create(menu))
@@ -73,7 +72,7 @@ class MenuServiceTest {
     @DisplayName("메뉴 그룹이 존재하지 않으면 메뉴를 등록할 수 없습니다.")
     @Test
     void createWithNotExistsMenuGroup() {
-        final Menu menu = MenuFixture.menu(null, "양념 후라이드 세트", new BigDecimal("30000"),
+        final Menu menu = menu(null, "양념 후라이드 세트", new BigDecimal("30000"),
                 menuGroup(), List.of(menuProduct()), true
         );
         when(menuGroupRepository.findById(menu.getMenuGroupId()))
@@ -81,5 +80,19 @@ class MenuServiceTest {
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("메뉴 상품이 없거나 비어있으면 메뉴를 등록할 수 없습니다.")
+    @ParameterizedTest(name = "입력값 `{0}`")
+    @NullAndEmptySource
+    void createWithEmptyMenuProducts(List<MenuProduct> menuProducts) {
+        final MenuGroup menuGroup = menuGroup();
+        final Menu menu = menu(null, "양념 후라이드 세트", new BigDecimal("30000"),
+                menuGroup, menuProducts, true
+        );
+        when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
