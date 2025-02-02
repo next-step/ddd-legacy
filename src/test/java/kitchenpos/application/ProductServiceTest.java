@@ -81,6 +81,20 @@ class ProductServiceTest {
         assertThatThrownBy(() -> productService.create(product)).isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("상품명에 비속어가 들어있다면 에러를 발생시킨다.")
+    @ParameterizedTest
+    @CsvSource(value = {"fuck:7000", "shit:6000"}, delimiter = ':')
+    void hasProfanity(String name, BigDecimal price) {
+        product.setName(name);
+        product.setPrice(price);
+        // Mock 객체가 containsProfanity() 호출 시 true를 반환하도록 설정
+        when(purgomalumClient.containsProfanity(name)).thenReturn(true);
+        // Mock 객체가 save() 호출 시 product를 반환하도록 설정
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        assertThatThrownBy(() -> productService.create(product)).isInstanceOf(IllegalArgumentException.class);
+    }
+    
     @DisplayName("상품의 가격이 비어있다면 에러를 발생시킨다.")
     @ParameterizedTest
     @NullSource
