@@ -81,6 +81,18 @@ class ProductServiceTest {
         assertThatThrownBy(() -> productService.create(product)).isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("상품의 가격이 비어있다면 에러를 발생시킨다.")
+    @ParameterizedTest
+    @NullSource
+    void nullPrice(BigDecimal price) {
+        product.setName("짜장면");
+        product.setPrice(price);
+        // Mock 객체가 save() 호출 시 product를 반환하도록 설정
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        assertThatThrownBy(() -> productService.create(product)).isInstanceOf(IllegalArgumentException.class);
+    }
+
     @Test
     void changePrice() {
     }
