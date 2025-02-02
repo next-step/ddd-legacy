@@ -49,9 +49,13 @@ class OrderServiceTest : BehaviorSpec() {
                 menuName = "메뉴",
                 menuPrice = BigDecimal("10000"),
                 menuGroupName = "메뉴 그룹",
-                productName = "상품",
-                productPrice = BigDecimal("10000"),
-                productQuantity = 1L,
+                products = listOf(
+                    CreateMenuHelper.ProductDto(
+                        name = "상품",
+                        price = BigDecimal("10000"),
+                        quantity = 1L
+                    )
+                ),
                 isDisplayed = true
             )
             menuRepository.save(menu)
@@ -110,9 +114,13 @@ class OrderServiceTest : BehaviorSpec() {
                     menuName = "숨김메뉴",
                     menuPrice = BigDecimal("10000"),
                     menuGroupName = "메뉴 그룹",
-                    productName = "상품",
-                    productPrice = BigDecimal("10000"),
-                    productQuantity = 1L,
+                    products = listOf(
+                        CreateMenuHelper.ProductDto(
+                            name = "상품",
+                            price = BigDecimal("10000"),
+                            quantity = 1L
+                        )
+                    ),
                     isDisplayed = false
                 )
                 menuRepository.save(hiddenMenu)
@@ -143,9 +151,13 @@ class OrderServiceTest : BehaviorSpec() {
                 menuName = "메뉴",
                 menuPrice = BigDecimal("10000"),
                 menuGroupName = "메뉴 그룹",
-                productName = "상품",
-                productPrice = BigDecimal("10000"),
-                productQuantity = 1L,
+                products = listOf(
+                    CreateMenuHelper.ProductDto(
+                        name = "상품",
+                        price = BigDecimal("10000"),
+                        quantity = 1L
+                    )
+                ),
                 isDisplayed = true
             )
             menuRepository.save(menu)
@@ -200,9 +212,13 @@ class OrderServiceTest : BehaviorSpec() {
                 menuName = "메뉴",
                 menuPrice = BigDecimal("10000"),
                 menuGroupName = "메뉴 그룹",
-                productName = "상품",
-                productPrice = BigDecimal("10000"),
-                productQuantity = 1L,
+                products = listOf(
+                    CreateMenuHelper.ProductDto(
+                        name = "상품",
+                        price = BigDecimal("10000"),
+                        quantity = 1L
+                    )
+                ),
                 isDisplayed = true
             )
             menuRepository.save(menu)
