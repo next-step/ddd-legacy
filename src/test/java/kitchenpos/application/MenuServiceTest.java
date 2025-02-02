@@ -381,4 +381,14 @@ class MenuServiceTest {
         assertThatThrownBy(() -> menuService.display(menu.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    @DisplayName("메뉴가 존재하지 않으면 메뉴를 노출할 수 없습니다.")
+    @Test
+    void displayWithNotExistsMenu() {
+        final UUID menuId = UUID.randomUUID();
+        when(menuRepository.findById(menuId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> menuService.display(menuId))
+                .isInstanceOf(NoSuchElementException.class);
+    }
 }
