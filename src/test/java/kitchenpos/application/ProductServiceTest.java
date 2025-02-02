@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -55,12 +56,25 @@ class ProductServiceTest {
         assertThat(result.getPrice()).isEqualTo(price);
     }
 
+
     @DisplayName("상품 가격은 0원보다 작다면 에러를 발생시킨다.")
     @ParameterizedTest
     @CsvSource(value = {"짜장면:-1", "우동:-3000"}, delimiter = ':')
     void minusPrice(String name, BigDecimal price) {
         product.setName(name);
         product.setPrice(price);
+        // Mock 객체가 save() 호출 시 product를 반환하도록 설정
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        assertThatThrownBy(() -> productService.create(product)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품명은 비어있다면 에러를 발생시킨다.")
+    @ParameterizedTest
+    @NullSource
+    void nullName(String name) {
+        product.setName(name);
+        product.setPrice(BigDecimal.ONE);
         // Mock 객체가 save() 호출 시 product를 반환하도록 설정
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
