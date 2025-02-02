@@ -5,6 +5,8 @@ import kitchenpos.application.ProductService;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -17,13 +19,15 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @DisplayName(value = " Menu 테스트")
 public class MenuTest {
 
-    private static final BigDecimal BIG_DECIMAL_MINUS_ONE = BigDecimal.valueOf(-1);
     private static final String TEST_PRODUCT_NAME = "TEST치킨";
     private static final UUID 후라이드치킨_PRODUCT_UUID = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
 
@@ -31,13 +35,13 @@ public class MenuTest {
     private ProductService productService;
     @SpyBean
     private ProductRepository productRepository;
-    @Autowired
+    @SpyBean
     private PurgomalumClient mockPurgomalumClient;
     @Autowired
     private MenuService menuService;
-    @Autowired
+    @SpyBean
     private MenuRepository menuRepository;
-    @Autowired
+    @SpyBean
     private MenuGroupRepository menuGroupRepository;
 
 
@@ -48,10 +52,11 @@ public class MenuTest {
         private static final BigDecimal 후라이드치킨_MINUS_PRICE = new BigDecimal(-10);
 
         private static final String 후라이드치킨_MENU_NAME = "후라이드 치킨메뉴";
-        public static final UUID 후라이드치킨_MENU_UUID = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
-        public static final UUID 후라이드치킨_MENU_GROUP_UUID = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
+        private static final String 후라이드치킨_PROFANITY_MENU_NAME = "fucking 치킨메뉴";
+        private static final UUID 후라이드치킨_MENU_UUID = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
+        private static final UUID 후라이드치킨_MENU_GROUP_UUID = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
         private static final String 한마리메뉴_MENU_GROUP_NAME = "한마리메뉴";
-        public static final int MINUS_QUANTITY = -1;
+        private static final int MINUS_QUANTITY = -1;
         private static final BigDecimal 후라이드치킨_OVER_PRICE = new BigDecimal(21000);
         private static final UUID 후라이드치킨_PRODUCT_UUID = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
 
@@ -61,7 +66,7 @@ public class MenuTest {
             productRepository.save(product);
             MenuGroup menuGroup = MenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_GROUP_UUID);
             menuGroupRepository.save(menuGroup);
-            List<MenuProduct> menuProducts = List.of(MenuProduct(product, 1));
+            List<MenuProduct> menuProducts = List.of(MenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
             Menu menu = Menu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
             menuRepository.save(menu);
         }
@@ -72,13 +77,43 @@ public class MenuTest {
 
         }
 
+        @DisplayName(value = "메뉴를 등록할 수 있다.")
+        @Test
+        void createMenu() {
+            Mockito.clearInvocations(menuRepository,productRepository);
+            Product product = Product(MenuTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
+            MenuGroup menuGroup = MenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_GROUP_UUID);
+
+            List<MenuProduct> menuProducts = List.of(MenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
+            Menu menuRequest = Menu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
+
+            Menu menu = menuService.create(menuRequest);
+
+            //행위검증
+            verify(menuRepository,times(1)).save(ArgumentCaptor.forClass(Menu.class).capture());
+            verify(productRepository, times(1)).findAllByIdIn(Mockito.anyList());
+            verify(productRepository, times(1)).findById(Mockito.any());
+            verify(menuGroupRepository, times(1)).findById(Mockito.any());
+
+//            assertEquals(menu,menuRequest);
+            assertAll(
+                    () -> assertThat(menu.getId()).isNotNull(),
+                    () -> assertThat(menu.getMenuGroup().getId()).isEqualTo(menuRequest.getMenuGroupId()),
+                    () -> assertThat(menu.getName()).isEqualTo(menuRequest.getName()),
+                    () -> assertThat(menu.getMenuProducts()).hasSize(menuRequest.getMenuProducts().size()),
+                    () -> assertThat(menu.isDisplayed()).isEqualTo(menuRequest.isDisplayed()),
+                    () -> assertThat(menu.getPrice()).isEqualTo(menuRequest.getPrice())
+            );
+
+        }
+
         @DisplayName(value = "메뉴의 가격은 0원 이상이어야 한다.")
         @Test
         void invalidMenuAmount() {
             Product product = Product(MenuTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
             MenuGroup menuGroup = MenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_UUID);
             //상품명이나 가격이 없을때 에러처리
-            List<MenuProduct> menuProducts = List.of(MenuProduct(product, 1));
+            List<MenuProduct> menuProducts = List.of(MenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
             Menu menu = Menu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_MINUS_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
             ThrowingCallable throwingCallable = () -> menuService.create(menu);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
@@ -89,8 +124,8 @@ public class MenuTest {
         void invalidMenuProduct() {
             Product product = Product(MenuTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
             MenuGroup menuGroup = MenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_GROUP_UUID);
-            //상품명이나 가격이 없을때 에러처리
-            List<MenuProduct> menuProducts = List.of(MenuProduct(product, 1));
+
+            List<MenuProduct> menuProducts = List.of(MenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
             Menu menu = Menu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_MINUS_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
             ThrowingCallable throwingCallable = () -> menuService.create(menu);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
@@ -101,8 +136,7 @@ public class MenuTest {
         void menuProductNotEqualsProductSize() {
             Product product = Product(MenuTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
             MenuGroup menuGroup = MenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_GROUP_UUID);
-            //상품명이나 가격이 없을때 에러처리
-            List<MenuProduct> menuProducts = List.of(MenuProduct(product, MINUS_QUANTITY));
+            List<MenuProduct> menuProducts = List.of(MenuProduct(product, MINUS_QUANTITY, 후라이드치킨_PRODUCT_UUID));
             Menu menu = Menu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
             ThrowingCallable throwingCallable = () -> menuService.create(menu);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
@@ -113,20 +147,37 @@ public class MenuTest {
         void invalidTotalMenuAmount() {
             Product product = Product(MenuTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
             MenuGroup menuGroup = MenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_GROUP_UUID);
-            //상품명이나 가격이 없을때 에러처리
-            List<MenuProduct> menuProducts = List.of(MenuProduct(product, 1));
+
+            List<MenuProduct> menuProducts = List.of(MenuProduct(product, 1 , 후라이드치킨_PRODUCT_UUID));
             Menu menu = Menu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_OVER_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
 
             ThrowingCallable throwingCallable = () -> menuService.create(menu);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
         }
 
+        @DisplayName(value = "메뉴의 이름이 없거나 비속어가 들어가 있으면 안됩니다.")
+        @Test
+        void invalidMenuName() {
+            Mockito.when(mockPurgomalumClient.containsProfanity(후라이드치킨_PROFANITY_MENU_NAME)).thenReturn(true);
+
+            Product product = Product(MenuTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
+            MenuGroup menuGroup = MenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_GROUP_UUID);
+            List<MenuProduct> menuProducts = List.of(MenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
+            Menu menu = Menu(후라이드치킨_MENU_UUID, 후라이드치킨_PROFANITY_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
+
+            ThrowingCallable throwingCallable = () -> menuService.create(menu);
+            assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+        }
+
+
+
     }
 
-    private MenuProduct MenuProduct(Product product, int quantity) {
+    private MenuProduct MenuProduct(Product product, int quantity, UUID productId) {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setProduct(product);
         menuProduct.setQuantity(quantity);
+        menuProduct.setProductId(productId);
         return menuProduct;
     }
 
