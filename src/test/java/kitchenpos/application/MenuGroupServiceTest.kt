@@ -2,56 +2,74 @@ package kitchenpos.application
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.kotest.matchers.shouldNotBe
+import kitchenpos.domain.MenuGroup
 import kitchenpos.domain.MenuGroupRepository
-import kitchenpos.fixture.MenuGroupFixture
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
-class MenuGroupServiceTest : BehaviorSpec({
+@SpringBootTest
+@Transactional
+class MenuGroupServiceTest : BehaviorSpec() {
 
-    val menuGroupRepository = mockk<MenuGroupRepository>()
-    val sut = MenuGroupService(menuGroupRepository)
+    @Autowired
+    lateinit var menuGroupService: MenuGroupService
 
-    given("create 메서드가 호출되었을 때") {
-        `when`("유효한 이름이 제공되면") {
-            beforeEach {
-                clearAllMocks()
-                val request = MenuGroupFixture.create(name = "Valid Name")
-                every { menuGroupRepository.save(any()) } returns request
+    @Autowired
+    lateinit var menuGroupRepository: MenuGroupRepository
+
+
+    init {
+        Given("MenuGroupService가 주어졌을 때") {
+            When("메뉴 그룹의 이름이 없는 경우") {
+                Then("예외를 던진다") {
+                    val menuGroup = MenuGroup()
+
+                    shouldThrow<IllegalArgumentException> {
+                        menuGroupService.create(menuGroup)
+                    }
+                }
             }
 
-            then("MenuGroup이 정상적으로 생성되고 저장되어야 한다") {
-                val request = MenuGroupFixture.create(name = "Valid Name")
-                val result = sut.create(request)
+            When("메뉴 그룹을 생성할 때") {
+                val menuGroup = MenuGroup().apply {
+                    name = "menuGroup"
+                }
 
-                result.name shouldBe request.name
+                Then("메뉴 그룹이 정상적으로 생성된다") {
+                    val savedMenuGroup = menuGroupService.create(menuGroup)
 
-                verify(exactly = 1) { menuGroupRepository.save(any()) }
+                    savedMenuGroup shouldNotBe null
+                    savedMenuGroup.id shouldNotBe null
+                    savedMenuGroup.name shouldBe "menuGroup"
+                }
             }
         }
 
-        `when`("이름이 null이거나 비어있으면") {
+        Given("메뉴 그룹이 저장되어 있을 때") {
             beforeEach {
-                clearAllMocks()
+                val menuGroup1 = MenuGroup().apply {
+                    id = UUID.randomUUID()
+                    name = "menuGroup1"
+                }
+                val menuGroup2 = MenuGroup().apply {
+                    id = UUID.randomUUID()
+                    name = "menuGroup2"
+                }
+                menuGroupRepository.saveAll(listOf(menuGroup1, menuGroup2))
             }
 
-            then("IllegalArgumentException이 발생해야 한다") {
-                val requestWithNullName = MenuGroupFixture.create(name = null)
-                val requestWithEmptyName = MenuGroupFixture.create(name = "")
+            When("모든 메뉴 그룹을 조회하면") {
+                Then("저장된 메뉴 그룹을 반환한다") {
+                    val menuGroups = menuGroupService.findAll()
 
-                shouldThrow<IllegalArgumentException> {
-                    sut.create(requestWithNullName)
+                    menuGroups shouldHaveSize 2
                 }
-
-                shouldThrow<IllegalArgumentException> {
-                    sut.create(requestWithEmptyName)
-                }
-
-                verify(exactly = 0) { menuGroupRepository.save(any()) }
             }
         }
     }
-})
+}
