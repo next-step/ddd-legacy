@@ -95,7 +95,7 @@ public class MenuTest {
             verify(productRepository, times(1)).findById(Mockito.any());
             verify(menuGroupRepository, times(1)).findById(Mockito.any());
 
-//            assertEquals(menu,menuRequest);
+
             assertAll(
                     () -> assertThat(menu.getId()).isNotNull(),
                     () -> assertThat(menu.getMenuGroup().getId()).isEqualTo(menuRequest.getMenuGroupId()),
