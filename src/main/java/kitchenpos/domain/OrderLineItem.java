@@ -24,9 +24,9 @@ public class OrderLineItem {
 
     @ManyToOne(optional = false)
     @JoinColumn(
-        name = "menu_id",
-        columnDefinition = "binary(16)",
-        foreignKey = @ForeignKey(name = "fk_order_line_item_to_menu")
+            name = "menu_id",
+            columnDefinition = "binary(16)",
+            foreignKey = @ForeignKey(name = "fk_order_line_item_to_menu")
     )
     private Menu menu;
 
@@ -56,6 +56,7 @@ public class OrderLineItem {
 
     public void setMenu(final Menu menu) {
         this.menu = menu;
+        this.menuId = menu.getId();
     }
 
     public long getQuantity() {
