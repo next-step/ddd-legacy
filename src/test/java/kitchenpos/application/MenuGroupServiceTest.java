@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.fixture.MenuGroupFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatException;
@@ -70,8 +70,8 @@ class MenuGroupServiceTest {
         @DisplayName("등록된 모든 메뉴 그룹을 조회한다.")
         void testFindAllGroupMenu() {
             // given
-            MenuGroup menuGroup1 = createMenuGroup("MENU_GROUP_NAME_1");
-            MenuGroup menuGroup2 = createMenuGroup("MENU_GROUP_NAME_2");
+            MenuGroup menuGroup1 = MenuGroupFixture.createMenuGroup("MENU_GROUP_NAME_1");
+            MenuGroup menuGroup2 = MenuGroupFixture.createMenuGroup("MENU_GROUP_NAME_2");
             menuGroupRepository.save(menuGroup1);
             menuGroupRepository.save(menuGroup2);
 
@@ -84,13 +84,6 @@ class MenuGroupServiceTest {
                     .extracting(MenuGroup::getName)
                     .containsExactly("MENU_GROUP_NAME_1", "MENU_GROUP_NAME_2");
         }
-    }
-
-    private MenuGroup createMenuGroup(final String name) {
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName(name);
-        return menuGroup;
     }
 
 }
