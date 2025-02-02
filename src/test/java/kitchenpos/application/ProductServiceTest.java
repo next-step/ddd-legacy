@@ -10,13 +10,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.AdditionalAnswers;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -133,25 +133,31 @@ class ProductServiceTest {
     @ValueSource(strings = {"-1", "-1000", "-10000"})
     void changePriceWithNegativePrice(final String price) {
         final UUID productId = createProductId();
-        final Product product = product(productId, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(menuRepository.findAllByProductId(productId)).thenReturn(emptyList());
 
         assertThatThrownBy(() ->
-                productService.changePrice(productId, product(productId, DEFAULT_PRODUCT_NAME, new BigDecimal(price))))
-                .isInstanceOf(IllegalArgumentException.class);
+                productService.changePrice(productId, product(productId, DEFAULT_PRODUCT_NAME, new BigDecimal(price)))
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("변경할 상품 가격이 비어있으면 예외가 발생합니다.")
     @Test
     void changePriceWithEmptyPrice() {
         final UUID productId = createProductId();
-        final Product product = product(productId, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(menuRepository.findAllByProductId(productId)).thenReturn(emptyList());
 
         assertThatThrownBy(() ->
-                productService.changePrice(productId, product(productId, DEFAULT_PRODUCT_NAME, null)))
-                .isInstanceOf(IllegalArgumentException.class);
+                productService.changePrice(productId, product(productId, DEFAULT_PRODUCT_NAME, null))
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품이 존재하지 않으면 상품 가격을 변경할 수 없습니다.")
+    @Test
+    void changePriceWithNonExistentProduct() {
+        final UUID productId = createProductId();
+        final BigDecimal changedPrice = BigDecimal.valueOf(16010);
+        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                productService.changePrice(productId, product(productId, DEFAULT_PRODUCT_NAME, changedPrice))
+        ).isInstanceOf(NoSuchElementException.class);
     }
 }
