@@ -317,4 +317,25 @@ class MenuServiceTest {
         assertThatThrownBy(() -> menuService.changePrice(changedMenu.getId(), changedMenu))
                 .isInstanceOf(NoSuchElementException.class);
     }
+
+    @DisplayName("메뉴의 가격이 메뉴 상품의 가격 합보다 크면 메뉴 가격을 수정할 수 없습니다.")
+    @Test
+    void changePriceWithPriceLessThanSumOfMenuProductPrice() {
+        final UUID menuId = UUID.randomUUID();
+        final MenuGroup menuGroup = menuGroup();
+        final Product firstProduct = product(UUID.randomUUID(), "후라이드 치킨", new BigDecimal("16000"));
+        final Product secondProduct = product(UUID.randomUUID(), "양념 치킨", new BigDecimal("16000"));
+        final MenuProduct firstMenuProduct = menuProduct(1L, 1L, firstProduct);
+        final MenuProduct secondMenuProduct = menuProduct(2L, 1L, secondProduct);
+        final Menu changedMenu = menu(menuId, "양념 후라이드 세트", new BigDecimal("32010"),
+                menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+        );
+        final Menu existedMenu = menu(menuId, "양념 후라이드 세트", new BigDecimal("30000"),
+                menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+        );
+        when(menuRepository.findById(existedMenu.getId())).thenReturn(Optional.of(existedMenu));
+
+        assertThatThrownBy(() -> menuService.changePrice(existedMenu.getId(), changedMenu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
