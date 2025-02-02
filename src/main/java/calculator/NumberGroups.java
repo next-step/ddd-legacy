@@ -8,7 +8,7 @@ public class NumberGroups {
 
     public NumberGroups(String[] values) {
         this.numbers = Arrays.stream(values)
-                .map(Number::new)
+                .map(Number::from)
                 .toList();
     }
 

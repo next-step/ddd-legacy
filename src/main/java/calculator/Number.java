@@ -2,17 +2,18 @@ package calculator;
 
 
 public class Number {
-    private final int value;
-    private static final NumberValidator numberValidator = new NumberValidator();
+    public static final Number ZERO = new Number(0);
+    private static final NumberValidator numberValidator = NumberValidator.getInstance();
 
-    public Number(String input) {
-        numberValidator.validate(input);
-        this.value = Integer.parseInt(input);
+    private final int value;
+
+    private Number(int value) {  // private 생성자
+        this.value = value;
     }
 
-    public Number(int value) {
-        numberValidator.validate(value);
-        this.value = value;
+    public static Number from(String input) {
+        numberValidator.validate(input);
+        return new Number(Integer.parseInt(input));
     }
 
     public Number add(Number other) {
@@ -23,6 +24,6 @@ public class Number {
         return value;
     }
 
-    public static Number ZERO = new Number(0);
+
 
 }
