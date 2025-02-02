@@ -3,7 +3,7 @@ package mission.step1;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CustomParser implements ParserStrategy {
+public class CustomParser implements Parsable {
 
     private static final int inValidDelimiterSize = 2;
     private static final String CUSTOM_DELIMITER_PATTERN = "//(.*)\n(.*)";

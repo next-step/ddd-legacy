@@ -1,6 +1,6 @@
 package mission.step1;
 
-public class Calculator implements CalculateStrategy {
+public class Calculator implements Calculable {
 
     private PositiveNumber accumulated;
 

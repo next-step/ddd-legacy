@@ -1,6 +1,6 @@
 package mission.step1;
 
-public interface ParserStrategy {
+public interface Parsable {
 
     String[] splitWithDelimiter(String input);
 }

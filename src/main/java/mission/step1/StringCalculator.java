@@ -7,9 +7,9 @@ public class StringCalculator {
     private static final int ZERO_VALUE = 0;
 
     private final CompositeParser parser;
-    private final CalculateStrategy calculator;
+    private final Calculable calculator;
 
-    public StringCalculator(CompositeParser parser, CalculateStrategy calculator) {
+    public StringCalculator(CompositeParser parser, Calculable calculator) {
         this.parser = parser;
         this.calculator = calculator;
     }

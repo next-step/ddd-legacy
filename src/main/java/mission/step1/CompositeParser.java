@@ -1,6 +1,6 @@
 package mission.step1;
 
-public class CompositeParser implements ParserStrategy {
+public class CompositeParser implements Parsable {
     private final Parser defaultParser;
     private final CustomParser customParser;
 

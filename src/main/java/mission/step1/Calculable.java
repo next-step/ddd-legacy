@@ -1,6 +1,6 @@
 package mission.step1;
 
-public interface CalculateStrategy {
+public interface Calculable {
 
     PositiveNumber calculate(PositiveNumber number);
 

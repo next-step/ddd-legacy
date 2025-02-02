@@ -17,7 +17,7 @@ class StringCalculatorTest {
 
     private CompositeParser parser;
     private StringCalculator stringCalculator;
-    private CalculateStrategy calculator;
+    private Calculable calculator;
 
     @BeforeEach
     void setUp() {
