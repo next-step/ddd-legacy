@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -50,7 +51,7 @@ class ProductServiceTest {
             // given
             final String name = "PRODUCT_NAME";
             final BigDecimal price = BigDecimal.valueOf(1000);
-            final Product request = createProduct(name, price);
+            final Product request = ProductFixture.createProduct(name, price);
             when(purgomalumClient.containsProfanity(anyString())).thenReturn(false);
 
             // when
@@ -71,7 +72,7 @@ class ProductServiceTest {
         @DisplayName("상품은 이름과 가격을 필수로 가진다.")
         void testNullOrEmptyName(final String name) {
             // given
-            final Product request = createProduct(name, BigDecimal.valueOf(1000));
+            final Product request = ProductFixture.createProduct(name, BigDecimal.valueOf(1000));
             when(purgomalumClient.containsProfanity(anyString())).thenReturn(false);
 
             // when & then
@@ -85,7 +86,7 @@ class ProductServiceTest {
         @ValueSource(ints = {-1000, -1})
         void testPriceLessThanZero(final int price) {
             // given
-            final Product request = createProduct("VALID_NAME", BigDecimal.valueOf(price));
+            final Product request = ProductFixture.createProduct("VALID_NAME", BigDecimal.valueOf(price));
             when(purgomalumClient.containsProfanity(anyString())).thenReturn(false);
 
             // when & then
@@ -98,7 +99,7 @@ class ProductServiceTest {
         @DisplayName("상품 등록 시 이름의 유해성 여부를 검사한다.")
         void testInappropriateName() {
             // given
-            final Product request = createProduct("INAPPROPRIATE_NAME", BigDecimal.valueOf(1000));
+            final Product request = ProductFixture.createProduct("INAPPROPRIATE_NAME", BigDecimal.valueOf(1000));
             when(purgomalumClient.containsProfanity(anyString())).thenReturn(true);
 
             // when & then
@@ -116,7 +117,7 @@ class ProductServiceTest {
 
         @BeforeEach
         void setup() {
-            final Product product = createProduct("PRODUCT_NAME", BigDecimal.valueOf(1000));
+            final Product product = ProductFixture.createProduct("PRODUCT_NAME", BigDecimal.valueOf(1000));
             when(purgomalumClient.containsProfanity(anyString())).thenReturn(false);
             existingId = productService.create(product).getId();
         }
@@ -172,8 +173,8 @@ class ProductServiceTest {
         @DisplayName("등록된 모든 상품의 목록을 조회한다.")
         void findAllProductsSuccess() {
             // given
-            final Product product1 = createProduct("PRODUCT_1", BigDecimal.valueOf(1000));
-            final Product product2 = createProduct("PRODUCT_2", BigDecimal.valueOf(2000));
+            final Product product1 = ProductFixture.createProduct("PRODUCT_1", BigDecimal.valueOf(1000));
+            final Product product2 = ProductFixture.createProduct("PRODUCT_2", BigDecimal.valueOf(2000));
             when(purgomalumClient.containsProfanity(anyString())).thenReturn(false);
             productService.create(product1);
             productService.create(product2);
@@ -187,14 +188,6 @@ class ProductServiceTest {
                     .extracting(Product::getName)
                     .containsExactly("PRODUCT_1", "PRODUCT_2");
         }
-    }
-
-    private Product createProduct(final String name, final BigDecimal price) {
-        final Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setName(name);
-        product.setPrice(price);
-        return product;
     }
 
 }
