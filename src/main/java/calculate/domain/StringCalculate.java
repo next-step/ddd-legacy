@@ -1,6 +1,7 @@
 package calculate.domain;
 
 public class StringCalculate {
+
     private final NumberGroups numberGroups;
 
     public StringCalculate(final String sentence) {
