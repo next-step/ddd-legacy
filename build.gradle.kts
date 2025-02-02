@@ -32,6 +32,13 @@ dependencies {
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.mysql:mysql-connector-j")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    testImplementation("io.cucumber:cucumber-java:7.20.1")
+    testImplementation("io.cucumber:cucumber-java8:7.20.1")
+    testImplementation("io.cucumber:cucumber-spring:7.20.1")
+    testImplementation("io.cucumber:cucumber-junit:7.20.1")
+    testImplementation("io.cucumber:cucumber-junit-platform-engine:7.20.1")
+    testImplementation("org.junit.platform:junit-platform-suite")
 }
 
 tasks.withType<KotlinCompile> {
