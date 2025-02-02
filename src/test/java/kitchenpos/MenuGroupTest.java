@@ -39,7 +39,7 @@ public class MenuGroupTest {
         @DisplayName(value = "메뉴를 등록할 수 있다.")
         @Test
         void createMenu() {
-            MenuGroup menuGroup = MenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
+            MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
             MenuGroup responseMenuGroup = menuGroupService.create(menuGroup);
             //행위검증
             verify(menuGroupRepository, times(1)).save(Mockito.any());
@@ -53,7 +53,7 @@ public class MenuGroupTest {
         @DisplayName(value = "메뉴그룹의 이름은 없으면 안됩니다.")
         @Test
         void invalidMenuAmount() {
-            MenuGroup menuGroup = MenuGroup("", 후라이드치킨_MENU_GROUP_UUID);
+            MenuGroup menuGroup = createMenuGroup("", 후라이드치킨_MENU_GROUP_UUID);
             ThrowingCallable throwingCallable = () -> menuGroupService.create(menuGroup);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
         }
@@ -66,7 +66,7 @@ public class MenuGroupTest {
         @DisplayName(value = "모든 메뉴그룹을 조회할 수 있다.")
         @Test
         void createMenu() {
-            MenuGroup menuGroup = MenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
+            MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
             menuGroupService.create(menuGroup);
            List<MenuGroup> responseMenuGroups = menuGroupService.findAll();
             //행위검증
@@ -76,7 +76,7 @@ public class MenuGroupTest {
         }
     }
 
-    private static MenuGroup MenuGroup(final String name, final UUID id) {
+    private static MenuGroup createMenuGroup(final String name, final UUID id) {
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setName(name);
         menuGroup.setId(id);

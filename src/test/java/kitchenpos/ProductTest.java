@@ -1,6 +1,5 @@
 package kitchenpos;
 
-import kitchenpos.application.MenuService;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
@@ -63,7 +62,7 @@ public class ProductTest {
         @Test
         void createProduct() {
             //상품명이나 가격이 없을때 에러처리
-            Product product = Product(후라이드치킨_PRODUCT_UUID, "", BIG_DECIMAL_MINUS_ONE);
+            Product product = ProductTest.createProduct(후라이드치킨_PRODUCT_UUID, "", BIG_DECIMAL_MINUS_ONE);
 
             ThrowingCallable throwingCallable = () -> productService.create(product);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
@@ -74,7 +73,7 @@ public class ProductTest {
         @CsvSource(value = {",", "fucking 맛있는 치킨"})
         void productInvalidName(final String productName) {
             //상품명에 빈값이나 비속어가 들어간 경우
-            Product product = Product(후라이드치킨_PRODUCT_UUID, productName, BigDecimal.ONE);
+            Product product = ProductTest.createProduct(후라이드치킨_PRODUCT_UUID, productName, BigDecimal.ONE);
             Mockito.when(mockPurgomalumClient.containsProfanity(productName)).thenReturn(true);
 
             //에러처리
@@ -86,7 +85,7 @@ public class ProductTest {
         @Test
         void productCreate() {
             //상품명에 빈값이나 비속어가 들어간 경우
-            Product product = Product(후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, BigDecimal.ONE);
+            Product product = ProductTest.createProduct(후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, BigDecimal.ONE);
             //에러처리
             productService.create(product);
 
@@ -104,12 +103,12 @@ public class ProductTest {
 
         @BeforeEach
         void initialize() {
-            Product product = Product(ProductTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
+            Product product = createProduct(ProductTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
             productRepository.save(product);
-            MenuGroup menuGroup = MenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_GROUP_UUID);
+            MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_GROUP_UUID);
             menuGroupRepository.save(menuGroup);
-            List<MenuProduct> menuProducts = List.of(MenuProduct(product, 1));
-            Menu menu = Menu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
+            List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1));
+            Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
             menuRepository.save(menu);
         }
 
@@ -136,7 +135,7 @@ public class ProductTest {
         @Test
         void zeroProductPrice() {
             //상품명이나 가격이 없을때 에러처리
-            Product product = Product(ProductTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, BIG_DECIMAL_MINUS_ONE);
+            Product product = createProduct(ProductTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, BIG_DECIMAL_MINUS_ONE);
 
             ThrowingCallable throwingCallable = () -> productService.changePrice(ProductTest.후라이드치킨_PRODUCT_UUID, product);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
@@ -166,7 +165,7 @@ public class ProductTest {
     class AllProductFindTest {
         @BeforeEach
         void initialize() {
-            Product product = Product(ProductTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
+            Product product = createProduct(ProductTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
             productRepository.save(product);
         }
 
@@ -180,7 +179,7 @@ public class ProductTest {
         }
     }
 
-    private MenuProduct MenuProduct(Product product, int quantity) {
+    private MenuProduct createMenuProduct(Product product, int quantity) {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setProduct(product);
         menuProduct.setQuantity(quantity);
@@ -188,7 +187,7 @@ public class ProductTest {
     }
 
 
-    private static Product Product(UUID uuid, String name, BigDecimal price) {
+    private static Product createProduct(UUID uuid, String name, BigDecimal price) {
         Product product = new Product();
         product.setId(uuid);
         product.setName(name);
@@ -196,14 +195,14 @@ public class ProductTest {
         return product;
     }
 
-    private static MenuGroup MenuGroup(String name, UUID id) {
+    private static MenuGroup createMenuGroup(String name, UUID id) {
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setName(name);
         menuGroup.setId(id);
         return menuGroup;
     }
 
-    private static Menu Menu(UUID id, String name, BigDecimal price, MenuGroup menuGroup, List<MenuProduct> menuProducts, UUID menuGroupId) {
+    private static Menu createMenu(UUID id, String name, BigDecimal price, MenuGroup menuGroup, List<MenuProduct> menuProducts, UUID menuGroupId) {
         Menu menu = new Menu();
         menu.setId(id);
         menu.setName(name);
