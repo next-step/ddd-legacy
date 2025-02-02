@@ -13,12 +13,11 @@ class CreateMenuGroupDefs : CucumberTest() {
     @Autowired
     private lateinit var menuGroupService: MenuGroupService
 
-    private var menuGroup: MenuGroup = MenuGroup();
+    private var menuGroup: MenuGroup = MenuGroupFixture.fixture();
 
     @Given("메뉴 그룹 이름은 {string}")
     fun 메뉴그룹이름은String이다(name: String?) {
-        menuGroup = MenuGroup()
-        menuGroup.name = name
+        menuGroup = MenuGroupFixture.fixture(name = name)
     }
 
     @Then("메뉴 그룹 생성 성공")
