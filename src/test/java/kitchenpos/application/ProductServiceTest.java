@@ -141,4 +141,17 @@ class ProductServiceTest {
                 productService.changePrice(productId, product(productId, DEFAULT_PRODUCT_NAME, new BigDecimal(price))))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @DisplayName("변경할 상품 가격이 비어있으면 예외가 발생합니다.")
+    @Test
+    void changePriceWithEmptyPrice() {
+        final UUID productId = createProductId();
+        final Product product = product(productId, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(menuRepository.findAllByProductId(productId)).thenReturn(emptyList());
+
+        assertThatThrownBy(() ->
+                productService.changePrice(productId, product(productId, DEFAULT_PRODUCT_NAME, null)))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
