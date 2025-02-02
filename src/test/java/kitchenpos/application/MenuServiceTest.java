@@ -362,4 +362,23 @@ class MenuServiceTest {
                 () -> assertThat(actual.isDisplayed()).isTrue()
         );
     }
+
+    @DisplayName("메뉴의 가격이 메뉴 상품의 가격 합보다 크면 메뉴를 노출할 수 없습니다.")
+    @Test
+    void displayWithPriceLessThanSumOfMenuProductPrice() {
+        final UUID menuId = UUID.randomUUID();
+        final MenuGroup menuGroup = menuGroup();
+        final Product firstProduct = product(UUID.randomUUID(), "후라이드 치킨", new BigDecimal("16000"));
+        final Product secondProduct = product(UUID.randomUUID(), "양념 치킨", new BigDecimal("16000"));
+        final Menu menu = menu(menuId, "양념 후라이드 세트", new BigDecimal("32010"),
+                menuGroup, List.of(
+                        menuProduct(1L, 1L, firstProduct),
+                        menuProduct(2L, 1L, secondProduct)
+                ), false
+        );
+        when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
+
+        assertThatThrownBy(() -> menuService.display(menu.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
 }
