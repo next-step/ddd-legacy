@@ -14,6 +14,8 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,20 +32,13 @@ class ProductServiceTest {
     private final MenuRepository menuRepository = mock(MenuRepository.class);
     private final PurgomalumClient purgomalumClient = mock(PurgomalumClient.class);
     private final ProductService productService = new ProductService(productRepository, menuRepository, purgomalumClient);
-    private final Product product = new Product();
-
-    @BeforeEach
-    void setUp() {
-        product.setId(UUID.randomUUID());
-    }
 
     @DisplayName("상품을 등록할 수 있다.")
     @ParameterizedTest
     @CsvSource(value = {"짜장면:7000", "우동:6000"}, delimiter = ':')
      void create(String name, BigDecimal price) {
         // given
-        product.setName(name);
-        product.setPrice(price);
+        Product product = makeTestProduct(name, price);
         // Mock 객체가 save() 호출 시 product를 반환하도록 설정
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
@@ -61,11 +56,14 @@ class ProductServiceTest {
     @ParameterizedTest
     @CsvSource(value = {"짜장면:-1", "우동:-3000"}, delimiter = ':')
     void minusPrice(String name, BigDecimal price) {
-        product.setName(name);
-        product.setPrice(price);
+        // given
+        Product product = makeTestProduct(name, price);
+
+        // when
         // Mock 객체가 save() 호출 시 product를 반환하도록 설정
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
+        // then
         assertThatThrownBy(() -> productService.create(product)).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -73,11 +71,14 @@ class ProductServiceTest {
     @ParameterizedTest
     @NullSource
     void nullName(String name) {
-        product.setName(name);
-        product.setPrice(BigDecimal.ONE);
+        // given
+        Product product = makeTestProduct(name, BigDecimal.ONE);
+
+        // when
         // Mock 객체가 save() 호출 시 product를 반환하도록 설정
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
+        // then
         assertThatThrownBy(() -> productService.create(product)).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -85,13 +86,16 @@ class ProductServiceTest {
     @ParameterizedTest
     @CsvSource(value = {"fuck:7000", "shit:6000"}, delimiter = ':')
     void hasProfanity(String name, BigDecimal price) {
-        product.setName(name);
-        product.setPrice(price);
+        // given
+        Product product = makeTestProduct(name, price);
+
+        // when
         // Mock 객체가 containsProfanity() 호출 시 true를 반환하도록 설정
         when(purgomalumClient.containsProfanity(name)).thenReturn(true);
         // Mock 객체가 save() 호출 시 product를 반환하도록 설정
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
+        // then
         assertThatThrownBy(() -> productService.create(product)).isInstanceOf(IllegalArgumentException.class);
     }
     
@@ -99,19 +103,45 @@ class ProductServiceTest {
     @ParameterizedTest
     @NullSource
     void nullPrice(BigDecimal price) {
-        product.setName("짜장면");
-        product.setPrice(price);
+        // given
+        Product product = makeTestProduct("짜장면", price);
+
+        // when
         // Mock 객체가 save() 호출 시 product를 반환하도록 설정
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
+        // then
         assertThatThrownBy(() -> productService.create(product)).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Test
-    void changePrice() {
+    @DisplayName("상품의 가격은 변경이 가능하다.")
+    @ParameterizedTest
+    @CsvSource(value = {"짜장면:7000:8000", "우동:6000:7000"}, delimiter = ':')
+    void changePrice(String name, BigDecimal price, BigDecimal changePrice) {
+        // given
+        Product asProduct = makeTestProduct(name, price);
+        Product toProduct = makeTestProduct(name, changePrice);
+
+        // when
+        when(productRepository.findById(any())).thenReturn(Optional.of(asProduct));
+        when(menuRepository.findAllByProductId(any())).thenReturn(List.of());
+
+        Product product = productService.changePrice(asProduct.getId(), toProduct);
+
+        // then
+        assertThat(product.getPrice()).isEqualTo(toProduct.getPrice());
+
     }
 
     @Test
     void findAll() {
+    }
+
+    Product makeTestProduct(String name, BigDecimal price) {
+        Product product = new Product();
+        product.setId(UUID.randomUUID());
+        product.setName(name);
+        product.setPrice(price);
+        return product;
     }
 }
