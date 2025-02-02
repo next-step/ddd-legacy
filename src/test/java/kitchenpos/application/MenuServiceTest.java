@@ -415,4 +415,14 @@ class MenuServiceTest {
                 () -> assertThat(actual.isDisplayed()).isFalse()
         );
     }
+
+    @DisplayName("메뉴가 존재하지 않으면 메뉴를 숨길 수 없습니다.")
+    @Test
+    void hideWithNotExistsMenu() {
+        final UUID menuId = UUID.randomUUID();
+        when(menuRepository.findById(menuId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> menuService.hide(menuId))
+                .isInstanceOf(NoSuchElementException.class);
+    }
 }
