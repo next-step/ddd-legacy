@@ -12,7 +12,7 @@ value class NonNegativeInt(
     }
 
     companion object {
-        const val LOWER_BOUND = 0
+        private const val LOWER_BOUND = 0
     }
 }
 
