@@ -1,0 +1,96 @@
+package kitchenpos.application;
+
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatException;
+
+@SpringBootTest
+class MenuGroupServiceTest {
+
+    @Autowired
+    private MenuGroupService menuGroupService;
+
+    @Autowired
+    private MenuGroupRepository menuGroupRepository;
+
+    @Nested
+    @DisplayName("메뉴 그룹 생성")
+    class CreateGroupMenu {
+
+        @Test
+        @DisplayName("메뉴 그룹 생성 성공")
+        void testCreateGroupMenu() {
+            // given
+            final String name = "MENU_GROUP_NAME";
+            final MenuGroup request = new MenuGroup();
+            request.setName(name);
+
+            // when
+            final MenuGroup result = menuGroupService.create(request);
+
+            // then
+            final MenuGroup found = menuGroupRepository.findById(result.getId()).orElse(null);
+
+            assertThat(found).isNotNull();
+            assertThat(found.getName()).isEqualTo(name);
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @DisplayName("메뉴 그룹은 이름을 필수로 가진다.")
+        void testNullOrEmptyName(final String name) {
+            // given
+            final MenuGroup request = new MenuGroup();
+            request.setName(name);
+
+            // when & then
+            assertThatException()
+                    .isThrownBy(() -> menuGroupService.create(request))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("그룹 메뉴 조회")
+    class FindGroupMenus {
+
+        @Test
+        @DisplayName("등록된 모든 메뉴 그룹을 조회한다.")
+        void testFindAllGroupMenu() {
+            // given
+            MenuGroup menuGroup1 = createMenuGroup("MENU_GROUP_NAME_1");
+            MenuGroup menuGroup2 = createMenuGroup("MENU_GROUP_NAME_2");
+            menuGroupRepository.save(menuGroup1);
+            menuGroupRepository.save(menuGroup2);
+
+            // when
+            final List<MenuGroup> result = menuGroupService.findAll();
+
+            // then
+            assertThat(result)
+                    .hasSize(2)
+                    .extracting(MenuGroup::getName)
+                    .containsExactly("MENU_GROUP_NAME_1", "MENU_GROUP_NAME_2");
+        }
+    }
+
+    private MenuGroup createMenuGroup(final String name) {
+        final MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(UUID.randomUUID());
+        menuGroup.setName(name);
+        return menuGroup;
+    }
+
+}
