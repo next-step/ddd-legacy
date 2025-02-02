@@ -6,7 +6,7 @@ package racingcar;
  */
 public record CarName(String name) {
 
-    static final int MAX_CAR_NAME = 5;
+    private static final int MAX_CAR_NAME = 5;
 
     public CarName {
         if (name == null) {
