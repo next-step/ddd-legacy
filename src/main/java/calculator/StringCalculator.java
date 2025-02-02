@@ -6,8 +6,6 @@ import java.util.List;
 
 public class StringCalculator {
 
-    private Integer result = 0;
-
     /* add : 문자열 덧셈 계산 */
     public Integer add(String input) {
 
@@ -28,8 +26,7 @@ public class StringCalculator {
         }
 
         // 3. 연산 - 숫자들의 합 구하기
-        result = numbers.sum();
-        return result;
+        return numbers.sum();
     }
 
 }

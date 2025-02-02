@@ -2,19 +2,19 @@ package calculator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Numbers {
 
-    private List<Number> numbers = new ArrayList<>();
+    private final List<Number> numbers;
 
     public Numbers() {
+        this.numbers = new ArrayList<>();
     }
 
-    public Numbers(List<String> numbers) {
-        this.numbers = numbers.stream()
+    public Numbers(List<String> stringNumbers) {
+        this.numbers = stringNumbers.stream()
                 .map(Numbers::convertNumber)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public boolean isNullOrEmpty() {
@@ -30,7 +30,7 @@ public class Numbers {
     }
 
     /* convertNumber : String > Integer 변환 */
-    public static int convertNumber(String input) {
+    public static Number convertNumber(String input) {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
