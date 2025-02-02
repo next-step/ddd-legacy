@@ -17,12 +17,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.Collections.emptyList;
 import static kitchenpos.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -50,7 +53,7 @@ class ProductServiceTest {
     void create() {
         final Product product = product(null, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
         when(purgomalumClient.containsProfanity(DEFAULT_PRODUCT_NAME)).thenReturn(false);
-        when(productRepository.save(any(Product.class))).then(AdditionalAnswers.returnsFirstArg());
+        when(productRepository.save(any(Product.class))).then(returnsFirstArg());
 
         final Product actual = productService.create(product);
 
@@ -68,7 +71,7 @@ class ProductServiceTest {
     void createWithEmptyName(final String name) {
         final Product product = product(null, name, DEFAULT_PRODUCT_PRICE);
         when(purgomalumClient.containsProfanity(name)).thenReturn(false);
-        when(productRepository.save(any(Product.class))).then(AdditionalAnswers.returnsFirstArg());
+        when(productRepository.save(any(Product.class))).then(returnsFirstArg());
 
         assertThatThrownBy(() -> productService.create(product))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -112,9 +115,9 @@ class ProductServiceTest {
         final UUID productId = createProductId();
         final Product product = product(productId, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
         final BigDecimal changedPrice = BigDecimal.valueOf(16010);
-        when(productRepository.findById(productId)).thenReturn(java.util.Optional.of(product));
-        when(menuRepository.findAllByProductId(productId)).thenReturn(java.util.Collections.emptyList());
-        when(productRepository.save(any(Product.class))).then(AdditionalAnswers.returnsFirstArg());
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(menuRepository.findAllByProductId(productId)).thenReturn(emptyList());
+        when(productRepository.save(any(Product.class))).then(returnsFirstArg());
         final Product actual = productService.changePrice(productId, product(productId, DEFAULT_PRODUCT_NAME, changedPrice));
 
         assertAll(
@@ -123,5 +126,19 @@ class ProductServiceTest {
                 () -> assertThat(actual.getName()).isEqualTo(DEFAULT_PRODUCT_NAME),
                 () -> assertThat(actual.getPrice()).isEqualByComparingTo(changedPrice)
         );
+    }
+
+    @DisplayName("변경할 상품 가격이 0원 이상이어야 합니다.")
+    @ParameterizedTest(name = "입력값 `{0}`")
+    @ValueSource(strings = {"-1", "-1000", "-10000"})
+    void changePriceWithNegativePrice(final String price) {
+        final UUID productId = createProductId();
+        final Product product = product(productId, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(menuRepository.findAllByProductId(productId)).thenReturn(emptyList());
+
+        assertThatThrownBy(() ->
+                productService.changePrice(productId, product(productId, DEFAULT_PRODUCT_NAME, new BigDecimal(price))))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
