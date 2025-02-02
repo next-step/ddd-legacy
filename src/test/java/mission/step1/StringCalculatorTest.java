@@ -23,7 +23,7 @@ class StringCalculatorTest {
     void setUp() {
         parser = new CompositeParser(new Parser(), new CustomParser());
         calculator = new Calculator();
-        stringCalculator = new StringCalculator(parser, calculator);
+        stringCalculator = new StringCalculator(parser);
     }
 
     @ParameterizedTest

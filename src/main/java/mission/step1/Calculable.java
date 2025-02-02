@@ -1,8 +1,5 @@
 package mission.step1;
 
 public interface Calculable {
-
-    PositiveNumber calculate(PositiveNumber number);
-
-    int getResult();
+    PositiveNumber calculate(PositiveNumber current, PositiveNumber number);
 }
