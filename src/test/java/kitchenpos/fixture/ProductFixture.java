@@ -14,7 +14,7 @@ public class ProductFixture {
     }
 
     public static Product product() {
-        return product(getUuid(), DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
+        return product(createProductId(), DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
     }
 
     public static Product product(UUID id, String name, int price) {
@@ -29,7 +29,7 @@ public class ProductFixture {
         return product;
     }
 
-    private static UUID getUuid() {
+    public static UUID createProductId() {
         return UUID.randomUUID();
     }
 }

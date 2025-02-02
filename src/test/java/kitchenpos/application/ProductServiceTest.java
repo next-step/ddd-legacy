@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import static kitchenpos.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -103,5 +104,24 @@ class ProductServiceTest {
 
         assertThatThrownBy(() -> productService.create(product))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품 가격을 변경할 수 있습니다.")
+    @Test
+    void changePrice() {
+        final UUID productId = createProductId();
+        final Product product = product(productId, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
+        final BigDecimal changedPrice = BigDecimal.valueOf(16010);
+        when(productRepository.findById(productId)).thenReturn(java.util.Optional.of(product));
+        when(menuRepository.findAllByProductId(productId)).thenReturn(java.util.Collections.emptyList());
+        when(productRepository.save(any(Product.class))).then(AdditionalAnswers.returnsFirstArg());
+        final Product actual = productService.changePrice(productId, product(productId, DEFAULT_PRODUCT_NAME, changedPrice));
+
+        assertAll(
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(actual.getId()).isEqualTo(productId),
+                () -> assertThat(actual.getName()).isEqualTo(DEFAULT_PRODUCT_NAME),
+                () -> assertThat(actual.getPrice()).isEqualByComparingTo(changedPrice)
+        );
     }
 }
