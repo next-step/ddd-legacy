@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,18 +55,16 @@ class ProductServiceTest {
         assertThat(result.getPrice()).isEqualTo(price);
     }
 
-    @DisplayName("상품 가격은 0원 이상이어야 한다.")
+    @DisplayName("상품 가격은 0원보다 작다면 에러를 발생시킨다.")
     @ParameterizedTest
-    @CsvSource(value = {"짜장면:7000", "우동:6000"}, delimiter = ':')
-    void positivePrice(String name, BigDecimal price) {
+    @CsvSource(value = {"짜장면:-1", "우동:-3000"}, delimiter = ':')
+    void minusPrice(String name, BigDecimal price) {
+        product.setName(name);
+        product.setPrice(price);
         // Mock 객체가 save() 호출 시 product를 반환하도록 설정
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
-        Product result = productService.create(product);
-
-        assertThat(result.getId()).isNotNull();
-        assertThat(result.getName()).isEqualTo(name);
-        assertThat(result.getPrice()).isEqualTo(price);
+        assertThatThrownBy(() -> productService.create(product)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
