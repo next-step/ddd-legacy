@@ -10,10 +10,10 @@ import java.util.stream.Stream;
 public class Separator {
 
     private final List<String> separators = new ArrayList<>(Arrays.asList(",", ":"));
+    private static final Pattern PATTERN = Pattern.compile("//(.*?)\\n");
 
     public Stream<NotNegativeNumber> separate(String input) {
-        Pattern pattern = Pattern.compile("//(.*?)\\n");
-        Matcher matcher = pattern.matcher(input);
+        Matcher matcher = PATTERN.matcher(input);
 
         if (matcher.find()) {
             String customSeparator = matcher.group(1);
