@@ -11,7 +11,6 @@ import kitchenpos.infra.PurgomalumClient
 import spec.BaseUnitSpec
 import java.math.BigDecimal
 import java.util.*
-import kotlin.NoSuchElementException
 
 internal class MenuServiceTest : BaseUnitSpec({
 

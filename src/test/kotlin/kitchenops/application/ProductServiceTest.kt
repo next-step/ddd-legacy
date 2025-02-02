@@ -6,11 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kitchenpos.application.ProductService
-import kitchenpos.domain.Menu
-import kitchenpos.domain.MenuProduct
-import kitchenpos.domain.MenuRepository
-import kitchenpos.domain.Product
-import kitchenpos.domain.ProductRepository
+import kitchenpos.domain.*
 import kitchenpos.infra.PurgomalumClient
 import spec.BaseUnitSpec
 import java.math.BigDecimal
