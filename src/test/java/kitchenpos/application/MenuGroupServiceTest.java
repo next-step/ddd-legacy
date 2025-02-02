@@ -33,9 +33,7 @@ class MenuGroupServiceTest {
         @DisplayName("메뉴 그룹 생성 성공")
         void testCreateGroupMenu() {
             // given
-            final String name = "MENU_GROUP_NAME";
-            final MenuGroup request = new MenuGroup();
-            request.setName(name);
+            final MenuGroup request = MenuGroupFixture.createMenuGroup("한마리메뉴");
 
             // when
             final MenuGroup result = menuGroupService.create(request);
@@ -44,7 +42,7 @@ class MenuGroupServiceTest {
             final MenuGroup found = menuGroupRepository.findById(result.getId()).orElse(null);
 
             assertThat(found).isNotNull();
-            assertThat(found.getName()).isEqualTo(name);
+            assertThat(found.getName()).isEqualTo(request.getName());
         }
 
         @ParameterizedTest
@@ -52,8 +50,7 @@ class MenuGroupServiceTest {
         @DisplayName("메뉴 그룹은 이름을 필수로 가진다.")
         void testNullOrEmptyName(final String name) {
             // given
-            final MenuGroup request = new MenuGroup();
-            request.setName(name);
+            final MenuGroup request = MenuGroupFixture.createMenuGroup(name);
 
             // when & then
             assertThatException()
@@ -70,8 +67,8 @@ class MenuGroupServiceTest {
         @DisplayName("등록된 모든 메뉴 그룹을 조회한다.")
         void testFindAllGroupMenu() {
             // given
-            MenuGroup menuGroup1 = MenuGroupFixture.createMenuGroup("MENU_GROUP_NAME_1");
-            MenuGroup menuGroup2 = MenuGroupFixture.createMenuGroup("MENU_GROUP_NAME_2");
+            MenuGroup menuGroup1 = MenuGroupFixture.createMenuGroup("한마리메뉴");
+            MenuGroup menuGroup2 = MenuGroupFixture.createMenuGroup("두마리메뉴");
             menuGroupRepository.save(menuGroup1);
             menuGroupRepository.save(menuGroup2);
 
@@ -81,8 +78,8 @@ class MenuGroupServiceTest {
             // then
             assertThat(result)
                     .hasSize(2)
-                    .extracting(MenuGroup::getName)
-                    .containsExactly("MENU_GROUP_NAME_1", "MENU_GROUP_NAME_2");
+                    .extracting(MenuGroup::getId)
+                    .containsExactly(menuGroup1.getId(), menuGroup2.getId());
         }
     }
 

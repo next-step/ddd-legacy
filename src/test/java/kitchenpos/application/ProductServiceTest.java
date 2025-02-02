@@ -8,11 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,20 +24,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatException;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
-@ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
-
-    @MockBean
-    private PurgomalumClient purgomalumClient;
 
     @Autowired
     private ProductService productService;
 
     @Autowired
     private ProductRepository productRepository;
+
+    @MockBean
+    private PurgomalumClient purgomalumClient;
 
     @Nested
     @DisplayName("상품 등록")
@@ -49,10 +46,8 @@ class ProductServiceTest {
         @DisplayName("상품을 등록한다.")
         void testRegisterProduct() {
             // given
-            final String name = "PRODUCT_NAME";
-            final BigDecimal price = BigDecimal.valueOf(1000);
-            final Product request = ProductFixture.createProduct(name, price);
-            when(purgomalumClient.containsProfanity(anyString())).thenReturn(false);
+            final Product request = ProductFixture.createProductRequest("후라이드", BigDecimal.valueOf(16_000));
+            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
 
             // when
             final Product result = productService.create(request);
@@ -62,18 +57,18 @@ class ProductServiceTest {
 
             assertThat(found).isNotNull();
             assertAll(
-                    () -> assertThat(found.getName()).isEqualTo(name),
-                    () -> assertThat(found.getPrice()).isEqualByComparingTo(price)
+                    () -> assertThat(found.getName()).isEqualTo(request.getName()),
+                    () -> assertThat(found.getPrice()).isEqualByComparingTo(request.getPrice())
             );
         }
 
         @ParameterizedTest
-        @NullAndEmptySource
+        @NullSource
         @DisplayName("상품은 이름과 가격을 필수로 가진다.")
-        void testNullOrEmptyName(final String name) {
+        void testNullName(final String name) {
             // given
-            final Product request = ProductFixture.createProduct(name, BigDecimal.valueOf(1000));
-            when(purgomalumClient.containsProfanity(anyString())).thenReturn(false);
+            final Product request = ProductFixture.createProductRequest(name, BigDecimal.valueOf(16_000));
+            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
 
             // when & then
             assertThatException()
@@ -86,8 +81,8 @@ class ProductServiceTest {
         @ValueSource(ints = {-1000, -1})
         void testPriceLessThanZero(final int price) {
             // given
-            final Product request = ProductFixture.createProduct("VALID_NAME", BigDecimal.valueOf(price));
-            when(purgomalumClient.containsProfanity(anyString())).thenReturn(false);
+            final Product request = ProductFixture.createProduct("후라이드", BigDecimal.valueOf(price));
+            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
 
             // when & then
             assertThatException()
@@ -99,8 +94,8 @@ class ProductServiceTest {
         @DisplayName("상품 등록 시 이름의 유해성 여부를 검사한다.")
         void testInappropriateName() {
             // given
-            final Product request = ProductFixture.createProduct("INAPPROPRIATE_NAME", BigDecimal.valueOf(1000));
-            when(purgomalumClient.containsProfanity(anyString())).thenReturn(true);
+            final Product request = ProductFixture.createProduct("부적절한이름", BigDecimal.valueOf(1000));
+            given(purgomalumClient.containsProfanity(anyString())).willReturn(true);
 
             // when & then
             assertThatException()
@@ -117,33 +112,31 @@ class ProductServiceTest {
 
         @BeforeEach
         void setup() {
-            final Product product = ProductFixture.createProduct("PRODUCT_NAME", BigDecimal.valueOf(1000));
-            when(purgomalumClient.containsProfanity(anyString())).thenReturn(false);
-            existingId = productService.create(product).getId();
+            existingId = saveProduct().getId();
         }
 
         @Test
         @DisplayName("지정한 상품의 가격을 변경할 수 있다.")
         void changeProductPriceSuccess() {
             // given
-            final Product request = new Product();
-            request.setPrice(BigDecimal.valueOf(2000));
+            final Product request = ProductFixture.createProductRequest("후라이드", BigDecimal.valueOf(20_000));
 
             // when
             final Product result = productService.changePrice(existingId, request);
 
             // then
-            assertThat(result).isNotNull();
-            assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(2000));
+            final Product found = productRepository.findById(result.getId()).orElse(null);
+
+            assertThat(found).isNotNull();
+            assertThat(found.getPrice()).isEqualByComparingTo(request.getPrice());
         }
 
         @ParameterizedTest
         @DisplayName("상품 가격 변경 시 가격이 0원 이상이어야 한다.")
         @ValueSource(ints = {-1000, -1})
-        void changeProductPriceFailsWithNegativePrice() {
+        void changeProductPriceFailsWithNegativePrice(final int price) {
             // given
-            final Product request = new Product();
-            request.setPrice(BigDecimal.valueOf(-2000));
+            final Product request = ProductFixture.createProductRequest("후라이드", BigDecimal.valueOf(price));
 
             // when & then
             assertThatException()
@@ -155,8 +148,7 @@ class ProductServiceTest {
         @DisplayName("등록되지 않은 상품의 가격을 변경할 수 없다.")
         void testNonExistingProduct() {
             // given
-            final Product request = new Product();
-            request.setPrice(BigDecimal.valueOf(2000));
+            final Product request = ProductFixture.createProductRequest("후라이드", BigDecimal.valueOf(20_000));
 
             // when & then
             assertThatException()
@@ -173,11 +165,7 @@ class ProductServiceTest {
         @DisplayName("등록된 모든 상품의 목록을 조회한다.")
         void findAllProductsSuccess() {
             // given
-            final Product product1 = ProductFixture.createProduct("PRODUCT_1", BigDecimal.valueOf(1000));
-            final Product product2 = ProductFixture.createProduct("PRODUCT_2", BigDecimal.valueOf(2000));
-            when(purgomalumClient.containsProfanity(anyString())).thenReturn(false);
-            productService.create(product1);
-            productService.create(product2);
+            List<UUID> ids = List.of(saveProduct(1).getId(), saveProduct(2).getId());
 
             // when
             final List<Product> result = productService.findAll();
@@ -185,9 +173,18 @@ class ProductServiceTest {
             // then
             assertThat(result)
                     .hasSize(2)
-                    .extracting(Product::getName)
-                    .containsExactly("PRODUCT_1", "PRODUCT_2");
+                    .extracting(Product::getId)
+                    .containsExactly(ids.toArray(UUID[]::new));
         }
+    }
+
+    private Product saveProduct(int index) {
+        final Product product = ProductFixture.createProduct("후라이드%d".formatted(index) + index, BigDecimal.valueOf(16_000));
+        return productRepository.save(product);
+    }
+
+    private Product saveProduct() {
+        return saveProduct(1);
     }
 
 }

@@ -15,4 +15,11 @@ public class ProductFixture {
         return product;
     }
 
+    public static Product createProductRequest(final String name, final BigDecimal price) {
+        final Product product = new Product();
+        product.setName(name);
+        product.setPrice(price);
+        return product;
+    }
+
 }
