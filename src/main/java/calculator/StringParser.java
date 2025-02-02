@@ -15,15 +15,15 @@ public class StringParser {
     }
 
     public static String[] splitNumbers(String text) {
-        Matcher m = CUSTOM_DELIMITER_PATTERN.matcher(text);
-        String delimiters = DEFAULT_DELIMITERS;
-
-        if (m.find()) {
-            String customDelimiter = m.group(CUSTOM_DELIMITER_INDEX);
-            delimiters = delimiters + "|" + customDelimiter;
-            text = m.group(ONLY_NUMBER_STRING_INDEX);
+        final Matcher m = CUSTOM_DELIMITER_PATTERN.matcher(text);
+        if (!m.find()) {
+            return text.split(DEFAULT_DELIMITERS);
         }
 
-        return text.split(delimiters);
+        final String customDelimiter = m.group(CUSTOM_DELIMITER_INDEX);
+        final String delimiter = String.join("|", DEFAULT_DELIMITERS, customDelimiter);
+
+        final String numberString = m.group(ONLY_NUMBER_STRING_INDEX);
+        return numberString.split(delimiter);
     }
 }
