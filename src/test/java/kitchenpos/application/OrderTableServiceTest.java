@@ -163,4 +163,19 @@ class OrderTableServiceTest {
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(createOrderTableId(), renewedOrderTable))
                 .isInstanceOf(NoSuchElementException.class);
     }
+
+    @DisplayName("가게 테이블의 손님 수를 0명 미만으로 변경할 수 없습니다.")
+    @Test
+    void changeNumberOfGuestsWhenNumberOfGuestsIsNegative() {
+        final OrderTable existedOrderTable = orderTable(
+                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, true
+        );
+        when(orderTableRepository.findById(existedOrderTable.getId())).thenReturn(Optional.of(existedOrderTable));
+        final OrderTable renewedOrderTable = orderTable(
+                existedOrderTable.getId(), existedOrderTable.getName(), -1, existedOrderTable.isOccupied()
+        );
+
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(existedOrderTable.getId(), renewedOrderTable))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
