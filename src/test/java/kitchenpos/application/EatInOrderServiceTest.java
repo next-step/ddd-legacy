@@ -148,6 +148,18 @@ class EatInOrderServiceTest {
                     eatInOrder(null, null, orderTable, OrderStatus.WAITING, List.of(orderLineItem))
             )).isInstanceOf(IllegalArgumentException.class);
         }
+
+        @DisplayName("주문 테이블이 존재하지 않으면 예외가 발생한다")
+        @Test
+        void createOrderWithoutOrderTable() {
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+            when(menuRepository.findById(menu.getId())).thenReturn(Optional.ofNullable(menu));
+            when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.create(
+                    eatInOrder(null, null, orderTable, OrderStatus.WAITING, List.of(orderLineItem))
+            )).isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
