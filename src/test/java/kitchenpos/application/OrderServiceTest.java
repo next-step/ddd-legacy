@@ -97,4 +97,29 @@ class OrderServiceTest {
                 () -> assertThat(order.getOrderTable()).isNull()
         );
     }
+
+    @DisplayName("배달 주문을 생성할 수 있습니다.")
+    @Test
+    void createDeliveryOrder() {
+        final Menu menu = menu();
+        final long quantity = 1L;
+        final OrderLineItem orderLineItem = orderLineItem(menu, quantity, menu.getPrice().multiply(BigDecimal.valueOf(quantity)));
+        final String deliverAddress = "서울시 강남구";
+
+        when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+        when(menuRepository.findById(menu.getId())).thenReturn(Optional.ofNullable(menu));
+        when(orderRepository.save(any(Order.class))).then(returnsFirstArg());
+        final Order order = orderService.create(
+                deliveryOrder(null, null, deliverAddress, OrderStatus.WAITING, List.of(orderLineItem))
+        );
+        assertAll(
+                () -> assertThat(order.getId()).isNotNull(),
+                () -> assertThat(order.getOrderDateTime()).isBeforeOrEqualTo(LocalDateTime.now()),
+                () -> assertThat(order.getDeliveryAddress()).isEqualTo(deliverAddress),
+                () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(order.getType()).isEqualTo(OrderType.DELIVERY),
+                () -> assertThat(order.getOrderTable()).isNull()
+        );
+    }
+
 }
