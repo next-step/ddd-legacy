@@ -118,13 +118,11 @@ class DeliveryOrderServiceTest {
         @NullAndEmptySource
         void createOrderWithoutOrderLineItems(final List<OrderLineItem> orderLineItems) {
             assertThatThrownBy(() -> orderService.create(
-                    order(
+                    deliveryOrder(
                             null,
                             null,
                             deliverAddress,
                             OrderStatus.WAITING,
-                            OrderType.EAT_IN,
-                            null,
                             orderLineItems
                     )
             )).isInstanceOf(IllegalArgumentException.class);
@@ -145,13 +143,11 @@ class DeliveryOrderServiceTest {
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
 
             assertThatThrownBy(() -> orderService.create(
-                    order(
+                    deliveryOrder(
                             null,
                             null,
                             deliverAddress,
                             OrderStatus.WAITING,
-                            OrderType.DELIVERY,
-                            null,
                             List.of(orderLineItem, otherOrderLineItem)
                     )
             )).isInstanceOf(IllegalArgumentException.class);
@@ -166,13 +162,11 @@ class DeliveryOrderServiceTest {
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
 
             assertThatThrownBy(() -> orderService.create(
-                    order(
+                    deliveryOrder(
                             null,
                             null,
                             deliverAddress,
                             OrderStatus.WAITING,
-                            OrderType.DELIVERY,
-                            null,
                             List.of(negativeOrderLineItem)
                     )
             )).isInstanceOf(IllegalArgumentException.class);
@@ -195,17 +189,27 @@ class DeliveryOrderServiceTest {
             when(menuRepository.findById(nonExistentMenu.getId())).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> orderService.create(
-                    order(
+                    deliveryOrder(
                             null,
                             null,
                             deliverAddress,
                             OrderStatus.WAITING,
-                            OrderType.DELIVERY,
-                            null,
                             List.of(nonExistentOrderLineItem)
                     )
             )).isInstanceOf(NoSuchElementException.class);
         }
 
+        @DisplayName("주문 항목의 메뉴의 가격이 일치하지 않으면 예외가 발생합니다")
+        @Test
+        void createOrderWithDifferentMenuPrice() {
+            final BigDecimal differentPrice = menu.getPrice().add(BigDecimal.ONE);
+            final Menu differentPriceMenu = menu(menu.getId(), menu.getName(), differentPrice, menu.getMenuGroup(), menu.getMenuProducts(), menu.isDisplayed());
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(differentPriceMenu));
+            when(menuRepository.findById(differentPriceMenu.getId())).thenReturn(Optional.ofNullable(differentPriceMenu));
+
+            assertThatThrownBy(() -> orderService.create(
+                    deliveryOrder(null, null, deliverAddress, OrderStatus.WAITING, List.of(orderLineItem))
+            )).isInstanceOf(IllegalArgumentException.class);
+        }
     }
 }
