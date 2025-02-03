@@ -340,6 +340,128 @@ class OrderServiceTest {
     }
     //endregion
 
+    //region [주문 완료]
+    @DisplayName("배달 주문의 상태를 주문 완료로 변경한다")
+    @Test
+    void complete() {
+        //given
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
+        Order order = createDeliveredOrder(deliveryOrderRequest);
+        //when
+        Order complete = orderService.complete(order.getId());
+        //then
+        assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName("배달 주문의 경우, 주문의 상태가 배달 완료(DELIVERED)인 경우만 주문을 완료할 수 있다")
+    @EnumSource(value = OrderStatus.class, names = "DELIVERED", mode = EnumSource.Mode.EXCLUDE)
+    @ParameterizedTest
+    void completeOrderByDelivery(OrderStatus orderStatus) {
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
+        Order order = orderService.create(deliveryOrderRequest);
+
+        order.setStatus(orderStatus);
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.complete(order.getId()));
+    }
+
+    @DisplayName("포장 주문의 상태를 주문 완료로 변경한다")
+    @Test
+    void completeByTakeOut() {
+        //given
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
+        Order servedOrder = createServedOrder(takeOutRequest);
+        //when
+        Order complete = orderService.complete(servedOrder.getId());
+        //then
+        assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName("매장 내 취식 주문 상태를 주문 완료로 변경한다")
+    @Test
+    void completeByEatIn() {
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        OrderTable orderTable = orderTableRepository.save(createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
+        Order eatInRequest = createEatInOrder(List.of(orderLineItem), orderTable.getId(), LocalDateTime.now());
+        Order servedOrder = createServedOrder(eatInRequest);
+        //when
+        Order complete = orderService.complete(servedOrder.getId());
+        //then
+        assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName("포장/매장 내 취식의 경우, 주문의 상태가 음식 제공됨(SERVED)인 경우만 주문을 완료할 수 있다")
+    @EnumSource(value = OrderStatus.class, names = "SERVED", mode = EnumSource.Mode.EXCLUDE)
+    @ParameterizedTest
+    void completeOrderByEatInOrTakeOut(OrderStatus orderStatus) {
+        //given
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
+
+        OrderTable orderTable = orderTableRepository.save(createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
+        Order eatInRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
+
+        Order takeoutOrder = orderService.create(takeOutRequest);
+        Order eatInOrder = orderService.create(eatInRequest);
+        //when
+        takeoutOrder.setStatus(orderStatus);
+        eatInOrder.setStatus(orderStatus);
+        //then
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.complete(takeoutOrder.getId()));
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.complete(eatInOrder.getId()));
+    }
+
+    @DisplayName("매장 내 식사의 경우, 주문 테이블의 모든 주문이 완료 상태가 아닐 때 테이블은 사용 중이며 손님의 수는 0으로 초기화되지 않는다")
+    @Test
+    void completeOrderByEatIn() {
+        //given
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        OrderTable orderTable = orderTableRepository.save(createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
+        Order eatInRequest = createEatInOrder(List.of(orderLineItem), orderTable.getId(), LocalDateTime.now());
+        //주문 상태가 SERVED인 주문1,2 생성
+        Order servedOrder1 = createServedOrder(eatInRequest);
+        Order servedOrder2 = createServedOrder(eatInRequest);
+
+        //when
+        Order complete = orderService.complete(servedOrder1.getId());
+
+        //then
+        assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(complete.getOrderTable().isOccupied()).isTrue();
+        assertThat(complete.getOrderTable().getNumberOfGuests()).isNotZero();
+    }
+
+    @DisplayName("매장 내 취식의 경우, 주문 테이블에의 모든 주문이 완료되면 테이블의 사용유무를 안함으로 변경하고 고객의 수를 0명으로 변경한다")
+    @Test
+    void clearOrderTable() {
+        //given
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        OrderTable orderTable = orderTableRepository.save(createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
+        Order eatInRequest = createEatInOrder(List.of(orderLineItem), orderTable.getId(), LocalDateTime.now());
+
+        Order servedOrder1 = createServedOrder(eatInRequest);
+        Order servedOrder2 = createServedOrder(eatInRequest);
+
+        //when
+        Order complete1 = orderService.complete(servedOrder1.getId());
+        Order complete2 = orderService.complete(servedOrder2.getId());
+
+        //then
+        assertThat(complete1.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(complete1.getOrderTable().isOccupied()).isFalse();
+        assertThat(complete1.getOrderTable().getNumberOfGuests()).isZero();
+
+        assertThat(complete2.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(complete2.getOrderTable().isOccupied()).isFalse();
+        assertThat(complete2.getOrderTable().getNumberOfGuests()).isZero();
+    }
+    //endregion
+
     private Product createProduct(UUID id, String name, BigDecimal price) {
         Product product = new Product();
         product.setId(id);
@@ -413,5 +535,19 @@ class OrderServiceTest {
         orderLineItem.setPrice(price);
         orderLineItem.setQuantity(quantity);
         return orderLineItem;
+    }
+
+    private Order createDeliveredOrder(Order deliveryOrder) {
+        Order order = orderService.create(deliveryOrder);
+        Order accept = orderService.accept(order.getId());
+        Order serve = orderService.serve(accept.getId());
+        Order startDelivery = orderService.startDelivery(serve.getId());
+        return orderService.completeDelivery(startDelivery.getId());
+    }
+
+    private Order createServedOrder(Order orderRequest) {
+        Order takeOutOrder = orderService.create(orderRequest);
+        Order accept = orderService.accept(takeOutOrder.getId());
+        return orderService.serve(accept.getId());
     }
 }
