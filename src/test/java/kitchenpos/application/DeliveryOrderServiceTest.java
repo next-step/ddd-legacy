@@ -381,6 +381,34 @@ class DeliveryOrderServiceTest {
         }
     }
 
+    @DisplayName("배달 주문을 배달 완료할 때")
+    @Nested
+    class Complete {
+        private Order order;
+
+        @BeforeEach
+        void setUp() {
+            this.order = deliveryOrder(
+                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.DELIVERING,
+                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+        }
+
+        @DisplayName("배달 주문을 배달 완료할 수 있습니다.")
+        @Test
+        void completeDeliveryOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.ofNullable(order));
+
+            final Order deliveredOrder = orderService.completeDelivery(order.getId());
+
+            assertAll(
+                    () -> assertThat(deliveredOrder.getId()).isEqualTo(order.getId()),
+                    () -> assertThat(deliveredOrder.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress()),
+                    () -> assertThat(deliveredOrder.getType()).isEqualTo(order.getType()),
+                    () -> assertThat(deliveredOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED)
+            );
+        }
+    }
+
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
         return price.multiply(BigDecimal.valueOf(quantity));
     }
