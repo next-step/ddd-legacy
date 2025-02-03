@@ -1,6 +1,6 @@
 package mission.step1;
 
-public class Parser implements ParserStrategy {
+public class Parser implements Parsable {
     private static final String DELIMITER = "[,:]";
 
     @Override

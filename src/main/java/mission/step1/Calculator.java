@@ -1,20 +1,9 @@
 package mission.step1;
 
-public class Calculator implements CalculateStrategy {
-
-    private PositiveNumber accumulated;
-
-    public Calculator() {
-        this.accumulated = PositiveNumber.from("0");
-    }
+public class Calculator implements Calculable {
 
     @Override
-    public PositiveNumber calculate(PositiveNumber number) {
-        this.accumulated = PositiveNumber.from(String.valueOf(accumulated.getValue() + number.getValue()));
-        return this.accumulated;
-    }
-
-    public int getResult() {
-        return this.accumulated.getValue();
+    public PositiveNumber calculate(PositiveNumber current, PositiveNumber number) {
+        return PositiveNumber.from(String.valueOf(current.getValue() + number.getValue()));
     }
 }

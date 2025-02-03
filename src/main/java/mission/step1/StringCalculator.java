@@ -3,15 +3,13 @@ package mission.step1;
 import org.springframework.util.StringUtils;
 
 public class StringCalculator {
-
     private static final int ZERO_VALUE = 0;
-
     private final CompositeParser parser;
-    private final CalculateStrategy calculator;
+    private final Calculator calculator;
 
-    public StringCalculator(CompositeParser parser, CalculateStrategy calculator) {
+    public StringCalculator(CompositeParser parser) {
         this.parser = parser;
-        this.calculator = calculator;
+        this.calculator = new Calculator();
     }
 
     public int add(String expression) {
@@ -24,9 +22,10 @@ public class StringCalculator {
     }
 
     private int calculateSum(String[] numbers) {
+        PositiveNumber accumulated = PositiveNumber.from("0");
         for (String number : numbers) {
-            calculator.calculate(PositiveNumber.from(number));
+            accumulated = calculator.calculate(accumulated, PositiveNumber.from(number));
         }
-        return calculator.getResult();
+        return accumulated.getValue();
     }
 }
