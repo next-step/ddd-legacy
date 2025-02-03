@@ -284,6 +284,62 @@ class OrderServiceTest {
     }
     //endregion
 
+    //region [배달 시작]
+    @DisplayName("배달 주문의 경우 음식이 제공되면 주문 상태를 배달 중(DELIVERING)으로 변경한다")
+    @Test
+    void startDelivery() {
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
+        Order order = orderService.create(deliveryOrderRequest);
+
+        order.setStatus(OrderStatus.SERVED);
+        Order deliveryStartorder = orderService.startDelivery(order.getId());
+
+        assertThat(deliveryStartorder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+    }
+
+    @DisplayName("주문 상태가 음식 제공됨(SERVED)인 경우, 배달 시작이 가능하다")
+    @EnumSource(value = OrderStatus.class, names = "SERVED", mode = EnumSource.Mode.EXCLUDE)
+    @ParameterizedTest
+    void validateDeliveryStartStatus(OrderStatus orderStatus) {
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
+        Order order = orderService.create(deliveryOrderRequest);
+
+        order.setStatus(orderStatus);
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.startDelivery(order.getId()));
+    }
+    //endregion
+
+    //region [배달 완료]
+    @DisplayName("배달 완료한 주문 상태를 배달완료(DELIVERED)로 변경한다")
+    @Test
+    void endDelivery() {
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
+        Order order = orderService.create(deliveryOrderRequest);
+
+        order.setStatus(OrderStatus.DELIVERING);
+        Order deliveryStartorder = orderService.completeDelivery(order.getId());
+
+        assertThat(deliveryStartorder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+    }
+
+    @DisplayName("주문 상태가 배달 중(DELIVERING)인 경우, 배달완료(DELIVERED)로 변경 가능하다")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = "DELIVERING", mode = EnumSource.Mode.EXCLUDE)
+    void validateDeliveryEndStatus(OrderStatus orderStatus) {
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
+        Order order = orderService.create(deliveryOrderRequest);
+
+        order.setStatus(orderStatus);
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.completeDelivery(order.getId()));
+    }
+    //endregion
+
     private Product createProduct(UUID id, String name, BigDecimal price) {
         Product product = new Product();
         product.setId(id);
