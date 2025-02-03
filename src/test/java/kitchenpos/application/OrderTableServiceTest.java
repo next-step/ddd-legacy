@@ -1,5 +1,7 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +34,10 @@ class OrderTableServiceTest {
     @MockBean
     @Autowired
     OrderTableRepository orderTableRepository;
+
+    @MockBean
+    @Autowired
+    OrderRepository orderRepository;
 
     @Autowired
     OrderTableService orderTableService;
@@ -82,6 +88,22 @@ class OrderTableServiceTest {
 
         assertThatThrownBy(() -> orderTableService.sit(createOrderTableId()))
                 .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("가게 테이블을 비울 수 있습니다.")
+    @Test
+    void clearOrderTable() {
+        final OrderTable orderTable = orderTable();
+        when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
+        when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(false);
+        when(orderTableRepository.save(any(OrderTable.class))).then(returnsFirstArg());
+
+        final OrderTable actual = orderTableService.clear(orderTable.getId());
+
+        assertAll(
+                () -> assertThat(actual.getNumberOfGuests()).isZero(),
+                () -> assertThat(actual.isOccupied()).isFalse()
+        );
     }
 
 }
