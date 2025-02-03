@@ -24,4 +24,16 @@ public record Tokens(List<String> token) {
     public String toString() {
         return token.toString();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Tokens that)) return false;
+        return token.equals(that.token);
+    }
+
+    @Override
+    public int hashCode() {
+        return token.hashCode();
+    }
 }
