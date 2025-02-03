@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static kitchenpos.fixture.MenuFixture.menu;
-import static kitchenpos.fixture.OrderFixture.eatInOrder;
-import static kitchenpos.fixture.OrderFixture.orderLineItem;
+import static kitchenpos.fixture.OrderFixture.*;
 import static kitchenpos.fixture.OrderTableFixture.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -72,6 +71,30 @@ class OrderServiceTest {
                 () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
                 () -> assertThat(order.getType()).isEqualTo(OrderType.EAT_IN),
                 () -> assertThat(order.getOrderTable()).isEqualTo(orderTable)
+        );
+    }
+
+    @DisplayName("포장 주문을 생성할 수 있습니다.")
+    @Test
+    void createTakeoutOrder() {
+        final Menu menu = menu();
+        final long quantity = 1L;
+        final OrderLineItem orderLineItem = orderLineItem(menu, quantity, menu.getPrice().multiply(BigDecimal.valueOf(quantity)));
+
+        when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+        when(menuRepository.findById(menu.getId())).thenReturn(Optional.ofNullable(menu));
+        when(orderRepository.save(any(Order.class))).then(returnsFirstArg());
+
+        final Order order = orderService.create(
+                takeoutOrder(null, null, OrderStatus.WAITING, List.of(orderLineItem))
+        );
+        assertAll(
+                () -> assertThat(order.getId()).isNotNull(),
+                () -> assertThat(order.getOrderDateTime()).isBeforeOrEqualTo(LocalDateTime.now()),
+                () -> assertThat(order.getDeliveryAddress()).isNull(),
+                () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(order.getType()).isEqualTo(OrderType.TAKEOUT),
+                () -> assertThat(order.getOrderTable()).isNull()
         );
     }
 }

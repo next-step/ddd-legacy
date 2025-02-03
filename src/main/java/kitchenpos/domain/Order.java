@@ -15,6 +15,7 @@ import jakarta.persistence.Transient;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Table(name = "orders")
@@ -115,7 +116,7 @@ public class Order {
 
     public void setOrderTable(final OrderTable orderTable) {
         this.orderTable = orderTable;
-        setOrderTableId(orderTable.getId());
+        setOrderTableId(Optional.ofNullable(orderTable).map(OrderTable::getId).orElse(null));
     }
 
     public UUID getOrderTableId() {
