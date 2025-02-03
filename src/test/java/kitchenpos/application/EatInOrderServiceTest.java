@@ -305,16 +305,19 @@ class EatInOrderServiceTest {
             this.order = eatInOrder(UUID.randomUUID(), LocalDateTime.now(), orderTable, OrderStatus.SERVED, List.of(orderLineItem));
         }
 
-        @DisplayName("서빙 상태의 주문을 완료할 수 있습니다")
+        @DisplayName("주문을 완료할 수 있습니다")
         @Test
         void completeOrder() {
             when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+            when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(true);
 
             final Order actual = orderService.complete(order.getId());
 
             assertAll(
                     () -> assertThat(actual.getId()).isEqualTo(order.getId()),
-                    () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED)
+                    () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                    () -> assertThat(actual.getOrderTable().isOccupied()).isTrue(),
+                    () -> assertThat(actual.getOrderTable().getNumberOfGuests()).isEqualTo(2)
             );
         }
 
@@ -353,7 +356,6 @@ class EatInOrderServiceTest {
             );
         }
     }
-
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
         return price.multiply(BigDecimal.valueOf(quantity));
