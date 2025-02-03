@@ -407,6 +407,16 @@ class DeliveryOrderServiceTest {
                     () -> assertThat(deliveredOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED)
             );
         }
+
+        @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
+        @Test
+        void completeDeliveryNonExistentOrder() {
+            final UUID nonExistentOrderId = createOrderId();
+            when(orderRepository.findById(nonExistentOrderId)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.completeDelivery(nonExistentOrderId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
