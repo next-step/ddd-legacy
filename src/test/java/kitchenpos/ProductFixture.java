@@ -2,6 +2,7 @@ package kitchenpos;
 
 import helper.IdGenerator;
 import helper.PriceGenerator;
+import kitchenpos.domain.Menu;
 import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
@@ -28,11 +29,27 @@ public class ProductFixture {
         return product;
     }
 
+    public static Product 후라이드_치킨_상품(BigDecimal price){
+        Product product = new Product();
+        product.setId(productIdGenerator.ramdom());
+        product.setName("후라이드 치킨");
+        product.setPrice(price);
+        return product;
+    }
+
     public static Product 콜라_상품() {
         Product product = new Product();
         product.setId(productIdGenerator.ramdom());
         product.setName("콜라");
         product.setPrice(priceGenerator.of(1000));
         return product;
+    }
+
+    //각격변경
+    public static Product 가격만_변경된_상품(Product origin, BigDecimal price) {
+        origin.setId(productIdGenerator.ramdom());
+        origin.setName("콜라");
+        origin.setPrice(price);
+        return origin;
     }
 }

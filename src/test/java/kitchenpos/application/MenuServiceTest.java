@@ -44,8 +44,8 @@ class MenuServiceTest {
     @InjectMocks
     private MenuService sut;
 
-    private final static BigDecimal 큰_메뉴_가격 = BigDecimal.valueOf(1000000);
-    private final static BigDecimal 음수_메뉴_가격 = BigDecimal.valueOf(-1);
+    private final static BigDecimal 큰_가격 = BigDecimal.valueOf(1000000);
+    private final static BigDecimal 음수_가격 = BigDecimal.valueOf(-1);
     private final static long 음수_수량 = -1L;
     private final static UUID 존재하지_않는_메뉴ID = UUID.randomUUID();
 
@@ -112,7 +112,7 @@ class MenuServiceTest {
 
             // 가격이 음수인 메뉴 생성
             Menu 음수_가격_메뉴 = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹, 후라이드_치킨_상품, 콜라_상품);
-            음수_가격_메뉴.setPrice(음수_메뉴_가격);
+            음수_가격_메뉴.setPrice(음수_가격);
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> sut.create(음수_가격_메뉴));
@@ -203,7 +203,7 @@ class MenuServiceTest {
             // 총 상품 가격: 16,000 + 1,000 = 17,000원
             // 메뉴 가격을 19,000원으로 설정하여 예외를 발생시킨다.
             Menu 비싼_메뉴 = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹, 후라이드_치킨_상품, 콜라_상품);
-            비싼_메뉴.setPrice(큰_메뉴_가격); //총 상품 가격보다 높음
+            비싼_메뉴.setPrice(큰_가격); //총 상품 가격보다 높음
 
             // 메뉴 그룹 존재 검증
             given(menuGroupRepository.findById(추천_메뉴그룹.getId()))
@@ -310,7 +310,7 @@ class MenuServiceTest {
         void changeMenuPriceNegativePriceThrowIllegalArgumentException() {
             // given
             Menu 후라이드_치킨_메뉴 = MenuFixture.후라이드_치킨_메뉴();
-            Menu 음수_가격_메뉴 = MenuFixture.가격만_변경된_메뉴(후라이드_치킨_메뉴, 음수_메뉴_가격);
+            Menu 음수_가격_메뉴 = MenuFixture.가격만_변경된_메뉴(후라이드_치킨_메뉴, 음수_가격);
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> sut.changePrice(후라이드_치킨_메뉴.getId(), 음수_가격_메뉴));
@@ -342,7 +342,7 @@ class MenuServiceTest {
             given(menuRepository.findById(기존_메뉴Id)).willReturn(Optional.of(기존_메뉴));
 
             // when
-            BigDecimal 변경할_가격 = 큰_메뉴_가격; // 기존 구성 상품 가격보다 높음
+            BigDecimal 변경할_가격 = 큰_가격; // 기존 구성 상품 가격보다 높음
             Menu 변경된_메뉴 = MenuFixture.가격만_변경된_메뉴(기존_메뉴, 변경할_가격);
 
             // then
@@ -449,6 +449,4 @@ class MenuServiceTest {
             assertThat(결과).hasSize(2);
         }
     }
-
-
 }
