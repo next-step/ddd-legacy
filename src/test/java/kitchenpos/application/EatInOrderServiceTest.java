@@ -30,7 +30,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
-@DisplayName("매장 식사 주문")
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class EatInOrderServiceTest {
@@ -54,7 +53,7 @@ class EatInOrderServiceTest {
     @Autowired
     OrderService orderService;
 
-    @DisplayName("생성할 때")
+    @DisplayName("매장 식사 주문을 생성할 때")
     @Nested
     class Create {
 
@@ -123,6 +122,16 @@ class EatInOrderServiceTest {
                             orderTable,
                             orderLineItems
                     )
+            )).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("주문 항목의 메뉴가 존재하지 않으면 예외가 발생한다")
+        @Test
+        void createOrderWithoutMenus() {
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of());
+
+            assertThatThrownBy(() -> orderService.create(
+                    eatInOrder(null, null, orderTable, OrderStatus.WAITING, List.of(orderLineItem))
             )).isInstanceOf(IllegalArgumentException.class);
         }
     }
