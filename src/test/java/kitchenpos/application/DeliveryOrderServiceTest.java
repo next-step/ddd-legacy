@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +19,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static kitchenpos.fixture.MenuFixture.createMenuId;
 import static kitchenpos.fixture.MenuFixture.menu;
+import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
+import static kitchenpos.fixture.MenuProductFixture.menuProduct;
 import static kitchenpos.fixture.OrderFixture.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -106,5 +111,48 @@ class DeliveryOrderServiceTest {
                             List.of(orderLineItem))
             )).isInstanceOf(IllegalArgumentException.class);
         }
+
+        @DisplayName("주문 항목이 없거나 비어있으면 예외가 발생합니다")
+        @ParameterizedTest(name = "주문 항목: {0}")
+        @NullAndEmptySource
+        void createOrderWithoutOrderLineItems(final List<OrderLineItem> orderLineItems) {
+            assertThatThrownBy(() -> orderService.create(
+                    order(
+                            null,
+                            null,
+                            deliverAddress,
+                            OrderStatus.WAITING,
+                            OrderType.EAT_IN,
+                            null,
+                            orderLineItems
+                    )
+            )).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴의 개수와 주문 항목의 개수가 다르면 예외가 발생합니다")
+        @Test
+        void createOrderWithDifferentMenuCount() {
+            final Menu otherMenu = menu(
+                    createMenuId(),
+                    "otherMenu",
+                    BigDecimal.valueOf(10000),
+                    menuGroup(),
+                    List.of(menuProduct()),
+                    true
+            );
+            final OrderLineItem otherOrderLineItem = orderLineItem(null, otherMenu, 1L, otherMenu.getPrice());
+            assertThatThrownBy(() -> orderService.create(
+                    order(
+                            null,
+                            null,
+                            deliverAddress,
+                            OrderStatus.WAITING,
+                            OrderType.DELIVERY,
+                            null,
+                            List.of(orderLineItem, otherOrderLineItem)
+                    )
+            )).isInstanceOf(IllegalArgumentException.class);
+        }
+
     }
 }

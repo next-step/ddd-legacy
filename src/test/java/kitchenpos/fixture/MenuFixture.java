@@ -21,11 +21,11 @@ public class MenuFixture {
     }
 
     public static Menu menu() {
-        return menu(uuid(), DEFAULT_MENU_NAME, DEFAULT_MENU_PRICE,
-                menuGroup(uuid(), "세트 메뉴"),
+        return menu(createMenuId(), DEFAULT_MENU_NAME, DEFAULT_MENU_PRICE,
+                menuGroup(createMenuId(), "세트 메뉴"),
                 List.of(
-                        menuProduct(1L, 1L, product(uuid(), "양념 치킨", 16_000)),
-                        menuProduct(2L, 1L, product(uuid(), "후라이드 치킨", 16_000))
+                        menuProduct(1L, 1L, product(createMenuId(), "양념 치킨", 16_000)),
+                        menuProduct(2L, 1L, product(createMenuId(), "후라이드 치킨", 16_000))
                 ),
                 true);
     }
@@ -43,7 +43,7 @@ public class MenuFixture {
         return menu;
     }
 
-    private static UUID uuid() {
+    public static UUID createMenuId() {
         return UUID.randomUUID();
     }
 }
