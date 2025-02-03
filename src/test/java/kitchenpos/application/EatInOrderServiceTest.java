@@ -137,6 +137,18 @@ class EatInOrderServiceTest {
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
+        @DisplayName("메뉴가 미노출 상태이면 예외가 발생합니다")
+        @Test
+        void createOrderWithNonDisplayedMenu() {
+            final Menu nonDisplayedMenu = menu(menu.getId(), menu.getName(), menu.getPrice(), menu.getMenuGroup(), menu.getMenuProducts(), false);
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(nonDisplayedMenu));
+            when(menuRepository.findById(nonDisplayedMenu.getId())).thenReturn(Optional.ofNullable(nonDisplayedMenu));
+
+            assertThatThrownBy(() -> orderService.create(
+                    eatInOrder(null, null, orderTable, OrderStatus.WAITING, List.of(orderLineItem))
+            )).isInstanceOf(IllegalStateException.class);
+        }
+
         @DisplayName("주문 항목의 메뉴의 가격이 일치하지 않으면 예외가 발생합니다")
         @Test
         void createOrderWithDifferentMenuPrice() {
