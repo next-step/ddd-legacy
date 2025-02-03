@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.createMenuId;
 import static kitchenpos.fixture.MenuFixture.menu;
@@ -336,6 +337,16 @@ class DeliveryOrderServiceTest {
                     () -> assertThat(deliveringOrder.getType()).isEqualTo(order.getType()),
                     () -> assertThat(deliveringOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING)
             );
+        }
+
+        @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
+        @Test
+        void startDeliveryNonExistentOrder() {
+            final UUID nonExistentOrderId = createOrderId();
+            when(orderRepository.findById(nonExistentOrderId)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.startDelivery(nonExistentOrderId))
+                    .isInstanceOf(NoSuchElementException.class);
         }
 
         @DisplayName("서빙 상태가 아닌 주문을 배달 시작하려고 하면 예외가 발생합니다")
