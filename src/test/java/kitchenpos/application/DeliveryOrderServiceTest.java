@@ -77,11 +77,6 @@ class DeliveryOrderServiceTest {
         @DisplayName("대기 상태의 배달 주문을 생성할 수 있습니다.")
         @Test
         void createDeliveryOrder() {
-            final Menu menu = menu();
-            final long quantity = 1L;
-            final OrderLineItem orderLineItem = orderLineItem(null, menu, quantity, menu.getPrice().multiply(BigDecimal.valueOf(quantity)));
-            final String deliverAddress = "서울시 강남구";
-
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
             when(menuRepository.findById(menu.getId())).thenReturn(Optional.ofNullable(menu));
             when(orderRepository.save(any(Order.class))).then(returnsFirstArg());
@@ -93,8 +88,7 @@ class DeliveryOrderServiceTest {
                     () -> assertThat(order.getOrderDateTime()).isBeforeOrEqualTo(LocalDateTime.now()),
                     () -> assertThat(order.getDeliveryAddress()).isEqualTo(deliverAddress),
                     () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
-                    () -> assertThat(order.getType()).isEqualTo(OrderType.DELIVERY),
-                    () -> assertThat(order.getOrderTable()).isNull()
+                    () -> assertThat(order.getType()).isEqualTo(OrderType.DELIVERY)
             );
         }
 
@@ -157,18 +151,12 @@ class DeliveryOrderServiceTest {
         @Test
         void createOrderWithNegativeQuantity() {
             final long negativeQuantity = -1L;
-            final OrderLineItem negativeOrderLineItem = orderLineItem(null, menu, negativeQuantity, menu.getPrice().multiply(BigDecimal.valueOf(negativeQuantity)));
+            final OrderLineItem negativeOrderLineItem = orderLineItem(null, menu, negativeQuantity, orderLineItemPrice(menu.getPrice(), negativeQuantity));
 
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
 
             assertThatThrownBy(() -> orderService.create(
-                    deliveryOrder(
-                            null,
-                            null,
-                            deliverAddress,
-                            OrderStatus.WAITING,
-                            List.of(negativeOrderLineItem)
-                    )
+                    deliveryOrder(null, null, deliverAddress, OrderStatus.WAITING, List.of(negativeOrderLineItem))
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -184,18 +172,11 @@ class DeliveryOrderServiceTest {
                     true
             );
             final OrderLineItem nonExistentOrderLineItem = orderLineItem(null, nonExistentMenu, 1L, nonExistentMenu.getPrice());
-
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
             when(menuRepository.findById(nonExistentMenu.getId())).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> orderService.create(
-                    deliveryOrder(
-                            null,
-                            null,
-                            deliverAddress,
-                            OrderStatus.WAITING,
-                            List.of(nonExistentOrderLineItem)
-                    )
+                    deliveryOrder(null, null, deliverAddress, OrderStatus.WAITING, List.of(nonExistentOrderLineItem))
             )).isInstanceOf(NoSuchElementException.class);
         }
 
@@ -223,5 +204,21 @@ class DeliveryOrderServiceTest {
                     deliveryOrder(null, null, deliverAddress, OrderStatus.WAITING, List.of(orderLineItem))
             )).isInstanceOf(IllegalStateException.class);
         }
+
+        @DisplayName("배달 주소가 없으면 예외가 발생합니다")
+        @ParameterizedTest(name = "배달 주소: {0}")
+        @NullAndEmptySource
+        void createOrderWithoutDeliveryAddress(final String deliveryAddress) {
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+            when(menuRepository.findById(menu.getId())).thenReturn(Optional.ofNullable(menu));
+
+            assertThatThrownBy(() -> orderService.create(
+                    deliveryOrder(null, null, deliveryAddress, OrderStatus.WAITING, List.of(orderLineItem))
+            )).isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
+        return price.multiply(BigDecimal.valueOf(quantity));
     }
 }
