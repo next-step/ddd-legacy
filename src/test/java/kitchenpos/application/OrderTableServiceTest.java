@@ -106,4 +106,14 @@ class OrderTableServiceTest {
         );
     }
 
+    @DisplayName("가게 테이블이 모든 주문이 완료되지 않았을 경우 가게 테이블을 비울 수 없습니다.")
+    @Test
+    void clearOrderTableWithNonCompletedOrder() {
+        final OrderTable orderTable = orderTable();
+        when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
+        when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(true);
+
+        assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
 }
