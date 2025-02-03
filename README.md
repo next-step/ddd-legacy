@@ -6,6 +6,16 @@
 cd docker
 docker compose -p kitchenpos up -d
 ```
+## Cucumber 테스트 패키지 구조
+- `domain`
+  - `{domain}StepDefinition`
+    - feature 파일에 정의된 시나리오를 구현한 클래스
+  - `{domain}Fixture`
+    - domain fixture 클래스
+  - `{domain}Helper`
+    - StepDefinition 을 위한 helper 클래스
+- `test/resources/features`
+  - 도메인별 feature 파일 
 
 ## 요구 사항
 
