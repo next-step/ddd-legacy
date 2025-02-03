@@ -256,6 +256,34 @@ class OrderServiceTest {
     }
     //endregion
 
+    //region [음식 제공됨]
+    @DisplayName("주문 상태를 음식 제공됨(SERVED)로 변경한다")
+    @Test
+    void served() {
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
+        Order takeOutOrder = orderService.create(takeOutRequest);
+        Order acceptOrder = orderService.accept(takeOutOrder.getId());
+
+        Order servedOrder = orderService.serve(acceptOrder.getId());
+
+        assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
+    }
+
+    @DisplayName("주문의 상태가 주문 수락(ACCEPTED)일 때 음식 제공 가능하다")
+    @EnumSource(value = OrderStatus.class, names = "ACCEPTED", mode = EnumSource.Mode.EXCLUDE)
+    @ParameterizedTest
+    void validateServedStatus(OrderStatus orderStatus) {
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
+        Order takeOutOrder = orderService.create(takeOutRequest);
+
+        takeOutOrder.setStatus(orderStatus);
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.serve(takeOutOrder.getId()));
+    }
+    //endregion
+
     private Product createProduct(UUID id, String name, BigDecimal price) {
         Product product = new Product();
         product.setId(id);
