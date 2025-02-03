@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -168,6 +168,146 @@ class MenuServiceTest {
         //when, then
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> menuService.create(menu));
+    }
+    //endregion
+
+    //region[메뉴 수정]
+    @DisplayName("메뉴는 가격을 수정할 수 있다")
+    @Test
+    void changeMenuPrice() {
+        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
+        Menu menu = menuService.create(
+                createMenu(
+                        MENU_GROUP_ID,
+                        "치킨버거",
+                        new BigDecimal(7000),
+                        List.of(chickenBurger)));
+
+        menu.setPrice(new BigDecimal(6500));
+        Menu newPriceMenu = menuService.changePrice(menu.getId(), menu);
+
+        assertThat(newPriceMenu.getPrice()).isEqualTo(new BigDecimal(6500));
+    }
+
+    @DisplayName("메뉴의 가격이 0원 미만이면 변경할 수 없다")
+    @Test
+    void canNotChangeNegativePrice() {
+        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
+        Menu menu = menuService.create(
+                createMenu(
+                        MENU_GROUP_ID,
+                        "치킨버거",
+                        new BigDecimal(7000),
+                        List.of(chickenBurger)));
+
+        menu.setPrice(new BigDecimal(-1));
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> menuService.changePrice(menu.getId(), menu));
+    }
+
+    @DisplayName("메뉴의 가격은 포함된 상품 가격 총합과 동일하거나 할인된 가격으로만 수정 가능하다")
+    @Test
+    void validateMenuPriceOnModify() {
+        //given
+        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);    //7000원
+        MenuProduct side = createMenuProduct(SIDE_PRODUCT_ID, 1);   //2000원
+        MenuProduct coke = createMenuProduct(COKE_PRODUCT_ID, 1);   //2000원
+
+        Menu menu = createMenu(
+                MENU_GROUP_ID,
+                "치킨버거세트",
+                new BigDecimal(11000),
+                List.of(chickenBurger, side, coke)
+        );
+        Menu resultMenu = menuService.create(menu);
+
+        resultMenu.setPrice(new BigDecimal(11001));
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> menuService.changePrice(resultMenu.getId(), resultMenu));
+    }
+    //endregion
+
+    //region [메뉴 전시]
+    @DisplayName("메뉴를 메뉴판에 전시한다")
+    @Test
+    void display() {
+        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
+        Menu menu = menuService.create(
+                createMenu(
+                        MENU_GROUP_ID,
+                        "치킨버거",
+                        new BigDecimal(7000),
+                        List.of(chickenBurger)
+                )
+        );
+
+        Menu resultMenu = menuService.display(menu.getId());
+
+        assertThat(resultMenu.isDisplayed()).isTrue();
+    }
+
+    @DisplayName("메뉴의 가격이 포함된 상품 가격 총합과 동일하거나 할인된 가격인 경우만 전시할 수 있다")
+    @Test
+    void validateMenuPriceOnDisplay() {
+        //given
+        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);    //7000원
+        MenuProduct side = createMenuProduct(SIDE_PRODUCT_ID, 1);   //2000원
+        MenuProduct coke = createMenuProduct(COKE_PRODUCT_ID, 1);   //2000원
+
+        Menu menu = createMenu(
+                MENU_GROUP_ID,
+                "치킨버거세트",
+                new BigDecimal(11000),
+                List.of(chickenBurger, side, coke)
+        );
+        Menu resultMenu = menuService.create(menu);
+
+        resultMenu.setPrice(new BigDecimal(11001));
+        assertThatIllegalStateException()
+                .isThrownBy(() -> menuService.display(resultMenu.getId()));
+    }
+
+    @DisplayName("메뉴판의 전시여부를 X로 변경한다")
+    @Test
+    void hide() {
+        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
+        Menu menu = menuService.create(
+                createMenu(
+                        MENU_GROUP_ID,
+                        "치킨버거",
+                        new BigDecimal(7000),
+                        List.of(chickenBurger)
+                )
+        );
+
+        Menu resultMenu = menuService.hide(menu.getId());
+
+        assertThat(resultMenu.isDisplayed()).isFalse();
+    }
+    //endregion
+
+    //region [메뉴 조회]
+    @DisplayName("모든 메뉴들을 조회할 수 있다")
+    @Test
+    void findAll() {
+        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);    //7000원
+        MenuProduct side = createMenuProduct(SIDE_PRODUCT_ID, 1);   //2000원
+        MenuProduct coke = createMenuProduct(COKE_PRODUCT_ID, 1);   //2000원
+
+        menuService.create(createMenu(MENU_GROUP_ID, "치킨버거", new BigDecimal(7000), List.of(chickenBurger)));
+        menuService.create(createMenu(MENU_GROUP_ID, "감자튀김", new BigDecimal(2000), List.of(side)));
+        menuService.create(createMenu(MENU_GROUP_ID, "콜라", new BigDecimal(2000), List.of(coke)));
+
+        List<Menu> allMenus = menuService.findAll();
+        assertThat(allMenus.size()).isEqualTo(3);
+        assertThat(allMenus)
+                .extracting(Menu::getName, menu -> menu.getPrice().intValue())
+                .contains(
+                        Tuple.tuple("치킨버거", 7000),
+                        Tuple.tuple("감자튀김", 2000),
+                        Tuple.tuple("콜라", 2000)
+                );
     }
     //endregion
 
