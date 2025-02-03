@@ -39,6 +39,9 @@ dependencies {
     testImplementation("io.cucumber:cucumber-junit:7.20.1")
     testImplementation("io.cucumber:cucumber-junit-platform-engine:7.20.1")
     testImplementation("org.junit.platform:junit-platform-suite")
+
+    testImplementation("io.rest-assured:rest-assured:5.5.0")
+
 }
 
 tasks.withType<KotlinCompile> {
