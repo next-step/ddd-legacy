@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.Mock;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -122,30 +122,32 @@ class OrderTableServiceTest {
     }
 
     @DisplayName("가게 테이블의 손님 수를 변경할 수 있습니다.")
-    @Test
-    void changeNumberOfGuests() {
+    @ParameterizedTest(name = "손님 수 {0}")
+    @ValueSource(ints = {1, 10, 100})
+    void changeNumberOfGuests(final int numberOfGuests) {
         final OrderTable existedOrderTable = orderTable(
                 createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, true
         );
         when(orderTableRepository.findById(existedOrderTable.getId())).thenReturn(Optional.of(existedOrderTable));
         when(orderTableRepository.save(any(OrderTable.class))).then(returnsFirstArg());
         final OrderTable renewedOrderTable = orderTable(
-                existedOrderTable.getId(), existedOrderTable.getName(), 1, existedOrderTable.isOccupied()
+                existedOrderTable.getId(), existedOrderTable.getName(), numberOfGuests, existedOrderTable.isOccupied()
         );
         final OrderTable actual = orderTableService.changeNumberOfGuests(existedOrderTable.getId(), renewedOrderTable);
 
-        assertThat(actual.getNumberOfGuests()).isEqualTo(1);
+        assertThat(actual.getNumberOfGuests()).isEqualTo(numberOfGuests);
     }
 
     @DisplayName("가게 테이블이 비어있을 경우 손님 수를 변경할 수 없습니다.")
-    @Test
-    void changeNumberOfGuestsWhenOrderTableIsEmpty() {
+    @ParameterizedTest(name = "손님 수 {0}")
+    @ValueSource(ints = {1, 10, 100})
+    void changeNumberOfGuestsWhenOrderTableIsEmpty(final int numberOfGuests) {
         final OrderTable existedOrderTable = orderTable(
                 createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, DEFAULT_OCCUPIED
         );
         when(orderTableRepository.findById(existedOrderTable.getId())).thenReturn(Optional.of(existedOrderTable));
         final OrderTable renewedOrderTable = orderTable(
-                existedOrderTable.getId(), existedOrderTable.getName(), 1, existedOrderTable.isOccupied()
+                existedOrderTable.getId(), existedOrderTable.getName(), numberOfGuests, existedOrderTable.isOccupied()
         );
 
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(existedOrderTable.getId(), renewedOrderTable))
@@ -153,11 +155,12 @@ class OrderTableServiceTest {
     }
 
     @DisplayName("가게 테이블이 없을 경우 손님 수를 변경할 수 없습니다.")
-    @Test
-    void changeNumberOfGuestsWhenOrderTableIsNotExist() {
+    @ParameterizedTest(name = "손님 수 {0}")
+    @ValueSource(ints = {1, 10, 100})
+    void changeNumberOfGuestsWhenOrderTableIsNotExist(final int numberOfGuests) {
         when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
         final OrderTable renewedOrderTable = orderTable(
-                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, 1, true
+                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, numberOfGuests, true
         );
 
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(createOrderTableId(), renewedOrderTable))
@@ -165,14 +168,15 @@ class OrderTableServiceTest {
     }
 
     @DisplayName("가게 테이블의 손님 수를 0명 미만으로 변경할 수 없습니다.")
-    @Test
-    void changeNumberOfGuestsWhenNumberOfGuestsIsNegative() {
+    @ParameterizedTest(name = "손님 수 {0}")
+    @ValueSource(ints = {-1, -10, -100})
+    void changeNumberOfGuestsWhenNumberOfGuestsIsNegative(final int numberOfGuests) {
         final OrderTable existedOrderTable = orderTable(
                 createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, true
         );
         when(orderTableRepository.findById(existedOrderTable.getId())).thenReturn(Optional.of(existedOrderTable));
         final OrderTable renewedOrderTable = orderTable(
-                existedOrderTable.getId(), existedOrderTable.getName(), -1, existedOrderTable.isOccupied()
+                existedOrderTable.getId(), existedOrderTable.getName(), numberOfGuests, existedOrderTable.isOccupied()
         );
 
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(existedOrderTable.getId(), renewedOrderTable))
