@@ -32,7 +32,7 @@ class MenuStepDefinitions : CucumberTest() {
 
     @Given("메뉴 이름은 {string}이고 가격은 {int}원이다")
     fun 메뉴생성_입력(name: String, price: Int) {
-        menu = MenuFixture.fixture(name = name, price = price)
+        menu = MenuFixture.fixture(name = name, price = price, displayed = true)
     }
 
     @Given("메뉴의 메뉴그룹은 {string}이다")
@@ -76,7 +76,7 @@ class MenuStepDefinitions : CucumberTest() {
         }
         RestAssured
             .given()
-            .`when`().delete("/api/menus/${findMenu.id}/hide")
+            .`when`().put("/api/menus/${findMenu.id}/hide")
     }
 
 
@@ -113,6 +113,7 @@ class MenuStepDefinitions : CucumberTest() {
     @Then("메뉴 이름 {string}로 조회하면 {menuDisplayed} 상태이다")
     fun 메뉴조회_확인(name: String, displayed: Boolean) {
         val findMenu = 메뉴_이름으로_메뉴_조회(name)
+        assertThat(findMenu.name).isEqualTo(name)
         assertThat(findMenu.isDisplayed).isEqualTo(displayed)
     }
 }

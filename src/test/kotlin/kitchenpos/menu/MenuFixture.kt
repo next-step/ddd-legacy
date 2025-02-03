@@ -10,10 +10,12 @@ class MenuFixture {
         fun fixture(
             name: String? = DEFAULT_NAME,
             price: Int = DEFAULT_PRICE,
+            displayed: Boolean = false,
         ): Menu {
             val menu = Menu()
             menu.name = name
             menu.price = price.toBigDecimal()
+            menu.isDisplayed = displayed
             return menu
         }
     }
