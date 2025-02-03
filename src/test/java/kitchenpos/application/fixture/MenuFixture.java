@@ -34,4 +34,8 @@ public class MenuFixture {
 
         return menu;
     }
+
+    public static Menu create(String name, String price){
+        return setMenu(MenuGroupFixture.DEFAULT_MENUGROUP, name, price, MenuProductFixture.DEFAULT_MENU_PRODUCTS);
+    }
 }
