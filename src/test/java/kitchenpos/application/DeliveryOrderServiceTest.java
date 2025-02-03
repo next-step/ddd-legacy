@@ -469,6 +469,19 @@ class DeliveryOrderServiceTest {
             assertThatThrownBy(() -> orderService.complete(nonExistentOrderId))
                     .isInstanceOf(NoSuchElementException.class);
         }
+
+        @DisplayName("배달 주문이 완료되지 않은 상태에서 완료하려고 하면 예외가 발생합니다")
+        @Test
+        void completeNonDeliveredOrder() {
+            final Order nonDeliveredOrder = deliveryOrder(
+                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.DELIVERING,
+                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+
+            when(orderRepository.findById(nonDeliveredOrder.getId())).thenReturn(Optional.ofNullable(nonDeliveredOrder));
+
+            assertThatThrownBy(() -> orderService.complete(nonDeliveredOrder.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
 
