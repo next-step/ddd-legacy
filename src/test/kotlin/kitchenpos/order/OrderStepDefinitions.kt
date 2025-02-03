@@ -9,6 +9,8 @@ import kitchenpos.domain.Order
 import kitchenpos.domain.OrderStatus
 import kitchenpos.domain.OrderType
 import kitchenpos.menu.MenuHelper.Companion.메뉴_이름으로_메뉴_조회
+import kitchenpos.ordertable.OrderTableFixture
+import kitchenpos.ordertable.OrderTableHelper
 import kitchenpos.utils.CucumberTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -81,6 +83,11 @@ class OrderStepDefinitions : CucumberTest() {
         order.type = type
     }
 
+    @Given("홀주문에 가게테이블 {string}을 입력한다")
+    fun 홀주문_가게테이블_입력(name: String) {
+        order.orderTableId = OrderTableHelper.가게테이블이름으로_가게테이블_조회(name).id
+    }
+
     @Given("주문에 메뉴 {string}와 수량 {int}개를 입력한다")
     fun 주문_메뉴_추가(menuName: String, quantity: Long) {
         val menu = 메뉴_이름으로_메뉴_조회(menuName)
@@ -106,6 +113,17 @@ class OrderStepDefinitions : CucumberTest() {
     @Given("포장주문이 생성되어있다")
     fun 포장주문_생성() {
         order.type = OrderType.TAKEOUT
+        order = RestAssured
+            .given().body(order).contentType("application/json")
+            .`when`().post("/api/orders")
+            .then().extract().`as`(Order::class.java)
+    }
+
+    @Given("홀주문이 생성되어있다")
+    fun 홀주문_생성() {
+        order.type = OrderType.EAT_IN
+        order.orderTableId = OrderTableHelper.가게테이블_생성_ID추출(OrderTableFixture.fixture(occupied = true))
+        OrderTableHelper.가게테이블_점유(order.orderTableId)
         order = RestAssured
             .given().body(order).contentType("application/json")
             .`when`().post("/api/orders")
