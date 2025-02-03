@@ -160,6 +160,19 @@ class EatInOrderServiceTest {
                     eatInOrder(null, null, orderTable, OrderStatus.WAITING, List.of(orderLineItem))
             )).isInstanceOf(NoSuchElementException.class);
         }
+
+        @DisplayName("주문 테이블이 사용중인 상태가 아니라면 예외가 발생합니다.")
+        @Test
+        void createOrderWithEmptyOrderTable() {
+            final OrderTable emptyOrderTable = orderTable(createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, 0, false);
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+            when(menuRepository.findById(menu.getId())).thenReturn(Optional.ofNullable(menu));
+            when(orderTableRepository.findById(emptyOrderTable.getId())).thenReturn(Optional.of(emptyOrderTable));
+
+            assertThatThrownBy(() -> orderService.create(
+                    eatInOrder(null, null, emptyOrderTable, OrderStatus.WAITING, List.of(orderLineItem))
+            )).isInstanceOf(IllegalStateException.class);
+        }
     }
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
