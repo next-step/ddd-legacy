@@ -7,6 +7,7 @@ import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.fake.InMemoryMenuGroupRepository;
 import kitchenpos.fixture.MenuGroupFixture;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,8 +20,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 
 class MenuGroupServiceTest {
-    private final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
-    private final MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
+    private MenuGroupRepository menuGroupRepository;
+    private MenuGroupService menuGroupService;
+
+    @BeforeEach
+    void setUp() {
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        menuGroupService = new MenuGroupService(menuGroupRepository);
+    }
 
     @Test
     @DisplayName("메뉴 그룹을 생성한다")
