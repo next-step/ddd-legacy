@@ -4,6 +4,7 @@ import kitchenpos.domain.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,8 +15,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
 @Transactional
 @SpringBootTest
@@ -78,6 +79,85 @@ class OrderTableServiceTest {
         OrderTable resultOrderTable = orderTableService.sit(orderTable.getId());
 
         assertThat(resultOrderTable.isOccupied()).isTrue();
+    }
+    //endregion
+
+    //region [주문테이블 정리]
+    @DisplayName("테이블의 주문 상태가 완료가 아니면 정리할 수 없다")
+    @EnumSource(value = OrderStatus.class, names = "COMPLETED", mode = EnumSource.Mode.EXCLUDE)
+    @ParameterizedTest
+    void validateOrderStatus(OrderStatus status) {
+        //given
+        OrderTable orderTable = orderTableService.create(createOrderTable("1번테이블"));
+        orderTableService.sit(orderTable.getId());
+        orderTable.setNumberOfGuests(4);
+        orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
+
+        Order order = createUnnamedOrder(orderTable.getId());
+        //when, then
+        order.setStatus(status);
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderTableService.clear(orderTable.getId()));
+    }
+
+    @DisplayName("테이블 정리하면 손님의 수 0명, 테이블 사용유무 안함으로 변경된다")
+    @Test
+    void clear() {
+        //given
+        OrderTable orderTable = orderTableService.create(createOrderTable("1번테이블"));
+        orderTableService.sit(orderTable.getId());
+        orderTable.setNumberOfGuests(4);
+        orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
+
+        Order order = createUnnamedOrder(orderTable.getId());
+        //when
+        order.setStatus(OrderStatus.COMPLETED);
+        OrderTable clearOrder = orderTableService.clear(orderTable.getId());
+        //then
+        assertThat(clearOrder.getNumberOfGuests()).isZero();
+        assertThat(clearOrder.isOccupied()).isFalse();
+    }
+    //endregion
+
+    //region [고객의 수 변경]
+    @DisplayName("테이블의 고객 수를 0미만으로 변경할 수 없다")
+    @Test
+    void changeNumberOfGuestsByNegative() {
+        OrderTable orderTable = orderTableService.create(createOrderTable("1번테이블"));
+
+        orderTable.setNumberOfGuests(-1);
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
+    }
+
+    @DisplayName("테이블의 사용유무가 사용안함이면 손님의 수를 변경할 수 없다")
+    @Test
+    void changeNumberOfGuestsByUnUse() {
+        OrderTable orderTable = orderTableService.create(createOrderTable("1번테이블"));
+
+        orderTable.setOccupied(false);
+        orderTable.setNumberOfGuests(10);
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
+    }
+    //endregion
+
+    //region [모든 주문 테이블 조회]
+    @DisplayName("모든 테이블 조회가 가능하다")
+    @Test
+    void findAll() {
+        orderTableService.create(createOrderTable("1번테이블"));
+        orderTableService.create(createOrderTable("2번테이블"));
+        orderTableService.create(createOrderTable("3번테이블"));
+
+        List<OrderTable> orderTables = orderTableService.findAll();
+
+        assertThat(orderTables).hasSize(3);
+        assertThat(orderTables)
+                .extracting(OrderTable::getName)
+                .contains("1번테이블", "2번테이블", "3번테이블");
     }
     //endregion
 
