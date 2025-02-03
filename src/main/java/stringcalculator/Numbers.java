@@ -22,4 +22,8 @@ public class Numbers {
 
         return result;
     }
+
+    public List<PositiveNumber> getNumbers() {
+        return numbers;
+    }
 }
