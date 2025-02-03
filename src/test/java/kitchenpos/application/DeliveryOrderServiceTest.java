@@ -336,6 +336,19 @@ class DeliveryOrderServiceTest {
                     () -> assertThat(deliveringOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING)
             );
         }
+
+        @DisplayName("서빙 상태가 아닌 주문을 배달 시작하려고 하면 예외가 발생합니다")
+        @Test
+        void startDeliveryNonServedOrder() {
+            final Order nonServedOrder = deliveryOrder(
+                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.ACCEPTED,
+                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+
+            when(orderRepository.findById(nonServedOrder.getId())).thenReturn(Optional.ofNullable(nonServedOrder));
+
+            assertThatThrownBy(() -> orderService.startDelivery(nonServedOrder.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
