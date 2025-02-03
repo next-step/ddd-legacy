@@ -1,4 +1,3 @@
-@Test
 Feature: 상품을 수정
 
   Scenario: 상품의 가격을 수정한다

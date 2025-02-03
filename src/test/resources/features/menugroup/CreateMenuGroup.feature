@@ -1,4 +1,3 @@
-@Test
 Feature: 메뉴 그룹을 생성
 
   Scenario: 메뉴 그룹이 생성된다

@@ -1,4 +1,3 @@
-@Test
 Feature: 상품을 생성
 
   Scenario: 상품이 생성된다
