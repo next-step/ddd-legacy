@@ -18,6 +18,14 @@ class MenuGroupStepDefinitions : CucumberTest() {
         menuGroup = MenuGroupFixture.fixture()
     }
 
+    @Given("메뉴 그룹  이름: {string}")
+    fun 메뉴그룹이름(name: String) {
+        menuGroup = MenuGroupFixture.fixture(name = name)
+        RestAssured
+            .given().body(menuGroup).contentType(ContentType.JSON)
+            .`when`().post("/api/menu-groups")
+    }
+
     @Given("메뉴 그룹 이름은 {string}")
     fun 메뉴그룹이름은String이다(name: String?) {
         menuGroup = MenuGroupFixture.fixture(name = name)

@@ -19,8 +19,8 @@ class ProductStepDefinitions : CucumberTest() {
         product = ProductFixture.fixture()
     }
 
-    @Given("상품 이름은 {productName} 이고 상품 가격은 {int}원인 상품이 등록되어 있다")
-    fun 상품생성(name: String?, price: Int) {
+    @Given("상품  이름: {string} 가격: {int}원")
+    fun 상품생성(name: String, price: Int) {
         product = ProductFixture.fixture(name = name, price = price.toBigDecimal())
         RestAssured
             .given().body(product).contentType("application/json")
@@ -39,18 +39,18 @@ class ProductStepDefinitions : CucumberTest() {
             .`when`().post("/api/products")
     }
 
-    @When("상품 이름이 {productName}인 상품의 가격을 {int}원으로 수정한다")
-    fun 상품이름은string이고상품가격은int원으로수정한다(name: String?, price: Int) {
-        val product = 상품이름으로_상품_조회(name!!)
+    @When("상품 이름이 {string}인 상품의 가격을 {int}원으로 수정한다")
+    fun 상품이름은string이고상품가격은int원으로수정한다(name: String, price: Int) {
+        val product = 상품이름으로_상품_조회(name)
         product.price = price.toBigDecimal()
         RestAssured
             .given().body(product).contentType("application/json")
             .`when`().put("/api/products/${product.id}/price")
     }
 
-    @Then("상품 이름은 {productName} 이고 상품 가격은 {int}원이다")
-    fun 상품이름은string이고상품가격은int원이다(name: String?, price: Int) {
-        val product = 상품이름으로_상품_조회(name!!)
+    @Then("상품 이름은 {string}이고 상품 가격은 {int}원이다")
+    fun 상품이름은string이고상품가격은int원이다(name: String, price: Int) {
+        val product = 상품이름으로_상품_조회(name)
         assertThat(product.name).isEqualTo(name)
         assertThat(product.price)
             .usingComparator(BigDecimal::compareTo)
