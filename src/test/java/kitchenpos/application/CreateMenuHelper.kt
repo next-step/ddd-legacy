@@ -40,15 +40,14 @@ class CreateMenuHelper(
         val savedProducts = products.map { productDto ->
             if (productDto.id != null) {
                 return@map productRepository.findById(productDto.id).orElseThrow()
-            } else {
-                productRepository.save(
-                    Product().apply {
-                        id = UUID.randomUUID()  // ID 할당 추가
-                        name = productDto.name
-                        price = productDto.price
-                    }
-                )
             }
+            productRepository.save(
+                Product().apply {
+                    id = UUID.randomUUID()  // ID 할당 추가
+                    name = productDto.name
+                    price = productDto.price
+                }
+            )
         }
 
         val menuProducts = savedProducts.map { savedProduct ->

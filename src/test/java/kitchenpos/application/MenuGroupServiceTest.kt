@@ -2,6 +2,7 @@ package kitchenpos.application
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -51,23 +52,22 @@ class MenuGroupServiceTest : BehaviorSpec() {
         }
 
         Given("메뉴 그룹이 저장되어 있을 때") {
-            beforeEach {
-                val menuGroup1 = MenuGroup().apply {
-                    id = UUID.randomUUID()
-                    name = "menuGroup1"
-                }
-                val menuGroup2 = MenuGroup().apply {
-                    id = UUID.randomUUID()
-                    name = "menuGroup2"
-                }
-                menuGroupRepository.saveAll(listOf(menuGroup1, menuGroup2))
+            val menuGroup1 = MenuGroup().apply {
+                id = UUID.randomUUID()
+                name = "menuGroup1"
             }
+            val menuGroup2 = MenuGroup().apply {
+                id = UUID.randomUUID()
+                name = "menuGroup2"
+            }
+            val savedMenuGroups = menuGroupRepository.saveAll(listOf(menuGroup1, menuGroup2))
 
             When("모든 메뉴 그룹을 조회하면") {
                 Then("저장된 메뉴 그룹을 반환한다") {
                     val menuGroups = menuGroupService.findAll()
 
                     menuGroups shouldHaveSize 2
+                    menuGroups.map { it.id } shouldContainAll savedMenuGroups.map { it.id }
                 }
             }
         }
