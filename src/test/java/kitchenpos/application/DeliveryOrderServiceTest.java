@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static kitchenpos.fixture.MenuFixture.createMenuId;
@@ -175,6 +176,35 @@ class DeliveryOrderServiceTest {
                             List.of(negativeOrderLineItem)
                     )
             )).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴가 존재하지 않으면 예외가 발생합니다")
+        @Test
+        void createOrderWithNonExistentMenu() {
+            final Menu nonExistentMenu = menu(
+                    createMenuId(),
+                    "nonExistentMenu",
+                    BigDecimal.valueOf(10000),
+                    menuGroup(),
+                    List.of(menuProduct()),
+                    true
+            );
+            final OrderLineItem nonExistentOrderLineItem = orderLineItem(null, nonExistentMenu, 1L, nonExistentMenu.getPrice());
+
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+            when(menuRepository.findById(nonExistentMenu.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.create(
+                    order(
+                            null,
+                            null,
+                            deliverAddress,
+                            OrderStatus.WAITING,
+                            OrderType.DELIVERY,
+                            null,
+                            List.of(nonExistentOrderLineItem)
+                    )
+            )).isInstanceOf(NoSuchElementException.class);
         }
 
     }
