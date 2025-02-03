@@ -1,11 +1,13 @@
 package kitchenpos.product
 
 import io.cucumber.java.Before
+import io.cucumber.java.ParameterType
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import io.restassured.RestAssured
 import kitchenpos.domain.Product
+import kitchenpos.product.ProductHelper.Companion.상품이름으로_상품_조회
 import kitchenpos.utils.CucumberTest
 import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
@@ -17,6 +19,15 @@ class ProductStepDefinitions : CucumberTest() {
     @Before
     fun setUp() {
         product = ProductFixture.fixture()
+    }
+
+    @ParameterType(".*")
+    fun productName(name: String?): String? {
+        if (name == "null") {
+            return null
+        } else {
+            return name
+        }
     }
 
     @Given("상품  이름: {string} 가격: {int}원")
@@ -63,12 +74,5 @@ class ProductStepDefinitions : CucumberTest() {
             .get("/api/products")
             .then().extract().`as`(Array<Product>::class.java)
         assertThat(products).hasSize(0)
-    }
-
-    private fun 상품이름으로_상품_조회(name: String): Product {
-        return RestAssured
-            .get("/api/products")
-            .then().log().all().extract().`as`(Array<Product>::class.java)
-            .find { it.name == name }!!
     }
 }

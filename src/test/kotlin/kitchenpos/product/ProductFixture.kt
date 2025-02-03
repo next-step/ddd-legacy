@@ -1,17 +1,7 @@
 package kitchenpos.product
 
-import io.cucumber.java.ParameterType
 import kitchenpos.domain.Product
 import java.math.BigDecimal
-
-@ParameterType(".*")
-fun productName(name: String?): String? {
-    if (name == "null") {
-        return null
-    } else {
-        return name
-    }
-}
 
 
 class ProductFixture {
