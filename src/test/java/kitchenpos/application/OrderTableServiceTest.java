@@ -93,7 +93,9 @@ class OrderTableServiceTest {
     @DisplayName("가게 테이블을 비울 수 있습니다.")
     @Test
     void clearOrderTable() {
-        final OrderTable orderTable = orderTable();
+        final OrderTable orderTable = orderTable(
+                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, true
+        );
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
         when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(false);
         when(orderTableRepository.save(any(OrderTable.class))).then(returnsFirstArg());
@@ -109,11 +111,29 @@ class OrderTableServiceTest {
     @DisplayName("가게 테이블이 모든 주문이 완료되지 않았을 경우 가게 테이블을 비울 수 없습니다.")
     @Test
     void clearOrderTableWithNonCompletedOrder() {
-        final OrderTable orderTable = orderTable();
+        final OrderTable orderTable = orderTable(
+                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, true
+        );
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
         when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(true);
 
         assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("가게 테이블의 손님 수를 변경할 수 있습니다.")
+    @Test
+    void changeNumberOfGuests() {
+        final OrderTable existedOrderTable = orderTable(
+                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, true
+        );
+        when(orderTableRepository.findById(existedOrderTable.getId())).thenReturn(Optional.of(existedOrderTable));
+        when(orderTableRepository.save(any(OrderTable.class))).then(returnsFirstArg());
+        final OrderTable renewedOrderTable = orderTable(
+                existedOrderTable.getId(), existedOrderTable.getName(), 1, existedOrderTable.isOccupied()
+        );
+        final OrderTable actual = orderTableService.changeNumberOfGuests(existedOrderTable.getId(), renewedOrderTable);
+
+        assertThat(actual.getNumberOfGuests()).isEqualTo(1);
     }
 }
