@@ -6,10 +6,11 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import io.restassured.RestAssured
 import kitchenpos.domain.OrderTable
+import kitchenpos.utils.CucumberTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 
-class OrderTableStepDefinitions {
+class OrderTableStepDefinitions : CucumberTest() {
     private var orderTable: OrderTable = OrderTableFixture.fixture()
 
     @Before

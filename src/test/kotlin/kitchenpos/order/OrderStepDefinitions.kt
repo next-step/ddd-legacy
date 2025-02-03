@@ -130,6 +130,17 @@ class OrderStepDefinitions : CucumberTest() {
             .then().extract().`as`(Order::class.java)
     }
 
+    @Given("홀주문이 가게테이블 {string}에 생성되어있다")
+    fun 홀주문_생성(orderTableName: String) {
+        order.type = OrderType.EAT_IN
+        order.orderTableId = OrderTableHelper.가게테이블이름으로_가게테이블_조회(orderTableName).id
+        OrderTableHelper.가게테이블_점유(order.orderTableId)
+        order = RestAssured
+            .given().body(order).contentType("application/json")
+            .`when`().post("/api/orders")
+            .then().extract().`as`(Order::class.java)
+    }
+
     @When("주문을 생성한다")
     fun 주문을_생성한다() {
         try {
