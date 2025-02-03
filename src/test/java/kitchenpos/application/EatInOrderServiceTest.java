@@ -326,6 +326,16 @@ class EatInOrderServiceTest {
             assertThatThrownBy(() -> orderService.complete(order.getId()))
                     .isInstanceOf(NoSuchElementException.class);
         }
+
+        @DisplayName("서빙 상태가 아닌 주문을 완료하려고 하면 예외가 발생합니다")
+        @Test
+        void completeNotServedOrder() {
+            final Order completedOrder = eatInOrder(UUID.randomUUID(), LocalDateTime.now(), orderTable, OrderStatus.COMPLETED, List.of(orderLineItem));
+            when(orderRepository.findById(completedOrder.getId())).thenReturn(Optional.of(completedOrder));
+
+            assertThatThrownBy(() -> orderService.complete(completedOrder.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
 
