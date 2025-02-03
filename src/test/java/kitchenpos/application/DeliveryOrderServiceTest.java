@@ -458,6 +458,17 @@ class DeliveryOrderServiceTest {
                     () -> assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED)
             );
         }
+
+        @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
+        @Test
+        void completeNonExistentOrder() {
+            final UUID nonExistentOrderId = createOrderId();
+
+            when(orderRepository.findById(nonExistentOrderId)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.complete(nonExistentOrderId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
 
