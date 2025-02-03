@@ -417,6 +417,19 @@ class DeliveryOrderServiceTest {
             assertThatThrownBy(() -> orderService.completeDelivery(nonExistentOrderId))
                     .isInstanceOf(NoSuchElementException.class);
         }
+
+        @DisplayName("배달 중이 아닌 주문을 배달 완료하려고 하면 예외가 발생합니다")
+        @Test
+        void completeDeliveryNonDeliveringOrder() {
+            final Order nonDeliveringOrder = deliveryOrder(
+                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.SERVED,
+                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+
+            when(orderRepository.findById(nonDeliveringOrder.getId())).thenReturn(Optional.ofNullable(nonDeliveringOrder));
+
+            assertThatThrownBy(() -> orderService.completeDelivery(nonDeliveringOrder.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
