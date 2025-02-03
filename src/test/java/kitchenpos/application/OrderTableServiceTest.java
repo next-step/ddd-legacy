@@ -151,4 +151,16 @@ class OrderTableServiceTest {
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(existedOrderTable.getId(), renewedOrderTable))
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    @DisplayName("가게 테이블이 없을 경우 손님 수를 변경할 수 없습니다.")
+    @Test
+    void changeNumberOfGuestsWhenOrderTableIsNotExist() {
+        when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
+        final OrderTable renewedOrderTable = orderTable(
+                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, 1, true
+        );
+
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(createOrderTableId(), renewedOrderTable))
+                .isInstanceOf(NoSuchElementException.class);
+    }
 }
