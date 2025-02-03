@@ -263,6 +263,15 @@ class EatInOrderServiceTest {
                     () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.SERVED)
             );
         }
+
+        @DisplayName("존재하지 않는 주문을 서빙하려고 하면 예외가 발생합니다")
+        @Test
+        void serveNonExistentOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.serve(order.getId()))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
 
