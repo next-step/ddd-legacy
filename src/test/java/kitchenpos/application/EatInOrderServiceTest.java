@@ -272,6 +272,16 @@ class EatInOrderServiceTest {
             assertThatThrownBy(() -> orderService.serve(order.getId()))
                     .isInstanceOf(NoSuchElementException.class);
         }
+
+        @DisplayName("접수 상태가 아닌 주문을 서빙하려고 하면 예외가 발생합니다")
+        @Test
+        void serveNotAcceptedOrder() {
+            final Order servedOrder = eatInOrder(UUID.randomUUID(), LocalDateTime.now(), orderTable, OrderStatus.SERVED, List.of(orderLineItem));
+            when(orderRepository.findById(servedOrder.getId())).thenReturn(Optional.of(servedOrder));
+
+            assertThatThrownBy(() -> orderService.serve(servedOrder.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
 
