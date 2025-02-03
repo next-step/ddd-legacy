@@ -241,8 +241,9 @@ internal class OrderServiceTest : BaseUnitSpec({
             actual.exceptionOrNull() shouldBe NoSuchElementException()
         }
 
-        // TODO: 주문 테이블이 비어야 먹을 수 있는데 isOccupied == true일경우 오류여야 하지 않나?
-        test("매장 내 식사일경우 주문 테이블이 비어있지 않으면 주문을 받을 수 없다").config(enabled = false) {
+        // TODO: 주문 테이블이 비어야 먹을 수 있는데 isOccupied == true일경우 오류로 하고 직접 sit으로 바꿔야 하지 않을까 싶다
+        // TODO: 주문 테이블에 먼저 sit 호출하고 create를 호출한다고 하면 맞는데 sit 호출과 create 사이에 시간이 걸리면 동시성에 문제생길 것 같은데...
+        test("매장 내 식사일경우 주문 테이블이 비어있지 않으면 주문을 받을 수 없다") {
             // given
             val menu = Menu().apply {
                 isDisplayed = true
@@ -251,7 +252,7 @@ internal class OrderServiceTest : BaseUnitSpec({
             every { menuRepository.findAllByIdIn(listOf(menu.id)) } returns listOf(menu)
             every { menuRepository.findById(menu.id) } returns Optional.of(menu)
 
-            val orderTable = OrderTable().apply { isOccupied = true }
+            val orderTable = OrderTable().apply { isOccupied = false }
             every { orderTableRepository.findById(orderTable.id) } returns Optional.of(orderTable)
 
             val orderLineItem = OrderLineItem().apply {
@@ -376,7 +377,6 @@ internal class OrderServiceTest : BaseUnitSpec({
             verify(exactly = 1) { orderRepository.save(any()) }
         }
 
-        // TODO: isOccupied 잘못되어서 여기도 잘못됨
         test("매장 내 식사 주문을 받을 수 있다") {
             // given
             val menu = Menu().apply {
