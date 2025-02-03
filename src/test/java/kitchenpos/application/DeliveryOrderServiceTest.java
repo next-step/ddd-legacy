@@ -15,6 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
+import java.net.SocketTimeoutException;
+import java.nio.channels.ConnectionPendingException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
@@ -235,6 +237,7 @@ class DeliveryOrderServiceTest {
         @Test
         void acceptDeliveryOrder() {
             when(orderRepository.findById(order.getId())).thenReturn(Optional.ofNullable(order));
+            doNothing().when(kitchenridersClient).requestDelivery(any(), any(), any());
 
             final Order acceptedOrder = orderService.accept(order.getId());
 
@@ -256,6 +259,18 @@ class DeliveryOrderServiceTest {
 
             assertThatThrownBy(() -> orderService.accept(nonWaitingOrder.getId())).isInstanceOf(IllegalStateException.class);
         }
+
+        @DisplayName("배달 서비스 요청 중 오류가 발생하면 예외가 발생합니다")
+        @Test
+        void acceptOrderWithDeliveryServiceError() {
+            final Class<ConnectionPendingException> exception = ConnectionPendingException.class;
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.ofNullable(order));
+            doThrow(exception).when(kitchenridersClient).requestDelivery(any(), any(), any());
+
+            assertThatThrownBy(() -> orderService.accept(order.getId())).isInstanceOf(exception);
+        }
+
+
     }
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
