@@ -209,6 +209,15 @@ class EatInOrderServiceTest {
                     () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
             );
         }
+
+        @DisplayName("존재하지 않는 주문을 수락하려고 하면 예외가 발생합니다")
+        @Test
+        void acceptNonExistentOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.accept(order.getId()))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
