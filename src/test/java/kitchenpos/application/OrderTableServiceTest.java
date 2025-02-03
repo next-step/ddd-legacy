@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.Optional;
+
 import static kitchenpos.fixture.OrderTableFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -46,7 +48,7 @@ class OrderTableServiceTest {
                 () -> assertNotNull(orderTable.getId()),
                 () -> assertThat(orderTable.getName()).isEqualTo(DEFAULT_ORDER_TABLE_NAME),
                 () -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(DEFAULT_NUMBER_OF_GUESTS),
-                () -> assertThat(orderTable.isOccupied()).isEqualTo(DEFAULT_OCCUPIED)
+                () -> assertThat(orderTable.isOccupied()).isFalse()
         );
     }
 
@@ -59,4 +61,18 @@ class OrderTableServiceTest {
         assertThatThrownBy(() -> orderTableService.create(orderTable))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @DisplayName("가게 테이블에 앉을 수 있습니다.")
+    @Test
+    void sitOrderTable() {
+        final OrderTable orderTable = orderTable();
+        when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
+        when(orderTableRepository.save(any(OrderTable.class))).then(returnsFirstArg());
+
+        final OrderTable actual = orderTableService.sit(orderTable.getId());
+
+        assertThat(actual.isOccupied()).isTrue();
+    }
+
+
 }
