@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.menu;
 import static kitchenpos.fixture.OrderFixture.*;
@@ -73,7 +74,7 @@ class EatInOrderServiceTest {
             this.orderTable = orderTable(createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, 2, true);
         }
 
-        @DisplayName("대기 상태의 주문을 생성할 수 있다")
+        @DisplayName("대기 상태의 주문을 생성할 수 있습니다")
         @Test
         void createOrder() {
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
@@ -94,7 +95,7 @@ class EatInOrderServiceTest {
             );
         }
 
-        @DisplayName("주문 형식이 없으면 예외가 발생한다")
+        @DisplayName("주문 형식이 없으면 예외가 발생합니다")
         @Test
         void createOrderWithoutType() {
             assertThatThrownBy(() -> orderService.create(
@@ -109,7 +110,7 @@ class EatInOrderServiceTest {
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 항목이 없거나 비어있으면 예외가 발생한다")
+        @DisplayName("주문 항목이 없거나 비어있으면 예외가 발생합니다")
         @ParameterizedTest(name = "주문 항목: {0}")
         @NullAndEmptySource
         void createOrderWithoutOrderLineItems(final List<OrderLineItem> orderLineItems) {
@@ -126,7 +127,7 @@ class EatInOrderServiceTest {
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 항목의 메뉴가 존재하지 않으면 예외가 발생한다")
+        @DisplayName("주문 항목의 메뉴가 존재하지 않으면 예외가 발생합니다")
         @Test
         void createOrderWithoutMenus() {
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of());
@@ -136,7 +137,7 @@ class EatInOrderServiceTest {
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 항목의 메뉴의 가격이 일치하지 않으면 예외가 발생한다")
+        @DisplayName("주문 항목의 메뉴의 가격이 일치하지 않으면 예외가 발생합니다")
         @Test
         void createOrderWithDifferentMenuPrice() {
             final BigDecimal differentPrice = menu.getPrice().add(BigDecimal.ONE);
@@ -149,7 +150,7 @@ class EatInOrderServiceTest {
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 테이블이 존재하지 않으면 예외가 발생한다")
+        @DisplayName("주문 테이블이 존재하지 않으면 예외가 발생합니다")
         @Test
         void createOrderWithoutOrderTable() {
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
@@ -172,6 +173,41 @@ class EatInOrderServiceTest {
             assertThatThrownBy(() -> orderService.create(
                     eatInOrder(null, null, emptyOrderTable, OrderStatus.WAITING, List.of(orderLineItem))
             )).isInstanceOf(IllegalStateException.class);
+        }
+    }
+
+    @DisplayName("매장 식사 주문을 수락할 때")
+    @Nested
+    class Accept {
+
+        private Menu menu;
+        private long quantity;
+        private BigDecimal price;
+        private OrderLineItem orderLineItem;
+        private OrderTable orderTable;
+        private Order order;
+
+        @BeforeEach
+        void setUp() {
+            this.menu = menu();
+            this.quantity = 1L;
+            this.price = orderLineItemPrice(menu.getPrice(), quantity);
+            this.orderLineItem = orderLineItem(1L, menu, quantity, price);
+            this.orderTable = orderTable(createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, 2, true);
+            this.order = eatInOrder(UUID.randomUUID(), LocalDateTime.now(), orderTable, OrderStatus.WAITING, List.of(orderLineItem));
+        }
+
+        @DisplayName("대기 상태의 주문을 수락할 수 있습니다")
+        @Test
+        void acceptOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+
+            final Order actual = orderService.accept(order.getId());
+
+            assertAll(
+                    () -> assertThat(actual.getId()).isEqualTo(order.getId()),
+                    () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
+            );
         }
     }
 
