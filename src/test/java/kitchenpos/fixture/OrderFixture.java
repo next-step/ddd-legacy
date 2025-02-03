@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class OrderFixture {
-    public static final String DEFAULT_ORDER_TYPE = "테이크아웃";
-    public static final String DEFAULT_ORDER_STATUS = "조리중";
-
     private OrderFixture() {
     }
 
