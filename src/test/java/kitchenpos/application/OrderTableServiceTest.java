@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static kitchenpos.fixture.OrderTableFixture.*;
@@ -74,5 +75,13 @@ class OrderTableServiceTest {
         assertThat(actual.isOccupied()).isTrue();
     }
 
+    @DisplayName("가게 테이블이 없을 경우 가게 테이블에 앉을 수 없습니다.")
+    @Test
+    void sitOrderTableWithNonExistOrderTable() {
+        when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderTableService.sit(createOrderTableId()))
+                .isInstanceOf(NoSuchElementException.class);
+    }
 
 }
