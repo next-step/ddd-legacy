@@ -230,6 +230,42 @@ class EatInOrderServiceTest {
         }
     }
 
+    @DisplayName("매장 식사 주문을 서빙할 때")
+    @Nested
+    class Serve {
+
+        private Menu menu;
+        private long quantity;
+        private BigDecimal price;
+        private OrderLineItem orderLineItem;
+        private OrderTable orderTable;
+        private Order order;
+
+        @BeforeEach
+        void setUp() {
+            this.menu = menu();
+            this.quantity = 1L;
+            this.price = orderLineItemPrice(menu.getPrice(), quantity);
+            this.orderLineItem = orderLineItem(1L, menu, quantity, price);
+            this.orderTable = orderTable(createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, 2, true);
+            this.order = eatInOrder(UUID.randomUUID(), LocalDateTime.now(), orderTable, OrderStatus.ACCEPTED, List.of(orderLineItem));
+        }
+
+        @DisplayName("접수 상태의 주문을 서빙할 수 있습니다")
+        @Test
+        void serveOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+
+            final Order actual = orderService.serve(order.getId());
+
+            assertAll(
+                    () -> assertThat(actual.getId()).isEqualTo(order.getId()),
+                    () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.SERVED)
+            );
+        }
+    }
+
+
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
         return price.multiply(BigDecimal.valueOf(quantity));
     }
