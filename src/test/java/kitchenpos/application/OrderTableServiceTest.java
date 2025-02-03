@@ -136,4 +136,19 @@ class OrderTableServiceTest {
 
         assertThat(actual.getNumberOfGuests()).isEqualTo(1);
     }
+
+    @DisplayName("가게 테이블이 비어있을 경우 손님 수를 변경할 수 없습니다.")
+    @Test
+    void changeNumberOfGuestsWhenOrderTableIsEmpty() {
+        final OrderTable existedOrderTable = orderTable(
+                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, DEFAULT_OCCUPIED
+        );
+        when(orderTableRepository.findById(existedOrderTable.getId())).thenReturn(Optional.of(existedOrderTable));
+        final OrderTable renewedOrderTable = orderTable(
+                existedOrderTable.getId(), existedOrderTable.getName(), 1, existedOrderTable.isOccupied()
+        );
+
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(existedOrderTable.getId(), renewedOrderTable))
+                .isInstanceOf(IllegalStateException.class);
+    }
 }
