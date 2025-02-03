@@ -61,4 +61,11 @@ class MenuStepDefinitions : CucumberTest() {
             .then().extract().`as`(Array<Menu>::class.java)
         assertThat(menus).hasSize(1)
     }
+
+    @Then("메뉴 생성 실패")
+    fun 메뉴생성실패() {
+        val menus = get("/api/menus")
+            .then().extract().`as`(Array<Menu>::class.java)
+        assertThat(menus).hasSize(0)
+    }
 }
