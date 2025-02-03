@@ -15,9 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
-import java.net.SocketTimeoutException;
 import java.nio.channels.ConnectionPendingException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -269,8 +267,34 @@ class DeliveryOrderServiceTest {
 
             assertThatThrownBy(() -> orderService.accept(order.getId())).isInstanceOf(exception);
         }
+    }
 
+    @DisplayName("배달 주문을 서빙할 때")
+    @Nested
+    class Server {
+        private Order order;
 
+        @BeforeEach
+        void setUp() {
+            this.order = deliveryOrder(
+                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.ACCEPTED,
+                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+        }
+
+        @DisplayName("배달 주문을 서빙할 수 있습니다.")
+        @Test
+        void serveDeliveryOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.ofNullable(order));
+
+            final Order servedOrder = orderService.serve(order.getId());
+
+            assertAll(
+                    () -> assertThat(servedOrder.getId()).isEqualTo(order.getId()),
+                    () -> assertThat(servedOrder.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress()),
+                    () -> assertThat(servedOrder.getType()).isEqualTo(order.getType()),
+                    () -> assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED)
+            );
+        }
     }
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
