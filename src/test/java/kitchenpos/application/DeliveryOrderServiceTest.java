@@ -225,12 +225,18 @@ class DeliveryOrderServiceTest {
     @Nested
     class Accept {
         private Order order;
+        private UUID orderId;
+        private LocalDateTime orderDateTime;
+        private String deliverAddress;
+        private OrderLineItem orderLineItem;
 
         @BeforeEach
         void setUp() {
-            this.order = deliveryOrder(
-                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.WAITING,
-                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+            this.orderId = createOrderId();
+            this.orderDateTime = LocalDateTime.now();
+            this.deliverAddress = "서울시 강남구";
+            this.orderLineItem = orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000));
+            this.order = deliveryOrder(orderId, orderDateTime, deliverAddress, OrderStatus.WAITING, List.of(orderLineItem));
         }
 
         @DisplayName("배달 주문을 수락할 수 있습니다.")
@@ -253,8 +259,8 @@ class DeliveryOrderServiceTest {
         @Test
         void acceptNonWaitingOrder() {
             final Order nonWaitingOrder = deliveryOrder(
-                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.ACCEPTED,
-                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+                    orderId, orderDateTime, deliverAddress, OrderStatus.ACCEPTED, List.of(orderLineItem)
+            );
             when(orderRepository.findById(nonWaitingOrder.getId())).thenReturn(Optional.ofNullable(nonWaitingOrder));
 
             assertThatThrownBy(() -> orderService.accept(nonWaitingOrder.getId())).isInstanceOf(IllegalStateException.class);
@@ -275,12 +281,18 @@ class DeliveryOrderServiceTest {
     @Nested
     class Server {
         private Order order;
+        private UUID orderId;
+        private LocalDateTime orderDateTime;
+        private String deliverAddress;
+        private OrderLineItem orderLineItem;
 
         @BeforeEach
         void setUp() {
-            this.order = deliveryOrder(
-                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.ACCEPTED,
-                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+            this.orderId = createOrderId();
+            this.orderDateTime = LocalDateTime.now();
+            this.deliverAddress = "서울시 강남구";
+            this.orderLineItem = orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000));
+            this.order = deliveryOrder(orderId, orderDateTime, deliverAddress, OrderStatus.ACCEPTED, List.of(orderLineItem));
         }
 
         @DisplayName("배달 주문을 서빙할 수 있습니다.")
@@ -302,8 +314,8 @@ class DeliveryOrderServiceTest {
         @Test
         void serveNonAcceptedOrder() {
             final Order nonAcceptedOrder = deliveryOrder(
-                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.WAITING,
-                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+                    orderId, orderDateTime, deliverAddress, OrderStatus.WAITING, List.of(orderLineItem)
+            );
 
             when(orderRepository.findById(nonAcceptedOrder.getId())).thenReturn(Optional.ofNullable(nonAcceptedOrder));
 
@@ -316,12 +328,18 @@ class DeliveryOrderServiceTest {
     @Nested
     class StartDelivery {
         private Order order;
+        private UUID orderId;
+        private LocalDateTime orderDateTime;
+        private String deliverAddress;
+        private OrderLineItem orderLineItem;
 
         @BeforeEach
         void setUp() {
-            this.order = deliveryOrder(
-                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.SERVED,
-                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+            this.orderId = createOrderId();
+            this.orderDateTime = LocalDateTime.now();
+            this.deliverAddress = "서울시 강남구";
+            this.orderLineItem = orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000));
+            this.order = deliveryOrder(orderId, orderDateTime, deliverAddress, OrderStatus.SERVED, List.of(orderLineItem));
         }
 
         @DisplayName("배달 주문을 배달 시작할 수 있습니다.")
@@ -385,12 +403,18 @@ class DeliveryOrderServiceTest {
     @Nested
     class CompleteDelivery {
         private Order order;
+        private UUID orderId;
+        private LocalDateTime orderDateTime;
+        private String deliverAddress;
+        private OrderLineItem orderLineItem;
 
         @BeforeEach
         void setUp() {
-            this.order = deliveryOrder(
-                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.DELIVERING,
-                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+            this.orderId = createOrderId();
+            this.orderDateTime = LocalDateTime.now();
+            this.deliverAddress = "서울시 강남구";
+            this.orderLineItem = orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000));
+            this.order = deliveryOrder(orderId, orderDateTime, deliverAddress, OrderStatus.DELIVERING, List.of(orderLineItem));
         }
 
         @DisplayName("배달 주문을 배달 완료할 수 있습니다.")
@@ -421,9 +445,7 @@ class DeliveryOrderServiceTest {
         @DisplayName("배달 중이 아닌 주문을 배달 완료하려고 하면 예외가 발생합니다")
         @Test
         void completeDeliveryNonDeliveringOrder() {
-            final Order nonDeliveringOrder = deliveryOrder(
-                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.SERVED,
-                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+            final Order nonDeliveringOrder = deliveryOrder(orderId, orderDateTime, deliverAddress, OrderStatus.SERVED, List.of(orderLineItem));
 
             when(orderRepository.findById(nonDeliveringOrder.getId())).thenReturn(Optional.ofNullable(nonDeliveringOrder));
 
@@ -436,12 +458,18 @@ class DeliveryOrderServiceTest {
     @Nested
     class Complete {
         private Order order;
+        private UUID orderId;
+        private LocalDateTime orderDateTime;
+        private String deliverAddress;
+        private OrderLineItem orderLineItem;
 
         @BeforeEach
         void setUp() {
-            this.order = deliveryOrder(
-                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.DELIVERED,
-                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+            this.orderId = createOrderId();
+            this.orderDateTime = LocalDateTime.now();
+            this.deliverAddress = "서울시 강남구";
+            this.orderLineItem = orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000));
+            this.order = deliveryOrder(orderId, orderDateTime, deliverAddress, OrderStatus.DELIVERED, List.of(orderLineItem));
         }
 
         @DisplayName("배달 주문을 완료할 수 있습니다.")
@@ -473,9 +501,7 @@ class DeliveryOrderServiceTest {
         @DisplayName("배달 주문이 완료되지 않은 상태에서 완료하려고 하면 예외가 발생합니다")
         @Test
         void completeNonDeliveredOrder() {
-            final Order nonDeliveredOrder = deliveryOrder(
-                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.DELIVERING,
-                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+            final Order nonDeliveredOrder = deliveryOrder(orderId, orderDateTime, deliverAddress, OrderStatus.DELIVERING, List.of(orderLineItem));
 
             when(orderRepository.findById(nonDeliveredOrder.getId())).thenReturn(Optional.ofNullable(nonDeliveredOrder));
 
@@ -483,7 +509,6 @@ class DeliveryOrderServiceTest {
                     .isInstanceOf(IllegalStateException.class);
         }
     }
-
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
         return price.multiply(BigDecimal.valueOf(quantity));
