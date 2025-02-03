@@ -383,7 +383,7 @@ class DeliveryOrderServiceTest {
 
     @DisplayName("배달 주문을 배달 완료할 때")
     @Nested
-    class Complete {
+    class CompleteDelivery {
         private Order order;
 
         @BeforeEach
@@ -431,6 +431,35 @@ class DeliveryOrderServiceTest {
                     .isInstanceOf(IllegalStateException.class);
         }
     }
+
+    @DisplayName("배달 주문을 완료할 때")
+    @Nested
+    class Complete {
+        private Order order;
+
+        @BeforeEach
+        void setUp() {
+            this.order = deliveryOrder(
+                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.DELIVERED,
+                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+        }
+
+        @DisplayName("배달 주문을 완료할 수 있습니다.")
+        @Test
+        void completeDeliveryOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.ofNullable(order));
+
+            final Order completedOrder = orderService.complete(order.getId());
+
+            assertAll(
+                    () -> assertThat(completedOrder.getId()).isEqualTo(order.getId()),
+                    () -> assertThat(completedOrder.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress()),
+                    () -> assertThat(completedOrder.getType()).isEqualTo(order.getType()),
+                    () -> assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED)
+            );
+        }
+    }
+
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
         return price.multiply(BigDecimal.valueOf(quantity));
