@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static kitchenpos.fixture.MenuFixture.menu;
-import static kitchenpos.fixture.OrderFixture.deliveryOrder;
-import static kitchenpos.fixture.OrderFixture.orderLineItem;
+import static kitchenpos.fixture.OrderFixture.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -50,12 +50,13 @@ class DeliveryOrderServiceTest {
     @Autowired
     OrderService orderService;
 
-    @DisplayName("배달 주문")
+    @DisplayName("배달 주문을 생성할 때")
     @Nested
-    class DeliveryOrder {
+    class Create {
         private Menu menu;
         private long quantity;
         private BigDecimal price;
+        private String deliverAddress;
         private OrderLineItem orderLineItem;
 
         @BeforeEach
@@ -63,10 +64,11 @@ class DeliveryOrderServiceTest {
             this.menu = menu();
             this.quantity = 1L;
             this.price = menu.getPrice().multiply(BigDecimal.valueOf(quantity));
+            this.deliverAddress = "서울시 강남구";
             this.orderLineItem = orderLineItem(null, menu, quantity, price);
         }
 
-        @DisplayName("배달 주문을 생성할 수 있습니다.")
+        @DisplayName("대기 상태의 배달 주문을 생성할 수 있습니다.")
         @Test
         void createDeliveryOrder() {
             final Menu menu = menu();
@@ -88,6 +90,21 @@ class DeliveryOrderServiceTest {
                     () -> assertThat(order.getType()).isEqualTo(OrderType.DELIVERY),
                     () -> assertThat(order.getOrderTable()).isNull()
             );
+        }
+
+        @DisplayName("주문 형식이 없으면 예외가 발생합니다")
+        @Test
+        void createOrderWithoutType() {
+            assertThatThrownBy(() -> orderService.create(
+                    order(
+                            null,
+                            null,
+                            deliverAddress,
+                            OrderStatus.WAITING,
+                            OrderType.DELIVERY,
+                            null,
+                            List.of(orderLineItem))
+            )).isInstanceOf(IllegalArgumentException.class);
         }
     }
 }
