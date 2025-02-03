@@ -58,7 +58,7 @@ class MenuGroupServiceTest {
     @DisplayName("이름이 없는 메뉴 그룹은 생성할 수 없다")
     @NullAndEmptySource
     @ParameterizedTest
-    void cannotmenuGroupWithoutName(String name) {
+    void cannotMenuGroupWithoutName(String name) {
         MenuGroup request = MenuGroupFixture.menuGroup(name);
 
         assertThatThrownBy(() -> menuGroupService.create(request))
