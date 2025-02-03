@@ -336,6 +336,22 @@ class EatInOrderServiceTest {
             assertThatThrownBy(() -> orderService.complete(completedOrder.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
+
+        @DisplayName("모든 주문이 완료되었다면 가게 테이블을 비웁니다")
+        @Test
+        void completeOrderAndEmptyOrderTable() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+            when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(false);
+
+            final Order actual = orderService.complete(order.getId());
+
+            assertAll(
+                    () -> assertThat(actual.getId()).isEqualTo(order.getId()),
+                    () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                    () -> assertThat(actual.getOrderTable().isOccupied()).isFalse(),
+                    () -> assertThat(actual.getOrderTable().getNumberOfGuests()).isEqualTo(0)
+            );
+        }
     }
 
 
