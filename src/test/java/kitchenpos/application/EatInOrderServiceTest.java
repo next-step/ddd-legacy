@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,9 +20,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static kitchenpos.fixture.MenuFixture.menu;
-import static kitchenpos.fixture.OrderFixture.eatInOrder;
-import static kitchenpos.fixture.OrderFixture.orderLineItem;
+import static kitchenpos.fixture.OrderFixture.*;
 import static kitchenpos.fixture.OrderTableFixture.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -52,28 +54,28 @@ class EatInOrderServiceTest {
     @Autowired
     OrderService orderService;
 
-    @DisplayName("매장 식사 주문")
+    @DisplayName("생성할 때")
     @Nested
-    class CreateEatInOrder {
+    class Create {
 
         private Menu menu;
         private long quantity;
         private BigDecimal price;
         private OrderLineItem orderLineItem;
+        private OrderTable orderTable;
 
         @BeforeEach
         void setUp() {
             this.menu = menu();
             this.quantity = 1L;
-            this.price = menu.getPrice().multiply(BigDecimal.valueOf(quantity));
-            this.orderLineItem = orderLineItem(menu, quantity, price);
+            this.price = orderLineItemPrice(menu.getPrice(), quantity);
+            this.orderLineItem = orderLineItem(null, menu, quantity, price);
+            this.orderTable = orderTable(createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, 2, true);
         }
 
-        @DisplayName("매장 식사 주문을 생성할 수 있습니다.")
+        @DisplayName("대기 상태의 주문을 생성할 수 있다")
         @Test
         void createOrder() {
-            final OrderTable orderTable = orderTable(createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, 2, true);
-
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
             when(menuRepository.findById(menu.getId())).thenReturn(Optional.ofNullable(menu));
             when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
@@ -91,5 +93,41 @@ class EatInOrderServiceTest {
                     () -> assertThat(order.getOrderTable()).isEqualTo(orderTable)
             );
         }
+
+        @DisplayName("주문 형식이 없으면 예외가 발생한다")
+        @Test
+        void createOrderWithoutType() {
+            assertThatThrownBy(() -> orderService.create(
+                    order(
+                            null,
+                            null,
+                            null,
+                            OrderStatus.WAITING,
+                            OrderType.EAT_IN,
+                            orderTable,
+                            List.of(orderLineItem))
+            )).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("주문 항목이 없거나 비어있으면 예외가 발생한다")
+        @ParameterizedTest(name = "주문 항목: {0}")
+        @NullAndEmptySource
+        void createOrderWithoutOrderLineItems(final List<OrderLineItem> orderLineItems) {
+            assertThatThrownBy(() -> orderService.create(
+                    order(
+                            null,
+                            null,
+                            null,
+                            OrderStatus.WAITING,
+                            OrderType.EAT_IN,
+                            orderTable,
+                            orderLineItems
+                    )
+            )).isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
+        return price.multiply(BigDecimal.valueOf(quantity));
     }
 }

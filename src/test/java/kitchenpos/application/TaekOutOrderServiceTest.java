@@ -65,7 +65,7 @@ class TaekOutOrderServiceTest {
             this.menu = menu();
             this.quantity = 1L;
             this.price = menu.getPrice().multiply(BigDecimal.valueOf(quantity));
-            this.orderLineItem = orderLineItem(menu, quantity, price);
+            this.orderLineItem = orderLineItem(null, menu, quantity, price);
         }
 
         @DisplayName("포장 주문을 생성할 수 있습니다.")

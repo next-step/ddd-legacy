@@ -48,11 +48,13 @@ public class OrderFixture {
     }
 
     public static OrderLineItem orderLineItem(
+            final Long seq,
             final Menu menu,
             final long quantity,
             final BigDecimal price
     ) {
         final OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setSeq(seq);
         orderLineItem.setMenu(menu);
         orderLineItem.setQuantity(quantity);
         orderLineItem.setPrice(price);

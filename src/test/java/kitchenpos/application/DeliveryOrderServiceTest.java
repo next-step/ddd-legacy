@@ -63,7 +63,7 @@ class DeliveryOrderServiceTest {
             this.menu = menu();
             this.quantity = 1L;
             this.price = menu.getPrice().multiply(BigDecimal.valueOf(quantity));
-            this.orderLineItem = orderLineItem(menu, quantity, price);
+            this.orderLineItem = orderLineItem(null, menu, quantity, price);
         }
 
         @DisplayName("배달 주문을 생성할 수 있습니다.")
@@ -71,7 +71,7 @@ class DeliveryOrderServiceTest {
         void createDeliveryOrder() {
             final Menu menu = menu();
             final long quantity = 1L;
-            final OrderLineItem orderLineItem = orderLineItem(menu, quantity, menu.getPrice().multiply(BigDecimal.valueOf(quantity)));
+            final OrderLineItem orderLineItem = orderLineItem(null, menu, quantity, menu.getPrice().multiply(BigDecimal.valueOf(quantity)));
             final String deliverAddress = "서울시 강남구";
 
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
