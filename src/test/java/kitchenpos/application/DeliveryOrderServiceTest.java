@@ -141,6 +141,8 @@ class DeliveryOrderServiceTest {
                     true
             );
             final OrderLineItem otherOrderLineItem = orderLineItem(null, otherMenu, 1L, otherMenu.getPrice());
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+
             assertThatThrownBy(() -> orderService.create(
                     order(
                             null,
@@ -150,6 +152,27 @@ class DeliveryOrderServiceTest {
                             OrderType.DELIVERY,
                             null,
                             List.of(orderLineItem, otherOrderLineItem)
+                    )
+            )).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("주문 항목 중 하나라도 수량이 0보다 작으면 예외가 발생합니다")
+        @Test
+        void createOrderWithNegativeQuantity() {
+            final long negativeQuantity = -1L;
+            final OrderLineItem negativeOrderLineItem = orderLineItem(null, menu, negativeQuantity, menu.getPrice().multiply(BigDecimal.valueOf(negativeQuantity)));
+
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+
+            assertThatThrownBy(() -> orderService.create(
+                    order(
+                            null,
+                            null,
+                            deliverAddress,
+                            OrderStatus.WAITING,
+                            OrderType.DELIVERY,
+                            null,
+                            List.of(negativeOrderLineItem)
                     )
             )).isInstanceOf(IllegalArgumentException.class);
         }
