@@ -295,6 +295,19 @@ class DeliveryOrderServiceTest {
                     () -> assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED)
             );
         }
+
+        @DisplayName("수락 상태가 아닌 주문을 서빙하려고 하면 예외가 발생합니다")
+        @Test
+        void serveNonAcceptedOrder() {
+            final Order nonAcceptedOrder = deliveryOrder(
+                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.WAITING,
+                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+
+            when(orderRepository.findById(nonAcceptedOrder.getId())).thenReturn(Optional.ofNullable(nonAcceptedOrder));
+
+            assertThatThrownBy(() -> orderService.serve(nonAcceptedOrder.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
