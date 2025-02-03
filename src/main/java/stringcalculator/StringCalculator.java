@@ -10,11 +10,9 @@ public class StringCalculator {
             return 0;
         }
 
-        String[] numbers = StringSplitor.split(text);
+        Numbers numbers = new Numbers(StringSplitor.split(text));
 
-        String[] checkedNumbers = NegativeNumbersChecker.checkNumbers(numbers);
-
-        return NumberSummer.sum(checkedNumbers);
+        return numbers.sum();
     }
 
     private boolean isEmptyOrNull(String text) {
