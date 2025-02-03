@@ -5,6 +5,7 @@ import kitchenpos.domain.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 public class OrderFixture {
@@ -47,6 +48,10 @@ public class OrderFixture {
         return order;
     }
 
+    public static UUID createOrderId() {
+        return UUID.randomUUID();
+    }
+
     public static OrderLineItem orderLineItem(
             final Long seq,
             final Menu menu,
@@ -59,5 +64,9 @@ public class OrderFixture {
         orderLineItem.setQuantity(quantity);
         orderLineItem.setPrice(price);
         return orderLineItem;
+    }
+
+    public static Long createOrderLineItemId() {
+        return new Random().nextLong(1, 100);
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -215,6 +216,34 @@ class DeliveryOrderServiceTest {
             assertThatThrownBy(() -> orderService.create(
                     deliveryOrder(null, null, deliveryAddress, OrderStatus.WAITING, List.of(orderLineItem))
             )).isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @DisplayName("배달 주문을 수락할 때")
+    @Nested
+    class Accept {
+        private Order order;
+
+        @BeforeEach
+        void setUp() {
+            this.order = deliveryOrder(
+                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.WAITING,
+                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+        }
+
+        @DisplayName("배달 주문을 수락할 수 있습니다.")
+        @Test
+        void acceptDeliveryOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.ofNullable(order));
+
+            final Order acceptedOrder = orderService.accept(order.getId());
+
+            assertAll(
+                    () -> assertThat(acceptedOrder.getId()).isEqualTo(order.getId()),
+                    () -> assertThat(acceptedOrder.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress()),
+                    () -> assertThat(acceptedOrder.getType()).isEqualTo(order.getType()),
+                    () -> assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
+            );
         }
     }
 
