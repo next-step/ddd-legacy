@@ -93,6 +93,25 @@ class OrderStepDefinitions : CucumberTest() {
         order.deliveryAddress = "서울시 강남구"
     }
 
+    @Given("배달주문이 생성되어있다")
+    fun 배달주문_생성() {
+        order.type = OrderType.DELIVERY
+        order.deliveryAddress = "서울시 강남구"
+        order = RestAssured
+            .given().body(order).contentType("application/json")
+            .`when`().post("/api/orders")
+            .then().extract().`as`(Order::class.java)
+    }
+
+    @Given("포장주문이 생성되어있다")
+    fun 포장주문_생성() {
+        order.type = OrderType.TAKEOUT
+        order = RestAssured
+            .given().body(order).contentType("application/json")
+            .`when`().post("/api/orders")
+            .then().extract().`as`(Order::class.java)
+    }
+
     @When("주문을 생성한다")
     fun 주문을_생성한다() {
         try {
@@ -105,7 +124,42 @@ class OrderStepDefinitions : CucumberTest() {
         }
     }
 
-    @Then("생성한 주문의 타입은 {orderType}이고 상태는 {orderStatus}이다")
+    @When("주문을 접수한다")
+    fun 주문_접수() {
+        RestAssured
+            .given().body(order).contentType("application/json")
+            .`when`().put("/api/orders/${order.id}/accept")
+    }
+
+    @When("주문이 준비완료되었다")
+    fun 주문_준비완료() {
+        RestAssured
+            .given().body(order).contentType("application/json")
+            .`when`().put("/api/orders/${order.id}/serve")
+    }
+
+    @When("배달주문이 배달중이다")
+    fun 배달주문_배달중() {
+        RestAssured
+            .given().body(order).contentType("application/json")
+            .`when`().put("/api/orders/${order.id}/start-delivery")
+    }
+
+    @When("배달주문이 배달완료되었다")
+    fun 배달주문_배달완료() {
+        RestAssured
+            .given().body(order).contentType("application/json")
+            .`when`().put("/api/orders/${order.id}/complete-delivery")
+    }
+
+    @When("주문이 완료되었다")
+    fun 주문_완료() {
+        RestAssured
+            .given().body(order).contentType("application/json")
+            .`when`().put("/api/orders/${order.id}/complete")
+    }
+
+    @Then("현재 주문의 타입은 {orderType}이고 상태는 {orderStatus}이다")
     fun 주문_타입_상태_확인(type: OrderType, status: OrderStatus) {
         val createdOrder = OrderHelper.주문ID로_주문_조회(order.id)
         assertThat(createdOrder.type).isEqualTo(type)
