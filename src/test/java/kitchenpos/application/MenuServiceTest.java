@@ -1,6 +1,13 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
+import kitchenpos.application.fixture.MenuFixture;
+import kitchenpos.application.fixture.MenuGroupFixture;
+import kitchenpos.application.fixture.MenuProductFixture;
+import kitchenpos.application.fixture.ProductFixture;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,19 +50,19 @@ class MenuServiceTest {
 
     @BeforeEach
     void setUp() {
-        productRepository.save(createProduct(BURGER_PRODUCT_ID, "치킨버거", new BigDecimal(7000)));
-        productRepository.save(createProduct(SIDE_PRODUCT_ID, "감자튀김", new BigDecimal(2000)));
-        productRepository.save(createProduct(COKE_PRODUCT_ID, "콜라", new BigDecimal(2000)));
+        productRepository.save(ProductFixture.createProduct(BURGER_PRODUCT_ID, "치킨버거", new BigDecimal(7000)));
+        productRepository.save(ProductFixture.createProduct(SIDE_PRODUCT_ID, "감자튀김", new BigDecimal(2000)));
+        productRepository.save(ProductFixture.createProduct(COKE_PRODUCT_ID, "콜라", new BigDecimal(2000)));
 
-        menuGroupRepository.save(createMenuGroup(MENU_GROUP_ID, "세트메뉴"));
+        menuGroupRepository.save(MenuGroupFixture.createMenuGroup(MENU_GROUP_ID, "세트메뉴"));
     }
 
     //region [메뉴 등록]
     @DisplayName("단일 상품으로 메뉴를 등록할 수 있다")
     @Test
     void createMenuByProduct() {
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
-        Menu menu = createMenu(MENU_GROUP_ID, "치킨버거", new BigDecimal(7000), List.of(chickenBurger));
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);
+        Menu menu = MenuFixture.createMenu(MENU_GROUP_ID, "치킨버거", new BigDecimal(7000), List.of(chickenBurger));
 
         Menu resultMenu = menuService.create(menu);
 
@@ -71,11 +78,11 @@ class MenuServiceTest {
     @Test
     void createMenuByProducts() {
         //given
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
-        MenuProduct side = createMenuProduct(SIDE_PRODUCT_ID, 1);
-        MenuProduct coke = createMenuProduct(COKE_PRODUCT_ID, 1);
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);
+        MenuProduct side = MenuProductFixture.createMenuProduct(SIDE_PRODUCT_ID, 1);
+        MenuProduct coke = MenuProductFixture.createMenuProduct(COKE_PRODUCT_ID, 1);
 
-        Menu menu = createMenu(
+        Menu menu = MenuFixture.createMenu(
                 MENU_GROUP_ID,
                 "치킨버거세트",
                 new BigDecimal(10000),
@@ -94,9 +101,9 @@ class MenuServiceTest {
     @DisplayName("각 메뉴를 구성하는 상품의 수량은 0이상이어야 한다")
     @Test
     void validateMenuProductQuantity() {
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
-        MenuProduct coke = createMenuProduct(COKE_PRODUCT_ID, -1);
-        Menu menu = createMenu(
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);
+        MenuProduct coke = MenuProductFixture.createMenuProduct(COKE_PRODUCT_ID, -1);
+        Menu menu = MenuFixture.createMenu(
                 MENU_GROUP_ID,
                 "치킨버거+음료",
                 new BigDecimal(9000),
@@ -111,8 +118,8 @@ class MenuServiceTest {
     @ParameterizedTest
     @NullSource
     void notNullName(String nullName) {
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
-        Menu menu = createMenu(MENU_GROUP_ID, nullName, new BigDecimal(7000), List.of(chickenBurger));
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);
+        Menu menu = MenuFixture.createMenu(MENU_GROUP_ID, nullName, new BigDecimal(7000), List.of(chickenBurger));
 
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> menuService.create(menu));
@@ -123,8 +130,8 @@ class MenuServiceTest {
     void validateMenuName() {
         Mockito.when(purgomalumClient.containsProfanity("bad word")).thenReturn(true);
 
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
-        Menu menu = createMenu(MENU_GROUP_ID, "bad word", new BigDecimal(7000), List.of(chickenBurger));
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);
+        Menu menu = MenuFixture.createMenu(MENU_GROUP_ID, "bad word", new BigDecimal(7000), List.of(chickenBurger));
 
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> menuService.create(menu));
@@ -134,8 +141,8 @@ class MenuServiceTest {
     @ParameterizedTest
     @NullSource
     void notNullPrice(BigDecimal nullPrice) {
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
-        Menu menu = createMenu(MENU_GROUP_ID, "치킨버거", nullPrice, List.of(chickenBurger));
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);
+        Menu menu = MenuFixture.createMenu(MENU_GROUP_ID, "치킨버거", nullPrice, List.of(chickenBurger));
 
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> menuService.create(menu));
@@ -144,8 +151,8 @@ class MenuServiceTest {
     @DisplayName("메뉴의 가격은 0원 이상이어야 한다")
     @Test
     void nonNegativeMenuPrice() {
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
-        Menu menu = createMenu(MENU_GROUP_ID, "치킨버거", new BigDecimal(-1), List.of(chickenBurger));
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);
+        Menu menu = MenuFixture.createMenu(MENU_GROUP_ID, "치킨버거", new BigDecimal(-1), List.of(chickenBurger));
 
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> menuService.create(menu));
@@ -155,11 +162,11 @@ class MenuServiceTest {
     @Test
     void validateMenuPrice() {
         //given
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);    //7000원
-        MenuProduct side = createMenuProduct(SIDE_PRODUCT_ID, 1);   //2000원
-        MenuProduct coke = createMenuProduct(COKE_PRODUCT_ID, 1);   //2000원
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);    //7000원
+        MenuProduct side = MenuProductFixture.createMenuProduct(SIDE_PRODUCT_ID, 1);   //2000원
+        MenuProduct coke = MenuProductFixture.createMenuProduct(COKE_PRODUCT_ID, 1);   //2000원
 
-        Menu menu = createMenu(
+        Menu menu = MenuFixture.createMenu(
                 MENU_GROUP_ID,
                 "치킨버거세트",
                 new BigDecimal(11001),
@@ -175,9 +182,9 @@ class MenuServiceTest {
     @DisplayName("메뉴는 가격을 수정할 수 있다")
     @Test
     void changeMenuPrice() {
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);
         Menu menu = menuService.create(
-                createMenu(
+                MenuFixture.createMenu(
                         MENU_GROUP_ID,
                         "치킨버거",
                         new BigDecimal(7000),
@@ -192,9 +199,9 @@ class MenuServiceTest {
     @DisplayName("메뉴의 가격이 0원 미만이면 변경할 수 없다")
     @Test
     void canNotChangeNegativePrice() {
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);
         Menu menu = menuService.create(
-                createMenu(
+                MenuFixture.createMenu(
                         MENU_GROUP_ID,
                         "치킨버거",
                         new BigDecimal(7000),
@@ -210,11 +217,11 @@ class MenuServiceTest {
     @Test
     void validateMenuPriceOnModify() {
         //given
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);    //7000원
-        MenuProduct side = createMenuProduct(SIDE_PRODUCT_ID, 1);   //2000원
-        MenuProduct coke = createMenuProduct(COKE_PRODUCT_ID, 1);   //2000원
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);    //7000원
+        MenuProduct side = MenuProductFixture.createMenuProduct(SIDE_PRODUCT_ID, 1);   //2000원
+        MenuProduct coke = MenuProductFixture.createMenuProduct(COKE_PRODUCT_ID, 1);   //2000원
 
-        Menu menu = createMenu(
+        Menu menu = MenuFixture.createMenu(
                 MENU_GROUP_ID,
                 "치킨버거세트",
                 new BigDecimal(11000),
@@ -232,9 +239,9 @@ class MenuServiceTest {
     @DisplayName("메뉴를 메뉴판에 전시한다")
     @Test
     void display() {
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);
         Menu menu = menuService.create(
-                createMenu(
+                MenuFixture.createMenu(
                         MENU_GROUP_ID,
                         "치킨버거",
                         new BigDecimal(7000),
@@ -251,11 +258,11 @@ class MenuServiceTest {
     @Test
     void validateMenuPriceOnDisplay() {
         //given
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);    //7000원
-        MenuProduct side = createMenuProduct(SIDE_PRODUCT_ID, 1);   //2000원
-        MenuProduct coke = createMenuProduct(COKE_PRODUCT_ID, 1);   //2000원
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);    //7000원
+        MenuProduct side = MenuProductFixture.createMenuProduct(SIDE_PRODUCT_ID, 1);   //2000원
+        MenuProduct coke = MenuProductFixture.createMenuProduct(COKE_PRODUCT_ID, 1);   //2000원
 
-        Menu menu = createMenu(
+        Menu menu = MenuFixture.createMenu(
                 MENU_GROUP_ID,
                 "치킨버거세트",
                 new BigDecimal(11000),
@@ -271,9 +278,9 @@ class MenuServiceTest {
     @DisplayName("메뉴판의 전시여부를 X로 변경한다")
     @Test
     void hide() {
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);
         Menu menu = menuService.create(
-                createMenu(
+                MenuFixture.createMenu(
                         MENU_GROUP_ID,
                         "치킨버거",
                         new BigDecimal(7000),
@@ -291,13 +298,13 @@ class MenuServiceTest {
     @DisplayName("모든 메뉴들을 조회할 수 있다")
     @Test
     void findAll() {
-        MenuProduct chickenBurger = createMenuProduct(BURGER_PRODUCT_ID, 1);    //7000원
-        MenuProduct side = createMenuProduct(SIDE_PRODUCT_ID, 1);   //2000원
-        MenuProduct coke = createMenuProduct(COKE_PRODUCT_ID, 1);   //2000원
+        MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);    //7000원
+        MenuProduct side = MenuProductFixture.createMenuProduct(SIDE_PRODUCT_ID, 1);   //2000원
+        MenuProduct coke = MenuProductFixture.createMenuProduct(COKE_PRODUCT_ID, 1);   //2000원
 
-        menuService.create(createMenu(MENU_GROUP_ID, "치킨버거", new BigDecimal(7000), List.of(chickenBurger)));
-        menuService.create(createMenu(MENU_GROUP_ID, "감자튀김", new BigDecimal(2000), List.of(side)));
-        menuService.create(createMenu(MENU_GROUP_ID, "콜라", new BigDecimal(2000), List.of(coke)));
+        menuService.create(MenuFixture.createMenu(MENU_GROUP_ID, "치킨버거", new BigDecimal(7000), List.of(chickenBurger)));
+        menuService.create(MenuFixture.createMenu(MENU_GROUP_ID, "감자튀김", new BigDecimal(2000), List.of(side)));
+        menuService.create(MenuFixture.createMenu(MENU_GROUP_ID, "콜라", new BigDecimal(2000), List.of(coke)));
 
         List<Menu> allMenus = menuService.findAll();
         assertThat(allMenus.size()).isEqualTo(3);
@@ -310,35 +317,4 @@ class MenuServiceTest {
                 );
     }
     //endregion
-
-    private Product createProduct(UUID id, String name, BigDecimal price) {
-        Product product = new Product();
-        product.setId(id);
-        product.setName(name);
-        product.setPrice(price);
-        return product;
-    }
-
-    private Menu createMenu(UUID menuGroupId, String name, BigDecimal price, List<MenuProduct> products) {
-        Menu menu = new Menu();
-        menu.setMenuGroupId(menuGroupId);
-        menu.setName(name);
-        menu.setPrice(price);
-        menu.setMenuProducts(products);
-        return menu;
-    }
-
-    private MenuProduct createMenuProduct(UUID productId, int quantity) {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(productId);
-        menuProduct.setQuantity(quantity);
-        return menuProduct;
-    }
-
-    private MenuGroup createMenuGroup(UUID id, String name) {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(id);
-        menuGroup.setName(name);
-        return menuGroup;
-    }
 }
