@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -347,6 +348,24 @@ class DeliveryOrderServiceTest {
             when(orderRepository.findById(nonServedOrder.getId())).thenReturn(Optional.ofNullable(nonServedOrder));
 
             assertThatThrownBy(() -> orderService.startDelivery(nonServedOrder.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("배달 주문이 아닌 주문을 배달 시작하려고 하면 예외가 발생합니다")
+        @ParameterizedTest(name = "주문 형식: {0}")
+        @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
+        void startDeliveryNonDeliveryOrder(final OrderType orderType) {
+            final Order nonDeliveryOrder = order(
+                    createOrderId(), LocalDateTime.now(),
+                    "서울시 강남구",
+                    OrderStatus.SERVED,
+                    orderType,
+                    null,
+                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+
+            when(orderRepository.findById(nonDeliveryOrder.getId())).thenReturn(Optional.ofNullable(nonDeliveryOrder));
+
+            assertThatThrownBy(() -> orderService.startDelivery(nonDeliveryOrder.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
     }
