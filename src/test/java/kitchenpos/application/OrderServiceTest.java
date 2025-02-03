@@ -462,6 +462,28 @@ class OrderServiceTest {
     }
     //endregion
 
+    //region [주문 조회]
+    @DisplayName("모든 주문들을 조회할 수 있다")
+    @Test
+    void findAll(){
+        //given
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), "1번테이블", true, 4));
+
+        Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
+        Order deliveryRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
+        Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), orderTable.getId(), LocalDateTime.now());
+
+        Order takeOutOrder = orderService.create(takeOutRequest);
+        Order deliveryOrder = orderService.create(deliveryRequest);
+        Order eatInOrder = orderService.create(eatInOrderRequest);
+        //when
+        List<Order> orders = orderService.findAll();
+        //then
+        assertThat(orders).hasSize(3);
+    }
+    //endregion
+
     private Product createProduct(UUID id, String name, BigDecimal price) {
         Product product = new Product();
         product.setId(id);
