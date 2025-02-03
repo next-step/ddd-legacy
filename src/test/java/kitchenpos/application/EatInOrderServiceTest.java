@@ -218,6 +218,16 @@ class EatInOrderServiceTest {
             assertThatThrownBy(() -> orderService.accept(order.getId()))
                     .isInstanceOf(NoSuchElementException.class);
         }
+
+        @DisplayName("대기 상태가 아닌 주문을 수락하려고 하면 예외가 발생합니다")
+        @Test
+        void acceptNotWaitingOrder() {
+            final Order acceptedOrder = eatInOrder(UUID.randomUUID(), LocalDateTime.now(), orderTable, OrderStatus.ACCEPTED, List.of(orderLineItem));
+            when(orderRepository.findById(acceptedOrder.getId())).thenReturn(Optional.of(acceptedOrder));
+
+            assertThatThrownBy(() -> orderService.accept(acceptedOrder.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
