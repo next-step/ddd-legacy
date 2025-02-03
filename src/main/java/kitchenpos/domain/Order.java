@@ -115,6 +115,7 @@ public class Order {
 
     public void setOrderTable(final OrderTable orderTable) {
         this.orderTable = orderTable;
+        setOrderTableId(orderTable.getId());
     }
 
     public UUID getOrderTableId() {

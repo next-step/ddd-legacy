@@ -56,6 +56,7 @@ public class OrderLineItem {
 
     public void setMenu(final Menu menu) {
         this.menu = menu;
+        setMenuId(menu.getId());
     }
 
     public long getQuantity() {
