@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
@@ -225,6 +226,33 @@ class OrderServiceTest {
 
         assertThatIllegalStateException()
                 .isThrownBy(() -> orderService.create(eatInOrderRequest));
+    }
+    //endregion
+
+    //region [주문 수락]
+    @DisplayName("대기 중인 주문을 수락한다")
+    @Test
+    void acceptOrderStatus() {
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
+        Order takeOutOrder = orderService.create(takeOutRequest);
+
+        Order acceptOrder = orderService.accept(takeOutOrder.getId());
+
+        assertThat(acceptOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
+    @DisplayName("주문의 상태가 대기(WAITING)일 때 주문 수락이 가능하다")
+    @EnumSource(value = OrderStatus.class, names = "WAITING", mode = EnumSource.Mode.EXCLUDE)
+    @ParameterizedTest
+    void validateAcceptStatus(OrderStatus orderStatus) {
+        OrderLineItem orderLineItem = createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
+        Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
+        Order takeOutOrder = orderService.create(takeOutRequest);
+
+        takeOutOrder.setStatus(orderStatus);
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.accept(takeOutOrder.getId()));
     }
     //endregion
 
