@@ -34,7 +34,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@DisplayName("매장 주문 서비스 단위 테스트")
+@DisplayName("매장 식사 주문 서비스 단위 테스트")
 class EatInOrderServiceUnitTest {
 
     private OrderRepository orderRepository = mock(OrderRepository.class);
@@ -52,7 +52,7 @@ class EatInOrderServiceUnitTest {
         this.orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
 
-    @DisplayName("매장 주문을 생성할 때")
+    @DisplayName("매장 식사 주문을 생성할 때")
     @Nested
     class Create {
 
@@ -207,7 +207,7 @@ class EatInOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("매장 주문이 대기 상태일 때")
+    @DisplayName("매장 식사 주문이 대기 상태일 때")
     @Nested
     class Waiting {
 
@@ -263,7 +263,7 @@ class EatInOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("매장 주문이 접수 되었을 때")
+    @DisplayName("매장 식사 주문이 접수 되었을 때")
     @Nested
     class Accepted {
 
@@ -320,7 +320,7 @@ class EatInOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("매장 주문이 서빙 되었을 때")
+    @DisplayName("매장 식사 주문이 서빙 되었을 때")
     @Nested
     class Served {
 
