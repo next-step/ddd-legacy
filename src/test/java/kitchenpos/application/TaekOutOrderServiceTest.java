@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -100,6 +102,20 @@ class TaekOutOrderServiceTest {
                             OrderType.TAKEOUT,
                             null,
                             List.of(orderLineItem))
+            )).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("주문 항목이 없거나 비어있으면 예외가 발생합니다")
+        @ParameterizedTest(name = "주문 항목: {0}")
+        @NullAndEmptySource
+        void createOrderWithoutOrderLineItems(final List<OrderLineItem> orderLineItems) {
+            assertThatThrownBy(() -> orderService.create(
+                    takeoutOrder(
+                            null,
+                            null,
+                            OrderStatus.WAITING,
+                            orderLineItems
+                    )
             )).isInstanceOf(IllegalArgumentException.class);
         }
     }
