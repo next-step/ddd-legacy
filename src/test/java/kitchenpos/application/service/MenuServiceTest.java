@@ -89,7 +89,7 @@ class MenuServiceTest {
         @Test
         @DisplayName("메뉴 등록 성공")
         void 메뉴등록_성공() {
-            mockMenuCreation(false);
+            mockCreateMenu(false);
 
             mockSaveMenu();
 
@@ -136,7 +136,7 @@ class MenuServiceTest {
         @ParameterizedTest
         @ValueSource(strings = {"나쁜", "XXX"})
         void 메뉴명_비속어_검사(final String name) {
-            mockMenuCreation(true);
+            mockCreateMenu(true);
 
             chickenMenu = MenuFixture.test(
                 name,
@@ -300,7 +300,7 @@ class MenuServiceTest {
         }
     }
 
-    private void mockMenuCreation(boolean isProfanity) {
+    private void mockCreateMenu(boolean isProfanity) {
         mockFindByMenuGroup();
         mockFindAllByProduct();
         mockFindByProduct(chicken);
