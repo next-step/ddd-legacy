@@ -19,7 +19,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static kitchenpos.fixture.MenuFixture.createMenuId;
 import static kitchenpos.fixture.MenuFixture.menu;
+import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
+import static kitchenpos.fixture.MenuProductFixture.menuProduct;
 import static kitchenpos.fixture.OrderFixture.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -115,6 +118,30 @@ class TaekOutOrderServiceTest {
                             null,
                             OrderStatus.WAITING,
                             orderLineItems
+                    )
+            )).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴의 개수와 주문 항목의 개수가 다르면 예외가 발생합니다")
+        @Test
+        void createOrderWithDifferentMenuCount() {
+            final Menu otherMenu = menu(
+                    createMenuId(),
+                    "otherMenu",
+                    BigDecimal.valueOf(10000),
+                    menuGroup(),
+                    List.of(menuProduct()),
+                    true
+            );
+            final OrderLineItem otherOrderLineItem = orderLineItem(null, otherMenu, 1L, otherMenu.getPrice());
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+
+            assertThatThrownBy(() -> orderService.create(
+                    takeoutOrder(
+                            null,
+                            null,
+                            OrderStatus.WAITING,
+                            List.of(orderLineItem, otherOrderLineItem)
                     )
             )).isInstanceOf(IllegalArgumentException.class);
         }
