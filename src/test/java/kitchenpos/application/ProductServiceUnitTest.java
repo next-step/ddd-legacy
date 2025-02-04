@@ -1,11 +1,13 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -13,11 +15,14 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
 import static java.util.Collections.emptyList;
+import static kitchenpos.fixture.MenuFixture.*;
+import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
+import static kitchenpos.fixture.MenuProductFixture.menuProduct;
 import static kitchenpos.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -105,59 +110,86 @@ class ProductServiceUnitTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품 가격을 변경할 수 있습니다.")
-    @ParameterizedTest(name = "상품 가격 : `{0}`")
-    @ValueSource(strings = {"16000", "16010", "16020"})
-    void changePrice(final String price) {
-        final BigDecimal changedPrice = new BigDecimal(price);
-        final UUID productId = createProductId();
-        final Product product = product(productId, FRIED_CHICKEN, FRIED_CHICKEN_PRICE);
-        final Product changedPriceProduct = product(product.getId(), FRIED_CHICKEN, changedPrice);
+    @DisplayName("상품 가격을 변경할 때")
+    @Nested
+    class ChangePrice {
 
-        when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
-        when(menuRepository.findAllByProductId(product.getId())).thenReturn(emptyList());
-        when(productRepository.save(any(Product.class))).then(returnsFirstArg());
+        private Product product;
 
-        final Product actual = productService.changePrice(productId, changedPriceProduct);
-        assertAll(
-                () -> assertThat(actual).isNotNull(),
-                () -> assertThat(actual.getPrice()).isEqualByComparingTo(changedPrice)
-        );
-    }
+        @BeforeEach
+        void setUp() {
+            this.product = product(FRIED_CHICKEN, FRIED_CHICKEN_PRICE);
+        }
 
-    @DisplayName("변경할 상품 가격이 0원 이상이어야 합니다.")
-    @ParameterizedTest(name = "입력값 `{0}`")
-    @ValueSource(strings = {"-1", "-1000", "-10000"})
-    void changePriceWithNegativePrice(final String price) {
-        final UUID productId = createProductId();
-        final BigDecimal negativePrice = new BigDecimal(price);
+        @DisplayName("상품 가격을 변경할 수 있습니다.")
+        @ParameterizedTest(name = "상품 가격 : `{0}`")
+        @ValueSource(strings = {"16000", "16010", "16020"})
+        void changePrice(final String price) {
+            final BigDecimal changedPrice = new BigDecimal(price);
+            final Product changedPriceProduct = product(product.getId(), FRIED_CHICKEN, changedPrice);
 
-        assertThatThrownBy(() ->
-                productService.changePrice(productId, product(productId, FRIED_CHICKEN, negativePrice))
-        ).isInstanceOf(IllegalArgumentException.class);
-    }
+            when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
+            when(menuRepository.findAllByProductId(product.getId())).thenReturn(emptyList());
+            when(productRepository.save(any(Product.class))).then(returnsFirstArg());
 
-    @DisplayName("변경할 상품 가격이 비어있으면 예외가 발생합니다.")
-    @ParameterizedTest(name = "상품 가격 : `{0}`")
-    @NullSource
-    void changePriceWithEmptyPrice(final BigDecimal price) {
-        final UUID productId = createProductId();
+            final Product actual = productService.changePrice(changedPriceProduct.getId(), changedPriceProduct);
+            assertAll(
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(actual.getPrice()).isEqualByComparingTo(changedPrice)
+            );
+        }
 
-        assertThatThrownBy(() ->
-                productService.changePrice(productId, product(productId, FRIED_CHICKEN, price))
-        ).isInstanceOf(IllegalArgumentException.class);
-    }
+        @DisplayName("변경할 상품 가격이 0원 이상이어야 합니다.")
+        @ParameterizedTest(name = "입력값 `{0}`")
+        @ValueSource(strings = {"-1", "-1000", "-10000"})
+        void changePriceWithNegativePrice(final String price) {
+            final BigDecimal negativePrice = new BigDecimal(price);
+            final Product negativePricedProduct = product(product.getId(), FRIED_CHICKEN, negativePrice);
 
-    @DisplayName("상품이 존재하지 않으면 상품 가격을 변경할 수 없습니다.")
-    @ParameterizedTest(name = "상품 가격 : `{0}`")
-    @ValueSource(strings = {"16000", "16010", "16020"})
-    void changePriceWithNonExistentProduct(final String price) {
-        final UUID productId = createProductId();
-        final BigDecimal changedPrice = new BigDecimal(price);
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+            assertThatThrownBy(() -> productService.changePrice(negativePricedProduct.getId(), negativePricedProduct))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
 
-        assertThatThrownBy(() ->
-                productService.changePrice(productId, product(productId, FRIED_CHICKEN, changedPrice))
-        ).isInstanceOf(NoSuchElementException.class);
+        @DisplayName("변경할 상품 가격이 비어있으면 예외가 발생합니다.")
+        @ParameterizedTest(name = "상품 가격 : `{0}`")
+        @NullSource
+        void changePriceWithEmptyPrice(final BigDecimal price) {
+            final Product nullPricedProduct = product(product.getId(), FRIED_CHICKEN, price);
+
+            assertThatThrownBy(() -> productService.changePrice(nullPricedProduct.getId(), nullPricedProduct))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("상품이 존재하지 않으면 상품 가격을 변경할 수 없습니다.")
+        @ParameterizedTest(name = "상품 가격 : `{0}`")
+        @ValueSource(strings = {"16000", "16010", "16020"})
+        void changePriceWithNonExistentProduct(final String price) {
+            final BigDecimal changedPrice = new BigDecimal(price);
+            final Product changedPriceProduct = product(product.getId(), FRIED_CHICKEN, changedPrice);
+
+            when(productRepository.findById(changedPriceProduct.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> productService.changePrice(product.getId(), changedPriceProduct))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("상품을 포함한 메뉴의 가격이 변경된 상품의 가격보다 작으면 메뉴를 노출하지 않습니다.")
+        @ParameterizedTest(name = "상품 가격 : `{0}`")
+        @ValueSource(strings = {"15990", "15980", "15970"})
+        void changePriceWithLessThanMenuPrice(final String price) {
+            final BigDecimal changedPrice = new BigDecimal(price);
+            final Product changedPriceProduct = product(product.getId(), FRIED_CHICKEN, changedPrice);
+            final Menu menu = menu(menuGroup(), List.of(menuProduct(product)));
+
+            when(productRepository.findById(changedPriceProduct.getId())).thenReturn(Optional.of(product));
+            when(menuRepository.findAllByProductId(product.getId())).thenReturn(List.of(menu));
+
+            final Product actual = productService.changePrice(changedPriceProduct.getId(), changedPriceProduct);
+            assertAll(
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(actual.getPrice()).isEqualByComparingTo(changedPrice),
+                    () -> assertThat(menu.isDisplayed()).isFalse()
+            );
+        }
     }
 }
