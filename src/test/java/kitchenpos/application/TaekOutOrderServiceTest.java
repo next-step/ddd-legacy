@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.createMenuId;
 import static kitchenpos.fixture.MenuFixture.menu;
@@ -31,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -203,6 +205,38 @@ class TaekOutOrderServiceTest {
             assertThatThrownBy(() -> orderService.create(
                     takeoutOrder(null, null, OrderStatus.WAITING, List.of(orderLineItem))
             )).isInstanceOf(IllegalStateException.class);
+        }
+    }
+
+    @DisplayName("포장 주문을 수락할 때")
+    @Nested
+    class Accept {
+        private UUID orderId;
+        private LocalDateTime orderDateTime;
+        private OrderLineItem orderLineItem;
+        private Order order;
+
+        @BeforeEach
+        void setUp() {
+            this.orderId = createOrderId();
+            this.orderDateTime = LocalDateTime.now();
+            this.orderLineItem = orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000));
+            this.order = takeoutOrder(orderId, orderDateTime, OrderStatus.WAITING, List.of(orderLineItem));
+        }
+
+        @DisplayName("포장 주문을 수락할 수 있습니다.")
+        @Test
+        void acceptTakeOutOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.ofNullable(order));
+            doNothing().when(kitchenridersClient).requestDelivery(any(), any(), any());
+
+            final Order acceptedOrder = orderService.accept(order.getId());
+
+            assertAll(
+                    () -> assertThat(acceptedOrder.getId()).isEqualTo(order.getId()),
+                    () -> assertThat(acceptedOrder.getType()).isEqualTo(order.getType()),
+                    () -> assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
+            );
         }
     }
 
