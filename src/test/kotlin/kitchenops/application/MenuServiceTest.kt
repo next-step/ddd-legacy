@@ -24,7 +24,7 @@ internal class MenuServiceTest : BaseUnitSpec({
     context("메뉴를 생성할 수 있다") {
         test("가격을 지정하지 않으면 생성할 수 없다") {
             // given
-            val request = Menu().apply { price = null }
+            val request = createMenu(price = null)
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -35,7 +35,7 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("가격이 0원 미만이면 생성할 수 없다") {
             // given
-            val request = Menu().apply { price = BigDecimal("-1") }
+            val request = createMenu(price = BigDecimal("-1"))
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -46,13 +46,10 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("메뉴 그룹이 존재하지 않으면 생성할 수 없다") {
             // given
-            val mgId = UUID.randomUUID()
-            val request = Menu().apply {
-                price = BigDecimal("0")
-                menuGroupId = mgId
-            }
+            val menuGroup = createMenuGroup(id = UUID.randomUUID())
+            val request = createMenu(price = BigDecimal("0"), menuGroup = menuGroup)
 
-            every { menuGroupRepository.findById(mgId) } returns Optional.empty()
+            every { menuGroupRepository.findById(menuGroup.id) } returns Optional.empty()
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -63,15 +60,10 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("사용하는 상품을 지정하지 않으면 생성할 수 없다") {
             // given
-            val mgId = UUID.randomUUID()
-            val request = Menu().apply {
-                price = BigDecimal("0")
-                menuProducts = null
-                menuGroupId = mgId
-            }
+            val menuGroup = createMenuGroup(id = UUID.randomUUID())
+            every { menuGroupRepository.findById(menuGroup.id) } returns Optional.of(menuGroup)
 
-            val menuGroup = MenuGroup().apply { id = mgId }
-            every { menuGroupRepository.findById(mgId) } returns Optional.of(menuGroup)
+            val request = createMenu(price = BigDecimal("0"), menuProducts = null, menuGroup = menuGroup)
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -82,15 +74,10 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("사용하는 상품이 비어있으면 생성할 수 없다") {
             // given
-            val mgId = UUID.randomUUID()
-            val request = Menu().apply {
-                price = BigDecimal("100")
-                menuProducts = emptyList()
-                menuGroupId = mgId
-            }
+            val menuGroup = createMenuGroup(id = UUID.randomUUID())
+            every { menuGroupRepository.findById(menuGroup.id) } returns Optional.of(menuGroup)
 
-            val menuGroup = MenuGroup().apply { id = mgId }
-            every { menuGroupRepository.findById(mgId) } returns Optional.of(menuGroup)
+            val request = createMenu(price = BigDecimal("100"), menuProducts = emptyList(), menuGroup = menuGroup)
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -101,21 +88,15 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("사용하는 상품이 존재하지 않으면 생성할 수 없다") {
             // given
-            val invalidProductId = UUID.randomUUID()
-            val menuProduct = MenuProduct().apply {
-                productId = invalidProductId
-                quantity = 1
-            }
-            every { productRepository.findAllByIdIn(listOf(invalidProductId)) } returns emptyList()
+            val invalidProduct = createProduct(id = UUID.randomUUID())
+            val menuProduct = createMenuProduct(product = invalidProduct, quantity = 1)
+            every { productRepository.findAllByIdIn(listOf(invalidProduct.id)) } returns emptyList()
 
             val menuGroup = MenuGroup()
             every { menuGroupRepository.findById(menuGroup.id) } returns Optional.of(menuGroup)
 
-            val request = Menu().apply {
-                price = BigDecimal("100")
-                menuProducts = listOf(menuProduct)
-                menuGroupId = menuGroup.id
-            }
+            val request =
+                createMenu(price = BigDecimal("100"), menuProducts = listOf(menuProduct), menuGroup = menuGroup)
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -126,23 +107,17 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("사용하는 상품의 수량이 0개 미만이면 생성할 수 없다") {
             // given
-            val product = Product().apply { price = BigDecimal("100") }
+            val product = createProduct(price = BigDecimal("100"))
             every { productRepository.findById(product.id) } returns Optional.of(product)
 
-            val menuProduct = MenuProduct().apply {
-                quantity = 0
-                productId = product.id
-            }
+            val menuProduct = createMenuProduct(quantity = 0, product = product)
             every { productRepository.findAllByIdIn(listOf(menuProduct.productId)) } returns emptyList()
 
-            val menuGroup = MenuGroup()
+            val menuGroup = createMenuGroup()
             every { menuGroupRepository.findById(menuGroup.id) } returns Optional.of(menuGroup)
 
-            val request = Menu().apply {
-                price = BigDecimal("100")
-                menuProducts = listOf(menuProduct)
-                menuGroupId = menuGroup.id
-            }
+            val request =
+                createMenu(price = BigDecimal("100"), menuProducts = listOf(menuProduct), menuGroup = menuGroup)
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -153,23 +128,17 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("메뉴의 가격이 상품 가격의 총 합보다 클 경우 생성할 수 없다") {
             // given
-            val product = Product().apply { price = BigDecimal("100") }
+            val product = createProduct(price = BigDecimal("100"))
             every { productRepository.findById(product.id) } returns Optional.of(product)
 
-            val menuProduct = MenuProduct().apply {
-                quantity = 3
-                productId = product.id
-            }
+            val menuProduct = createMenuProduct(quantity = 3, product = product)
             every { productRepository.findAllByIdIn(listOf(menuProduct.productId)) } returns listOf(product)
 
-            val menuGroup = MenuGroup()
+            val menuGroup = createMenuGroup()
             every { menuGroupRepository.findById(menuGroup.id) } returns Optional.of(menuGroup)
 
-            val request = Menu().apply {
-                price = BigDecimal("500")
-                menuProducts = listOf(menuProduct)
-                menuGroupId = menuGroup.id
-            }
+            val request =
+                createMenu(price = BigDecimal("500"), menuProducts = listOf(menuProduct), menuGroup = menuGroup)
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -180,24 +149,21 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("이름을 지정하지 않으면 생성할 수 없다") {
             // given
-            val product = Product().apply { price = BigDecimal("100") }
+            val product = createProduct(price = BigDecimal("100"))
             every { productRepository.findById(product.id) } returns Optional.of(product)
 
-            val menuProduct = MenuProduct().apply {
-                quantity = 1
-                productId = product.id
-            }
+            val menuProduct = createMenuProduct(quantity = 1, product = product)
             every { productRepository.findAllByIdIn(listOf(menuProduct.productId)) } returns listOf(product)
 
-            val menuGroup = MenuGroup()
+            val menuGroup = createMenuGroup()
             every { menuGroupRepository.findById(menuGroup.id) } returns Optional.of(menuGroup)
 
-            val request = Menu().apply {
-                price = BigDecimal("100")
-                menuProducts = listOf(menuProduct)
-                menuGroupId = menuGroup.id
+            val request = createMenu(
+                price = BigDecimal("100"),
+                menuProducts = listOf(menuProduct),
+                menuGroup = menuGroup,
                 name = null
-            }
+            )
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -209,24 +175,21 @@ internal class MenuServiceTest : BaseUnitSpec({
         // TODO: empty name에 동작하지 않아야 할 것 같은데 버그인 듯 하다
         test("이름이 비어있으면 생성할 수 없다").config(enabled = false) {
             // given
-            val product = Product().apply { price = BigDecimal("100") }
+            val product = createProduct(price = BigDecimal("100"))
             every { productRepository.findById(product.id) } returns Optional.of(product)
 
-            val menuProduct = MenuProduct().apply {
-                quantity = 1
-                productId = product.id
-            }
+            val menuProduct = createMenuProduct(quantity = 1, product = product)
             every { productRepository.findAllByIdIn(listOf(menuProduct.productId)) } returns listOf(product)
 
-            val menuGroup = MenuGroup()
+            val menuGroup = createMenuGroup()
             every { menuGroupRepository.findById(menuGroup.id) } returns Optional.of(menuGroup)
 
-            val request = Menu().apply {
-                price = BigDecimal("100")
-                menuProducts = listOf(menuProduct)
-                menuGroupId = menuGroup.id
-                name = ""
-            }
+            val request = createMenu(
+                price = BigDecimal("100"),
+                menuProducts = listOf(menuProduct),
+                menuGroup = menuGroup,
+                name = "",
+            )
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -237,24 +200,21 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("메뉴의 이름에 욕설이 포함되면 생성할 수 없다") {
             // given
-            val product = Product().apply { price = BigDecimal("100") }
+            val product = createProduct(price = BigDecimal("100"))
             every { productRepository.findById(product.id) } returns Optional.of(product)
 
-            val menuProduct = MenuProduct().apply {
-                quantity = 1
-                productId = product.id
-            }
+            val menuProduct = createMenuProduct(quantity = 1, product = product)
             every { productRepository.findAllByIdIn(listOf(menuProduct.productId)) } returns listOf(product)
 
-            val menuGroup = MenuGroup()
+            val menuGroup = createMenuGroup()
             every { menuGroupRepository.findById(menuGroup.id) } returns Optional.of(menuGroup)
 
-            val request = Menu().apply {
-                price = BigDecimal("100")
-                menuProducts = listOf(menuProduct)
-                menuGroupId = menuGroup.id
-                name = "hell"
-            }
+            val request = createMenu(
+                price = BigDecimal("100"),
+                menuProducts = listOf(menuProduct),
+                menuGroup = menuGroup,
+                name = "hell",
+            )
 
             every { purgomalumClient.containsProfanity("hell") } returns true
 
@@ -267,36 +227,32 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("생성한다") {
             // given
-            val product = Product().apply { price = BigDecimal("100") }
+            val product = createProduct(price = BigDecimal("100"))
             every { productRepository.findById(product.id) } returns Optional.of(product)
 
-            val menuProduct = MenuProduct().apply {
-                quantity = 1
-                productId = product.id
-            }
+            val menuProduct = createMenuProduct(quantity = 1, product = product)
             every { productRepository.findAllByIdIn(listOf(menuProduct.productId)) } returns listOf(product)
 
-            val menuGroup = MenuGroup()
+            val menuGroup = createMenuGroup()
             every { menuGroupRepository.findById(menuGroup.id) } returns Optional.of(menuGroup)
 
             every { purgomalumClient.containsProfanity("myName") } returns false
 
-            every { menuRepository.save(any()) } returns Menu().apply {
-                price = BigDecimal("100")
-                menuProducts = listOf(menuProduct)
-                menuGroupId = menuGroup.id
-                this.menuGroup = menuGroup
-                name = "myName"
-                isDisplayed = true
-            }
+            every { menuRepository.save(any()) } returns createMenu(
+                price = BigDecimal("100"),
+                menuProducts = listOf(menuProduct),
+                menuGroup = menuGroup,
+                name = "myName",
+                displayed = true
+            )
 
-            val request = Menu().apply {
-                price = BigDecimal("100")
-                menuProducts = listOf(menuProduct)
-                menuGroupId = menuGroup.id
-                name = "myName"
-                isDisplayed = true
-            }
+            val request = createMenu(
+                price = BigDecimal("100"),
+                menuProducts = listOf(menuProduct),
+                menuGroup = menuGroup,
+                name = "myName",
+                displayed = true,
+            )
 
             // when
             val actual = sut.create(request)
@@ -318,9 +274,8 @@ internal class MenuServiceTest : BaseUnitSpec({
     context("메뉴를 전체 조회할 수 있다") {
         test("전체 조회한다") {
             // given
-            val menu1 = Menu()
-            val menu2 = Menu()
-
+            val menu1 = createMenu()
+            val menu2 = createMenu()
             every { menuRepository.findAll() } returns listOf(menu1, menu2)
 
             // when
@@ -334,7 +289,7 @@ internal class MenuServiceTest : BaseUnitSpec({
     context("메뉴의 가격을 변경할 수 있다") {
         test("가격을 지정하지 않으면 변경할 수 없다") {
             // given
-            val request = Menu().apply { price = null }
+            val request = createMenu(price = null)
 
             // when
             val actual = runCatching { sut.changePrice(request.id, request) }
@@ -345,7 +300,7 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("가격이 0원 미만이면 변경할 수 없다") {
             // given
-            val request = Menu().apply { price = BigDecimal("-1") }
+            val request = createMenu(price = BigDecimal("-1"))
 
             // when
             val actual = runCatching { sut.changePrice(request.id, request) }
@@ -356,7 +311,7 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("메뉴가 존재하지 않으면 변경할 수 없다") {
             // given
-            val request = Menu().apply { price = BigDecimal("100") }
+            val request = createMenu(price = BigDecimal("100"))
 
             every { menuRepository.findById(request.id) } returns Optional.empty()
 
@@ -369,19 +324,13 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("가격이 상품 가격의 합보다 크면 생성할 수 없다") {
             // given
-            val product = Product().apply { price = BigDecimal("100") }
-            val menuProduct = MenuProduct().apply {
-                quantity = 3
-                this.product = product
-            }
-            val menu = Menu().apply { menuProducts = listOf(menuProduct) }
+            val product = createProduct(price = BigDecimal("100"))
+            val menuProduct = createMenuProduct(quantity = 3, product = product)
+            val menu = createMenu(menuProducts = listOf(menuProduct))
 
             every { menuRepository.findById(menu.id) } returns Optional.of(menu)
 
-            val request = Menu().apply {
-                id = menu.id
-                price = BigDecimal("400")
-            }
+            val request = createMenu(id = menu.id, price = BigDecimal("400"))
 
             // when
             val actual = runCatching { sut.changePrice(request.id, request) }
@@ -392,19 +341,13 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("가격을 변경한다") {
             // given
-            val product = Product().apply { price = BigDecimal("1000") }
-            val menuProduct = MenuProduct().apply {
-                quantity = 1
-                this.product = product
-            }
-            val menu = Menu().apply { menuProducts = listOf(menuProduct) }
+            val product = createProduct(price = BigDecimal("1000"))
+            val menuProduct = createMenuProduct(quantity = 1, product = product)
+            val menu = createMenu(menuProducts = listOf(menuProduct))
 
             every { menuRepository.findById(menu.id) } returns Optional.of(menu)
 
-            val request = Menu().apply {
-                id = menu.id
-                price = BigDecimal("1000")
-            }
+            val request = createMenu(id = menu.id, price = BigDecimal("1000"))
 
             // when
             val actual = sut.changePrice(request.id, request)
@@ -418,7 +361,6 @@ internal class MenuServiceTest : BaseUnitSpec({
         test("메뉴가 존재하지 않으면 변경할 수 없다") {
             // given
             val menuId = UUID.randomUUID()
-
             every { menuRepository.findById(menuId) } returns Optional.empty()
 
             // when
@@ -430,16 +372,10 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("메뉴의 가격이 상품 가격의 합보다 클 경우에는 화면에 표시할 수 없다") {
             // given
-            val product = Product().apply { price = BigDecimal("100") }
-            val menuProduct = MenuProduct().apply {
-                quantity = 1
-                this.product = product
-            }
+            val product = createProduct(price = BigDecimal("100"))
+            val menuProduct = createMenuProduct(quantity = 1, product = product)
 
-            val menu = Menu().apply {
-                price = BigDecimal("1000")
-                menuProducts = listOf(menuProduct)
-            }
+            val menu = createMenu(price = BigDecimal("1000"), menuProducts = listOf(menuProduct))
             every { menuRepository.findById(menu.id) } returns Optional.of(menu)
 
             // when
@@ -451,17 +387,10 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("표시하게 변경한다") {
             // given
-            val product = Product().apply { price = BigDecimal("100") }
-            val menuProduct = MenuProduct().apply {
-                quantity = 1
-                this.product = product
-            }
+            val product = createProduct(price = BigDecimal("100"))
+            val menuProduct = createMenuProduct(quantity = 1, product = product)
 
-            val menu = Menu().apply {
-                price = BigDecimal("100")
-                menuProducts = listOf(menuProduct)
-                isDisplayed = false
-            }
+            val menu = createMenu(price = BigDecimal("100"), menuProducts = listOf(menuProduct), displayed = false)
             every { menuRepository.findById(menu.id) } returns Optional.of(menu)
 
             // when
@@ -476,7 +405,6 @@ internal class MenuServiceTest : BaseUnitSpec({
         test("메뉴가 존재하지 않으면 변경할 수 없다") {
             // given
             val menuId = UUID.randomUUID()
-
             every { menuRepository.findById(menuId) } returns Optional.empty()
 
             // when
@@ -488,7 +416,7 @@ internal class MenuServiceTest : BaseUnitSpec({
 
         test("숨기게 변경한다") {
             // given
-            val menu = Menu().apply { isDisplayed = true }
+            val menu = createMenu(displayed = true)
             every { menuRepository.findById(menu.id) } returns Optional.of(menu)
 
             // when
@@ -498,4 +426,38 @@ internal class MenuServiceTest : BaseUnitSpec({
             actual.isDisplayed shouldBe false
         }
     }
-})
+}) {
+    companion object {
+        fun createMenu(
+            id: UUID? = null,
+            name: String? = null,
+            price: BigDecimal? = null,
+            menuGroup: MenuGroup? = null,
+            displayed: Boolean = true,
+            menuProducts: List<MenuProduct>? = null
+        ) = Menu().apply {
+            this.id = id
+            this.name = name
+            this.price = price
+            this.menuGroup = menuGroup
+            this.menuGroupId = menuGroup?.id
+            this.isDisplayed = displayed
+            this.menuProducts = menuProducts
+        }
+
+        fun createMenuGroup(id: UUID? = null) = MenuGroup().apply {
+            this.id = id
+        }
+
+        fun createMenuProduct(product: Product?, quantity: Long = 0) = MenuProduct().apply {
+            this.product = product
+            this.productId = product?.id
+            this.quantity = quantity
+        }
+
+        fun createProduct(id: UUID? = null, price: BigDecimal? = null) = Product().apply {
+            this.id = id
+            this.price = price
+        }
+    }
+}

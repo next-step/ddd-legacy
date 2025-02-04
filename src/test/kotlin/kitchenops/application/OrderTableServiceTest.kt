@@ -23,7 +23,7 @@ internal class OrderTableServiceTest : BaseUnitSpec({
     context("주문 테이블을 생성할 수 있다") {
         test("이름을 지정하지 않으면 생성할 수 없다") {
             // given
-            val request = OrderTable().apply { name = null }
+            val request = createOrderTable(name = null)
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -34,7 +34,7 @@ internal class OrderTableServiceTest : BaseUnitSpec({
 
         test("이름이 비어있으면 생성할 수 없다") {
             // given
-            val request = OrderTable().apply { name = "" }
+            val request = createOrderTable(name = "")
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -45,7 +45,7 @@ internal class OrderTableServiceTest : BaseUnitSpec({
 
         test("생성한다") {
             // given
-            val request = OrderTable().apply { name = "1234" }
+            val request = createOrderTable(name = "1234")
 
             every { orderTableRepository.save(match { it.name == "1234" && !it.isOccupied && it.numberOfGuests == 0 }) } returns OrderTable().apply {
                 name = "1234"
@@ -70,8 +70,8 @@ internal class OrderTableServiceTest : BaseUnitSpec({
     context("주문 테이블을 전체 조회할 수 있다") {
         test("전체 조회한다") {
             // given
-            val orderTable1 = OrderTable()
-            val orderTable2 = OrderTable()
+            val orderTable1 = createOrderTable()
+            val orderTable2 = createOrderTable()
             every { orderTableRepository.findAll() } returns listOf(orderTable1, orderTable2)
 
             // when
@@ -97,7 +97,7 @@ internal class OrderTableServiceTest : BaseUnitSpec({
 
         test("착석한다") {
             // given
-            val orderTable = OrderTable().apply { isOccupied = false }
+            val orderTable = createOrderTable(occupied = false)
             every { orderTableRepository.findById(orderTable.id) } returns Optional.of(orderTable)
 
             // when
@@ -123,7 +123,7 @@ internal class OrderTableServiceTest : BaseUnitSpec({
 
         test("주문이 완료되지 않았을경우 테이블을 정리할 수 없다") {
             // given
-            val orderTable = OrderTable()
+            val orderTable = createOrderTable()
             every { orderTableRepository.findById(orderTable.id) } returns Optional.of(orderTable)
 
             every { orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED) } returns true
@@ -137,10 +137,7 @@ internal class OrderTableServiceTest : BaseUnitSpec({
 
         test("정리한다") {
             // given
-            val orderTable = OrderTable().apply {
-                numberOfGuests = 3
-                isOccupied = true
-            }
+            val orderTable = createOrderTable(numberOfGuests = 3, occupied = true)
             every { orderTableRepository.findById(orderTable.id) } returns Optional.of(orderTable)
 
             every { orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED) } returns false
@@ -159,7 +156,7 @@ internal class OrderTableServiceTest : BaseUnitSpec({
     context("주문 테이블의 손님 수를 변경할 수 있다") {
         test("손님 수가 0명 미만일경우 변경할 수 없다") {
             // given
-            val request = OrderTable().apply { numberOfGuests = -1 }
+            val request = createOrderTable(numberOfGuests = -1)
 
             // when
             val actual = kotlin.runCatching { sut.changeNumberOfGuests(request.id, request) }
@@ -185,7 +182,7 @@ internal class OrderTableServiceTest : BaseUnitSpec({
         // TODO: isOccupied 이외에도 numberOfGuests가 같이 있어서 numberOfGuests가 있는데 isOccupied는 false 인거와 같은 불일치가 있을 수 있음. numberOfGuests 하나로 통일해야 할 듯?
         test("주문 테이블에 손님이 없으면 변경할 수 없다") {
             // given
-            val orderTable = OrderTable().apply { isOccupied = false }
+            val orderTable = createOrderTable(occupied = false)
             every { orderTableRepository.findById(orderTable.id) } returns Optional.of(orderTable)
 
             val request = OrderTable().apply { numberOfGuests = 1 }
@@ -199,10 +196,7 @@ internal class OrderTableServiceTest : BaseUnitSpec({
 
         test("손님 수를 변경한다") {
             // given
-            val orderTable = OrderTable().apply {
-                isOccupied = true
-                numberOfGuests = 3
-            }
+            val orderTable = createOrderTable(occupied = true, numberOfGuests = 3)
             every { orderTableRepository.findById(orderTable.id) } returns Optional.of(orderTable)
 
             val request = OrderTable().apply { numberOfGuests = 1 }
@@ -214,4 +208,14 @@ internal class OrderTableServiceTest : BaseUnitSpec({
             actual.numberOfGuests shouldBe 1
         }
     }
-})
+}) {
+    companion object {
+        fun createOrderTable(id: UUID? = null, name: String? = null, numberOfGuests: Int = 0, occupied: Boolean = false) =
+            OrderTable().apply {
+                this.id = id
+                this.name = name
+                this.numberOfGuests = numberOfGuests
+                this.isOccupied = occupied
+            }
+    }
+}

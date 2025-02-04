@@ -1,5 +1,6 @@
 package kitchenops.application
 
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -13,12 +14,13 @@ import java.util.*
 internal class MenuGroupServiceTest : BaseUnitSpec({
 
     val menuGroupRepository = mockk<MenuGroupRepository>()
+
     val sut = MenuGroupService(menuGroupRepository)
 
     context("메뉴 그룹을 생성할 수 있다") {
         test("이름을 지정하지 않으면 생성할 수 없다") {
             // given
-            val request = MenuGroup().apply { name = null }
+            val request = createMenuGroup(name = null)
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -29,7 +31,7 @@ internal class MenuGroupServiceTest : BaseUnitSpec({
 
         test("이름이 비어있으면 생성할 수 없다") {
             // given
-            val request = MenuGroup().apply { name = "" }
+            val request = createMenuGroup(name = "")
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -41,14 +43,18 @@ internal class MenuGroupServiceTest : BaseUnitSpec({
         test("생성한다") {
             // given
             val requestName = "myName"
-            val request = MenuGroup().apply { name = requestName }
+            val request = createMenuGroup(name = requestName)
 
-            every { menuGroupRepository.save(match { it.name == requestName }) } returns request
+            every { menuGroupRepository.save(match { it.name == requestName }) } returns createMenuGroup(
+                id = UUID.randomUUID(),
+                name = requestName
+            )
 
             // when
             val actual = sut.create(request)
 
             // then
+            actual.id.shouldNotBeNull()
             actual.name shouldBe "myName"
 
             verify(exactly = 1) { menuGroupRepository.save(any()) }
@@ -70,4 +76,12 @@ internal class MenuGroupServiceTest : BaseUnitSpec({
             actual shouldBe listOf(menuGroup1, menuGroup2)
         }
     }
-})
+}) {
+    companion object {
+        fun createMenuGroup(id: UUID? = null, name: String? = null) =
+            MenuGroup().apply {
+                this.id = id
+                this.name = name
+            }
+    }
+}

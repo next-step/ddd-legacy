@@ -23,7 +23,7 @@ internal class ProductServiceTest : BaseUnitSpec({
     context("상품을 생성할 수 있다") {
         test("가격을 지정하지 않으면 생성할 수 없다") {
             // given
-            val request = Product().apply { price = null }
+            val request = createProduct(price = null)
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -34,7 +34,7 @@ internal class ProductServiceTest : BaseUnitSpec({
 
         test("가격이 0원 미만이면 생성할 수 없다") {
             // given
-            val request = Product().apply { price = BigDecimal("-1") }
+            val request = createProduct(price = BigDecimal("-1"))
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -45,10 +45,7 @@ internal class ProductServiceTest : BaseUnitSpec({
 
         test("이름을 지정하지 않으면 생성할 수 없다") {
             // given
-            val request = Product().apply {
-                price = BigDecimal("100")
-                name = null
-            }
+            val request = createProduct(price = BigDecimal("100"), name = null)
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -60,10 +57,7 @@ internal class ProductServiceTest : BaseUnitSpec({
         // TODO: empty name에 동작하지 않아야 할 것 같은데 버그인 듯 하다
         test("이름이 비어있으면 생성할 수 없다").config(enabled = false) {
             // given
-            val request = Product().apply {
-                price = BigDecimal("100")
-                name = ""
-            }
+            val request = createProduct(price = BigDecimal("100"), name = "")
 
             // when
             val actual = runCatching { sut.create(request) }
@@ -74,10 +68,7 @@ internal class ProductServiceTest : BaseUnitSpec({
 
         test("상품의 이름에 욕설이 포함되면 생성할 수 없다") {
             // given
-            val request = Product().apply {
-                price = BigDecimal("10")
-                name = "hell"
-            }
+            val request = createProduct(price = BigDecimal("10"), name = "hell")
 
             every { purgomalumClient.containsProfanity("hell") } returns true
 
@@ -90,10 +81,7 @@ internal class ProductServiceTest : BaseUnitSpec({
 
         test("생성한다") {
             // given
-            val request = Product().apply {
-                price = BigDecimal("1000")
-                name = "chicken"
-            }
+            val request = createProduct(price = BigDecimal("1000"), name = "chicken")
 
             every { purgomalumClient.containsProfanity("chicken") } returns false
             every { productRepository.save(match { it.price == BigDecimal("1000") && it.name == "chicken" }) } returns request
@@ -114,14 +102,8 @@ internal class ProductServiceTest : BaseUnitSpec({
     context("상품을 전체 조회할 수 있다") {
         test("전체 조회한다") {
             // given
-            val product1 = Product().apply {
-                price = BigDecimal("19900")
-                name = "fried chicken"
-            }
-            val product2 = Product().apply {
-                price = BigDecimal("3000")
-                name = "cheese ball"
-            }
+            val product1 = createProduct(price = BigDecimal("19900"), name = "fried chicken")
+            val product2 = createProduct(price = BigDecimal("3000"), name = "cheese ball")
 
             every { productRepository.findAll() } returns listOf(product1, product2)
 
@@ -136,7 +118,7 @@ internal class ProductServiceTest : BaseUnitSpec({
     context("상품의 가격을 변경할 수 있다") {
         test("상품의 가격을 지정하지 않으면 변경할 수 없다") {
             // given
-            val request = Product().apply { price = null }
+            val request = createProduct(price = null)
 
             // when
             val actual = runCatching { sut.changePrice(request.id, request) }
@@ -147,7 +129,7 @@ internal class ProductServiceTest : BaseUnitSpec({
 
         test("상품의 가격이 0원 미만이면 변경할 수 없다") {
             // given
-            val request = Product().apply { price = BigDecimal("-1") }
+            val request = createProduct(price = BigDecimal("-1"))
 
             // when
             val actual = runCatching { sut.changePrice(request.id, request) }
@@ -158,7 +140,7 @@ internal class ProductServiceTest : BaseUnitSpec({
 
         test("존재하지 않는 상품은 변경할 수 없다") {
             // given
-            val request = Product().apply { price = BigDecimal("100") }
+            val request = createProduct(price = BigDecimal("100"))
 
             every { productRepository.findById(request.id) } returns Optional.empty()
 
@@ -171,21 +153,12 @@ internal class ProductServiceTest : BaseUnitSpec({
 
         test("상품을 사용하는 메뉴의 가격이 메뉴를 구성하는 상품 가격의 총 합보다 클 경우 메뉴를 숨긴다") {
             // given
-            val request = Product().apply { price = BigDecimal("500") }
+            val request = createProduct(price = BigDecimal("500"))
             every { productRepository.findById(request.id) } returns Optional.of(request)
 
-            val product1 = Product().apply {
-                id = request.id
-                price = request.price
-            }
-            val menuProduct1 = MenuProduct().apply {
-                product = product1
-                quantity = 2
-            }
-            val menu = Menu().apply {
-                price = BigDecimal("600")
-                menuProducts = listOf(menuProduct1)
-            }
+            val product = createProduct(id = request.id, price = request.price)
+            val menuProduct = createMenuProduct(product = product, quantity = 2)
+            val menu = createMenu(price = BigDecimal("600"), menuProducts = listOf(menuProduct))
             every { menuRepository.findAllByProductId(request.id) } returns listOf(menu)
 
             // when
@@ -198,7 +171,7 @@ internal class ProductServiceTest : BaseUnitSpec({
 
         test("가격을 변경한다") {
             // given
-            val request = Product().apply { price = BigDecimal("300") }
+            val request = createProduct(price = BigDecimal("300"))
 
             every { productRepository.findById(request.id) } returns Optional.of(request)
             every { menuRepository.findAllByProductId(request.id) } returns emptyList()
@@ -210,4 +183,22 @@ internal class ProductServiceTest : BaseUnitSpec({
             actual.price shouldBe BigDecimal("300")
         }
     }
-})
+}) {
+    companion object {
+        fun createProduct(id: UUID? = null, name: String? = null, price: BigDecimal? = null) = Product().apply {
+            this.id = id
+            this.name = name
+            this.price = price
+        }
+
+        fun createMenuProduct(product: Product, quantity: Long) = MenuProduct().apply {
+            this.product = product
+            this.quantity = quantity
+        }
+
+        fun createMenu(price: BigDecimal, menuProducts: List<MenuProduct>) = Menu().apply {
+            this.price = price
+            this.menuProducts = menuProducts
+        }
+    }
+}
