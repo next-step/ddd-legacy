@@ -24,11 +24,8 @@ public class StringCalculator {
         String[] tokens = numbers.split(delimiter);
         int sum = 0;
         for (String token : tokens) {
-            int number = Integer.parseInt(token);
-            if (number < 0) {
-                throw new RuntimeException("Negative numbers are not allowed: " + number);
-            }
-            sum += number;
+            Number number = new Number(token);
+            sum += number.getValue();
         }
 
         return sum;
