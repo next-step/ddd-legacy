@@ -179,6 +179,19 @@ class TaekOutOrderServiceTest {
                     takeoutOrder(null, null, OrderStatus.WAITING, List.of(nonExistentOrderLineItem))
             )).isInstanceOf(NoSuchElementException.class);
         }
+
+        @DisplayName("주문 항목의 메뉴의 가격이 일치하지 않으면 예외가 발생합니다")
+        @Test
+        void createOrderWithDifferentMenuPrice() {
+            final BigDecimal differentPrice = menu.getPrice().add(BigDecimal.ONE);
+            final Menu differentPriceMenu = menu(menu.getId(), menu.getName(), differentPrice, menu.getMenuGroup(), menu.getMenuProducts(), menu.isDisplayed());
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(differentPriceMenu));
+            when(menuRepository.findById(differentPriceMenu.getId())).thenReturn(Optional.ofNullable(differentPriceMenu));
+
+            assertThatThrownBy(() -> orderService.create(
+                    takeoutOrder(null, null, OrderStatus.WAITING, List.of(orderLineItem))
+            )).isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
