@@ -1,21 +1,14 @@
 package kitchenpos.application.fixture;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import kitchenpos.domain.Menu;
-import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
-import kitchenpos.domain.OrderStatus;
-import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderType;
 
 public record OrderLineItemFixture(Menu 메뉴, long 주문수량, BigDecimal 주문가격) {
 
-    public static final long DEFAULT_ORDER_LINE_ITEM_QTY = 3;
-    public static final String DEFAULT_ORDER_LINE_ITEM_PRICE = "60000";
+    public static final long DEFAULT_ORDER_LINE_ITEM_QTY = 1;
+    public static final String DEFAULT_ORDER_LINE_ITEM_PRICE = "20000";
 
     public static OrderLineItemFixture init() {
         return new OrderLineItemFixture(

@@ -2,27 +2,29 @@ package kitchenpos.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import kitchenpos.application.OrderService;
 import kitchenpos.application.fixture.MenuFixture;
-import kitchenpos.application.fixture.MenuProductFixture;
 import kitchenpos.application.fixture.OrderFixture;
 import kitchenpos.application.fixture.OrderLineItemFixture;
 import kitchenpos.application.fixture.OrderTableFixture;
-import kitchenpos.application.fixture.ProductFixture;
 import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
+import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
 import kitchenpos.infra.KitchenridersClient;
@@ -87,6 +89,25 @@ class OrderServiceTest {
     @DisplayName("주문 등록")
     class 주문_등록 {
 
+        @Test
+        @DisplayName("주문 등록 성공")
+        void 주문등록_성공() {
+            mockCreateOrder();
+
+            var result = orderService.create(order);
+
+            assertAll(
+                () -> assertNotNull(result),
+                () -> assertEquals(result.getType(), order.getType()),
+                () -> assertEquals(result.getStatus(), order.getStatus()),
+                () -> assertEquals(result.getOrderDateTime(), order.getOrderDateTime()),
+                () -> assertEquals(result.getOrderLineItems(), order.getOrderLineItems()),
+                () -> assertEquals(result.getDeliveryAddress(), order.getDeliveryAddress()),
+                () -> assertEquals(result.getOrderTable(), order.getOrderTable())
+            );
+
+        }
+
         @ParameterizedTest
         @DisplayName("배달, 먹고가기, 포장(주문 유형)이 반드시 있어야 한다.")
         @NullSource
@@ -138,7 +159,6 @@ class OrderServiceTest {
                 OrderTableFixture.init().create()
             ).create();
 
-
             if (qty < 0) {
                 mockFindAllByMenu(order);
                 assertThatExceptionOfType(IllegalArgumentException.class)
@@ -157,10 +177,56 @@ class OrderServiceTest {
         @Test
         @DisplayName("메뉴가 노출된 상태여야 한다.")
         void 메뉴가_노출상태인지_검사() {
+            chickenMenu.setDisplayed(false);
+            
             mockFindAllByMenu(order);
-            mockFindByOrder();
-            mockFindByMenu();
-            assertThatExceptionOfType(NoSuchElementException.class)
+            mockFindByMenu(chickenMenu);
+
+            assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> orderService.create(order));
+        }
+
+        @Test
+        @DisplayName("메뉴가격과 주문 아이템 가격이 다르면 안된다.")
+        void 메뉴가격_주문아이템가격_비교() {
+            chickenMenu = MenuFixture.test(null, new BigDecimal("500000"), null, true, null)
+                .create();
+
+            mockFindAllByMenu(order);
+
+            mockFindByMenu(chickenMenu);
+
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> orderService.create(order));
+        }
+
+        @ParameterizedTest
+        @DisplayName("배달 주문시 배달 주소가 반드시 있어야 한다.")
+        @NullAndEmptySource
+        void 배달일경우_배달지주소_여부검사(final String address) {
+            order.setDeliveryAddress(address);
+
+            mockFindAllByMenu(order);
+
+            mockFindByMenu(chickenMenu);
+
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> orderService.create(order));
+        }
+
+        @Test
+        @DisplayName("먹고가기(주문유형)의 경우 주문 테이블내역이 있어야 한다.")
+        void 먹고가기일경우_주문테이블내역_여부검사() {
+            order.setType(OrderType.EAT_IN);
+            order.getOrderTable().setOccupied(false);
+
+            mockFindAllByMenu(order);
+
+            mockFindByMenu(chickenMenu);
+
+            mockFindByOrderTable(order.getOrderTable());
+
+            assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> orderService.create(order));
         }
     }
@@ -168,6 +234,7 @@ class OrderServiceTest {
     @Nested
     @DisplayName("주문 수락")
     class 주문_수락 {
+
         @Test
         @DisplayName("현 주문상태가 **대기**이어야 한다.")
         void 주문상태_대기인지_검사() {
@@ -200,6 +267,7 @@ class OrderServiceTest {
     @Nested
     @DisplayName("서빙/준비 완료")
     class 서빙_준비_완료 {
+
         @Test
         @DisplayName("현 주문상태가 **수락**이어야 한다.")
         void 주문상태_수락인지_검사() {
@@ -213,6 +281,7 @@ class OrderServiceTest {
     @Nested
     @DisplayName("배달 시작")
     class 배달_시작 {
+
         @Test
         @DisplayName("주문 유형이 **배달**이어야 한다.")
         void 주문유형_배달인지_검사() {
@@ -241,6 +310,7 @@ class OrderServiceTest {
     @Nested
     @DisplayName("배달 완료")
     class 배달_완료 {
+
         @Test
         @DisplayName("현 주문상태가 **배달중**이어야 한다.")
         void 주문상태_배달중인지_검사() {
@@ -280,6 +350,7 @@ class OrderServiceTest {
             assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> orderService.complete(order.getId()));
         }
+
         @Test
         @DisplayName("먹고가기(주문유형)일 경우, 해당 주문을 완료 처리 하고 해당 테이블에 다른 진행 중인 주문이 없다면 테이블을 비우고 인원 수를 0명으로 설정한다.")
         void 먹고가기이면_주문완료처리하고_테이블_초기화처리() {
@@ -287,9 +358,9 @@ class OrderServiceTest {
                 OrderType.EAT_IN,
                 OrderStatus.SERVED,
                 null,
+                List.of(OrderLineItemFixture.init().create()),
                 null,
-                null,
-                null
+                OrderTableFixture.init().create()
             ).create();
 
             mockFindByOrder();
@@ -313,7 +384,8 @@ class OrderServiceTest {
     }
 
     private void mockExistsByOrderTable(Order order, boolean status) {
-        when(orderRepository.existsByOrderTableAndStatusNot(order.getOrderTable(), OrderStatus.COMPLETED))
+        when(orderRepository.existsByOrderTableAndStatusNot(order.getOrderTable(),
+            OrderStatus.COMPLETED))
             .thenReturn(status);
     }
 
@@ -325,8 +397,24 @@ class OrderServiceTest {
                 .collect(Collectors.toList()));
     }
 
-    private void mockFindByMenu() {
+    private void mockFindByMenu(Menu menu) {
         when(menuRepository.findById(Mockito.any()))
             .thenReturn(Optional.of(chickenMenu));
     }
+
+    private void mockFindByOrderTable(OrderTable orderTable) {
+        when(orderTableRepository.findById(Mockito.any()))
+            .thenReturn(Optional.of(orderTable));
+    }
+
+    private void mockSaveMenu() {
+        when(orderRepository.save(Mockito.any(Order.class))).thenReturn(order);
+    }
+
+    private void mockCreateOrder() {
+        mockFindAllByMenu(order);
+        mockFindByMenu(chickenMenu);
+        mockSaveMenu();
+    }
+
 }
