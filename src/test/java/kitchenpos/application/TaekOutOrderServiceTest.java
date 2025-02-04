@@ -269,7 +269,6 @@ class TaekOutOrderServiceTest {
             this.order = takeoutOrder(orderId, orderDateTime, OrderStatus.ACCEPTED, List.of(orderLineItem));
         }
 
-
         @DisplayName("포장 주문을 서빙할 수 있습니다.")
         @Test
         void serveTakeOutOrder() {
@@ -294,6 +293,37 @@ class TaekOutOrderServiceTest {
             when(orderRepository.findById(nonAcceptedOrder.getId())).thenReturn(Optional.ofNullable(nonAcceptedOrder));
 
             assertThatThrownBy(() -> orderService.serve(nonAcceptedOrder.getId())).isInstanceOf(IllegalStateException.class);
+        }
+    }
+
+    @DisplayName("포장 주문을 완료할 때")
+    @Nested
+    class Complete {
+        private UUID orderId;
+        private LocalDateTime orderDateTime;
+        private OrderLineItem orderLineItem;
+        private Order order;
+
+        @BeforeEach
+        void setUp() {
+            this.orderId = createOrderId();
+            this.orderDateTime = LocalDateTime.now();
+            this.orderLineItem = orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000));
+            this.order = takeoutOrder(orderId, orderDateTime, OrderStatus.SERVED, List.of(orderLineItem));
+        }
+
+        @DisplayName("포장 주문을 완료할 수 있습니다.")
+        @Test
+        void completeDeliveryOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.ofNullable(order));
+
+            final Order completedOrder = orderService.complete(order.getId());
+
+            assertAll(
+                    () -> assertThat(completedOrder.getId()).isEqualTo(order.getId()),
+                    () -> assertThat(completedOrder.getType()).isEqualTo(order.getType()),
+                    () -> assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED)
+            );
         }
     }
 
