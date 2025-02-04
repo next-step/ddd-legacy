@@ -1,6 +1,7 @@
 package kitchenpos;
 
-import kitchenpos.application.MenuService;
+import kitchenpos.application.InMemoryOrderRepository;
+import kitchenpos.application.InMemoryOrderTableRepository;
 import kitchenpos.application.OrderService;
 import kitchenpos.domain.*;
 import org.assertj.core.api.ThrowableAssert;
@@ -10,7 +11,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest
+
 @DisplayName(value = " Order 테스트")
 @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class OrderTest {
@@ -56,19 +56,24 @@ public class OrderTest {
 
     @SpyBean
     private ProductRepository productRepository;
-    @Autowired
-    private MenuService menuService;
+
     @SpyBean
     private MenuRepository menuRepository;
     @SpyBean
     private MenuGroupRepository menuGroupRepository;
-    @SpyBean
-    private OrderRepository orderRepository;
+
+    private InMemoryOrderRepository inMemoryOrderRepository;
     @SpyBean
     private OrderService orderService;
-    @Autowired
-    private OrderTableRepository orderTableRepository;
 
+    private InMemoryOrderTableRepository inMemoryOrderTableRepository;
+
+    @BeforeEach
+    void setUp() {
+        inMemoryOrderRepository = new InMemoryOrderRepository();
+        inMemoryOrderTableRepository = new InMemoryOrderTableRepository();
+
+    }
 
     @DisplayName(value = "주문 추가 기능")
     @Nested
@@ -102,7 +107,7 @@ public class OrderTest {
         @DisplayName(value = "주문 추가기능 & 주문 검증이 끝나면 주문대기(WAITING) 상태가 됩니다")
         @Test
         void validateStateWaiting() {
-            Mockito.clearInvocations(orderService,orderRepository);
+            Mockito.clearInvocations(orderService,inMemoryOrderRepository);
             List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, DEFAULT_QUANTITY, 후라이드치킨_DEFAULT_PRICE));
 
             Order order = createOrder(ORDER_UUID, ORDER_TYPE_배달주문, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
@@ -111,8 +116,8 @@ public class OrderTest {
             Order orderResponse = orderService.create(order);
 
             verify(orderService,times(1)).create(Mockito.any());
-            verify(orderRepository,times(1)).save(Mockito.any());
-            assertThat(orderResponse.getStatus()).isEqualTo(OrderStatus.WAITING);
+            verify(inMemoryOrderRepository,times(1)).save(Mockito.any());
+            assertThat(orderResponse.getStatus()).isEqualTo(WAITING);
 
         }
 
@@ -203,7 +208,7 @@ public class OrderTest {
         void validateEatInOrderTable() {
             List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, DEFAULT_QUANTITY, 후라이드치킨_DEFAULT_PRICE));
             OrderTable orderTable = createOrderTable(ORDER_TABLE_ID, ORDER_TABLE_NAME, 0, TABLE_UNUSABLE);
-            orderTableRepository.save(orderTable);
+            inMemoryOrderTableRepository.save(orderTable);
             Order order = createOrder(ORDER_UUID, ORDER_TYPE_매장내식사주문, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
                     orderLineItems, "강남구",orderTable,orderTable.getId());
 
