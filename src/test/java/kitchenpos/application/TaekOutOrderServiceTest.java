@@ -240,6 +240,14 @@ class TaekOutOrderServiceTest {
             );
         }
 
+        @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
+        @Test
+        void acceptNonExistentOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.accept(order.getId())).isInstanceOf(NoSuchElementException.class);
+        }
+
         @DisplayName("대기 상태가 아닌 주문을 수락하려고 하면 예외가 발생합니다")
         @ParameterizedTest(name = "주문 상태: {0}")
         @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "COMPLETED"})
@@ -281,6 +289,14 @@ class TaekOutOrderServiceTest {
                     () -> assertThat(servedOrder.getType()).isEqualTo(order.getType()),
                     () -> assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED)
             );
+        }
+
+        @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
+        @Test
+        void serveNonExistentOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.serve(order.getId())).isInstanceOf(NoSuchElementException.class);
         }
 
         @DisplayName("수락 상태가 아닌 주문을 서빙하려고 하면 예외가 발생합니다")
@@ -336,6 +352,14 @@ class TaekOutOrderServiceTest {
             when(orderRepository.findById(nonServedOrder.getId())).thenReturn(Optional.ofNullable(nonServedOrder));
 
             assertThatThrownBy(() -> orderService.complete(nonServedOrder.getId())).isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
+        @Test
+        void completeNonExistentOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.complete(order.getId())).isInstanceOf(NoSuchElementException.class);
         }
     }
 
