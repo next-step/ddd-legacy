@@ -81,8 +81,7 @@ class ProductServiceTest {
         @ParameterizedTest
         @ValueSource(strings = {"나쁜", "XXX"})
         void 상품명_비속어_검사(final String name) {
-
-            when(purgomalumClient.containsProfanity(anyString())).thenReturn(true);
+            mockCheckProductName(true);
 
             chicken = ProductFixture.test(name, null).create();
             assertThatExceptionOfType(IllegalArgumentException.class)
@@ -143,8 +142,7 @@ class ProductServiceTest {
                 ).create())
             ).create();
 
-            when(menuRepository.findAllByProductId(Mockito.any()))
-                .thenReturn(List.of(chickenMenu));
+            mockFindByAllProducts(chickenMenu);
 
             productService.changePrice(chicken.getId(), chicken);
 
@@ -170,4 +168,12 @@ class ProductServiceTest {
         }
     }
 
+    private void mockFindByAllProducts(Menu chickenMenu) {
+        when(menuRepository.findAllByProductId(Mockito.any()))
+            .thenReturn(List.of(chickenMenu));
+    }
+
+    private void mockCheckProductName(boolean isProfanity) {
+        when(purgomalumClient.containsProfanity(anyString())).thenReturn(isProfanity);
+    }
 }

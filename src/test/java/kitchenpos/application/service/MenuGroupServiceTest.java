@@ -17,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
@@ -75,9 +76,10 @@ class MenuGroupServiceTest {
 
         }
 
+        @ParameterizedTest
         @DisplayName("메뉴 그룹명을 반드시 가진다.")
         @NullAndEmptySource
-        @ValueSource(strings = {" ", "   ", "\t", "\n"})
+        @ValueSource(strings = {" ", "   ","\t", "\n"})
         void 메뉴그룹명_유효성_검사(final String name) {
             menuGroup = MenuGroupFixture.test(name).create();
 
