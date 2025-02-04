@@ -8,6 +8,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
+import static kitchenpos.fixture.MenuProductFixture.menuProduct;
+
 public class MenuFixture {
     public static final String DEFAULT_MENU_NAME = "추억의 옛날 통닭";
     public static final String SECONDARY_MENU_NAME = "치킨 세트";
@@ -43,6 +46,10 @@ public class MenuFixture {
 
     public static Menu menu(final String name, final BigDecimal price, MenuGroup menuGroup, final List<MenuProduct> menuProducts, final boolean isDisplayed) {
         return menu(null, name, price, menuGroup, menuProducts, isDisplayed);
+    }
+
+    public static Menu menu() {
+        return menu(createMenuId(), DEFAULT_MENU_NAME, DEFAULT_MENU_PRICE, menuGroup(), List.of(menuProduct()), DEFAULT_DISPLAYED);
     }
 
     public static UUID createMenuId() {
