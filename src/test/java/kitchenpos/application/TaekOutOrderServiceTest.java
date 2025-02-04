@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static kitchenpos.fixture.MenuFixture.menu;
-import static kitchenpos.fixture.OrderFixture.orderLineItem;
-import static kitchenpos.fixture.OrderFixture.takeoutOrder;
+import static kitchenpos.fixture.OrderFixture.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -51,9 +51,9 @@ class TaekOutOrderServiceTest {
     OrderService orderService;
 
 
-    @DisplayName("포장 주문")
+    @DisplayName("포장 주문을 생성할 때")
     @Nested
-    class TakeoutOrder {
+    class Create {
 
         private Menu menu;
         private long quantity;
@@ -86,6 +86,21 @@ class TaekOutOrderServiceTest {
                     () -> assertThat(order.getType()).isEqualTo(OrderType.TAKEOUT),
                     () -> assertThat(order.getOrderTable()).isNull()
             );
+        }
+
+        @DisplayName("주문 형식이 없으면 예외가 발생합니다")
+        @Test
+        void createOrderWithoutType() {
+            assertThatThrownBy(() -> orderService.create(
+                    order(
+                            null,
+                            null,
+                            null,
+                            OrderStatus.WAITING,
+                            OrderType.TAKEOUT,
+                            null,
+                            List.of(orderLineItem))
+            )).isInstanceOf(IllegalArgumentException.class);
         }
     }
 }
