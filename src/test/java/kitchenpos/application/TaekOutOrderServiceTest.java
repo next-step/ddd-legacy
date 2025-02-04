@@ -253,6 +253,38 @@ class TaekOutOrderServiceTest {
         }
     }
 
+    @DisplayName("포장 주문을 서빙할 때")
+    @Nested
+    class Server {
+        private UUID orderId;
+        private LocalDateTime orderDateTime;
+        private OrderLineItem orderLineItem;
+        private Order order;
+
+        @BeforeEach
+        void setUp() {
+            this.orderId = createOrderId();
+            this.orderDateTime = LocalDateTime.now();
+            this.orderLineItem = orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000));
+            this.order = takeoutOrder(orderId, orderDateTime, OrderStatus.ACCEPTED, List.of(orderLineItem));
+        }
+
+
+        @DisplayName("포장 주문을 서빙할 수 있습니다.")
+        @Test
+        void serveTakeOutOrder() {
+            when(orderRepository.findById(order.getId())).thenReturn(Optional.ofNullable(order));
+
+            final Order servedOrder = orderService.serve(order.getId());
+
+            assertAll(
+                    () -> assertThat(servedOrder.getId()).isEqualTo(order.getId()),
+                    () -> assertThat(servedOrder.getType()).isEqualTo(order.getType()),
+                    () -> assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED)
+            );
+        }
+    }
+
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
         return price.multiply(BigDecimal.valueOf(quantity));
     }
