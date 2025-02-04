@@ -158,7 +158,7 @@ class ProductServiceTest {
     class 상품_조회 {
 
         @Test
-        @DisplayName("상품 조회시 특정 조건 없이 상품의 모든 목록을 조회할 수 있다.")
+        @DisplayName("특정 조건 없이 상품의 모든 목록을 조회할 수 있다.")
         void 상품목록_조회() {
             when(productRepository.findAll()).thenReturn(List.of(chicken));
             List<Product> result = productService.findAll();
