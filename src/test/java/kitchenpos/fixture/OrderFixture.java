@@ -5,10 +5,15 @@ import kitchenpos.domain.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class OrderFixture {
+
+    public static final String DELIVERY_ADDRESS = "서울시 강남구";
+    public static final long SINGLE_QUANTITY = 1L;
+    private static final AtomicLong ATOMIC_LONG = new AtomicLong(1L);
+
     private OrderFixture() {
     }
 
@@ -48,8 +53,33 @@ public class OrderFixture {
         return order;
     }
 
+    public static LocalDateTime createOrderDateTime() {
+        return LocalDateTime.now();
+    }
+
     public static UUID createOrderId() {
         return UUID.randomUUID();
+    }
+
+    public static OrderLineItem orderLineItem(
+            final Menu menu
+    ) {
+        return orderLineItem(createOrderLineItemSeq(), menu, SINGLE_QUANTITY);
+    }
+
+    public static OrderLineItem orderLineItem(
+            final Long seq,
+            final Menu menu
+    ) {
+        return orderLineItem(seq, menu, SINGLE_QUANTITY);
+    }
+
+    public static OrderLineItem orderLineItem(
+            final Long seq,
+            final Menu menu,
+            final long quantity
+    ) {
+        return orderLineItem(seq, menu, quantity, orderLineItemPrice(menu.getPrice(), quantity));
     }
 
     public static OrderLineItem orderLineItem(
@@ -66,7 +96,11 @@ public class OrderFixture {
         return orderLineItem;
     }
 
-    public static Long createOrderLineItemId() {
-        return new Random().nextLong(1, 100);
+    public static Long createOrderLineItemSeq() {
+        return ATOMIC_LONG.getAndIncrement();
+    }
+
+    private static BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
+        return price.multiply(BigDecimal.valueOf(quantity));
     }
 }

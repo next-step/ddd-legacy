@@ -6,13 +6,13 @@ import java.util.UUID;
 
 public class MenuGroupFixture {
 
-    private static final String DEFAULT_MENU_GROUP_NAME = "메뉴 그룹";
+    public static final String DEFAULT_MENU_GROUP_NAME = "세트 메뉴";
 
     private MenuGroupFixture() {
     }
 
     public static MenuGroup menuGroup() {
-        return menuGroup(getUuid(), DEFAULT_MENU_GROUP_NAME);
+        return menuGroup(createMenuGroupId(), DEFAULT_MENU_GROUP_NAME);
     }
 
     public static MenuGroup menuGroup(final UUID uuid) {
@@ -30,7 +30,7 @@ public class MenuGroupFixture {
         return menuGroup;
     }
 
-    private static UUID getUuid() {
+    private static UUID createMenuGroupId() {
         return UUID.randomUUID();
     }
 }

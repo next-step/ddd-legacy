@@ -7,14 +7,14 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class MenuProductFixture {
 
-    private static final long DEFAULT_QUANTITY = 1L;
-    private static final AtomicLong atomicLong = new AtomicLong(1L);
+    public static final long SINGLE_QUANTITY = 1L;
+    private static final AtomicLong ATOMIC_LONG = new AtomicLong(1L);
 
     private MenuProductFixture() {
     }
 
-    public static MenuProduct menuProduct() {
-        return menuProduct(seq(), DEFAULT_QUANTITY, ProductFixture.product());
+    public static MenuProduct menuProduct(final Product product) {
+        return menuProduct(createMenuProductSeq(), SINGLE_QUANTITY, product);
     }
 
     public static MenuProduct menuProduct(final Long seq, final long quantity, final Product product) {
@@ -26,7 +26,7 @@ public class MenuProductFixture {
         return menuProduct;
     }
 
-    public static Long seq() {
-        return atomicLong.getAndIncrement();
+    public static Long createMenuProductSeq() {
+        return ATOMIC_LONG.getAndIncrement();
     }
 }

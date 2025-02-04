@@ -6,96 +6,84 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
+import static kitchenpos.domain.OrderStatus.*;
+import static kitchenpos.domain.OrderType.TAKEOUT;
 import static kitchenpos.fixture.MenuFixture.createMenuId;
 import static kitchenpos.fixture.MenuFixture.menu;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
 import static kitchenpos.fixture.MenuProductFixture.menuProduct;
 import static kitchenpos.fixture.OrderFixture.*;
+import static kitchenpos.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @DisplayName("포장 주문 서비스 통합 테스트")
-@SpringBootTest
-@ExtendWith(MockitoExtension.class)
-class TakeOutOrderServiceTest {
+class TakeOutOrderServiceUnitTest {
 
-    @MockBean
-    @Autowired
-    OrderRepository orderRepository;
+    private OrderRepository orderRepository = mock(OrderRepository.class);
+    private MenuRepository menuRepository = mock(MenuRepository.class);
+    private OrderTableRepository orderTableRepository = mock(OrderTableRepository.class);
+    private KitchenridersClient kitchenridersClient = mock(KitchenridersClient.class);
+    private OrderService orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
 
-    @MockBean
-    @Autowired
-    MenuRepository menuRepository;
-
-    @MockBean
-    @Autowired
-    OrderTableRepository orderTableRepository;
-
-    @MockBean
-    @Autowired
-    KitchenridersClient kitchenridersClient;
-
-    @Autowired
-    OrderService orderService;
-
+    @BeforeEach
+    void setUp() {
+        orderRepository = mock(OrderRepository.class);
+        menuRepository = mock(MenuRepository.class);
+        orderTableRepository = mock(OrderTableRepository.class);
+        kitchenridersClient = mock(KitchenridersClient.class);
+        orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
+    }
 
     @DisplayName("포장 주문을 생성할 때")
     @Nested
     class Create {
 
         private Menu menu;
-        private long quantity;
-        private BigDecimal price;
         private OrderLineItem orderLineItem;
 
         @BeforeEach
         void setUp() {
-            this.menu = menu();
-            this.quantity = 1L;
-            this.price = menu.getPrice().multiply(BigDecimal.valueOf(quantity));
-            this.orderLineItem = orderLineItem(null, menu, quantity, price);
+            this.menu = menu(menuGroup(), List.of(
+                    menuProduct(product(SEASONED_CHICKEN, SEASONED_CHICKEN_PRICE)),
+                    menuProduct(product(FRIED_CHICKEN, SEASONED_CHICKEN_PRICE))
+            ));
+            this.orderLineItem = orderLineItem(null, menu);
         }
 
-        @DisplayName("포장 주문을 생성할 수 있습니다.")
+        @DisplayName("대기 상태의 포장 주문을 생성할 수 있습니다.")
         @Test
         void createTakeoutOrder() {
+            final Order takeOutOrder = takeoutOrder(null, null, WAITING, List.of(orderLineItem));
+
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
             when(menuRepository.findById(menu.getId())).thenReturn(Optional.ofNullable(menu));
             when(orderRepository.save(any(Order.class))).then(returnsFirstArg());
 
-            final Order order = orderService.create(
-                    takeoutOrder(null, null, OrderStatus.WAITING, List.of(orderLineItem))
-            );
+            final Order actual = orderService.create(takeOutOrder);
             assertAll(
-                    () -> assertThat(order.getId()).isNotNull(),
-                    () -> assertThat(order.getOrderDateTime()).isBeforeOrEqualTo(LocalDateTime.now()),
-                    () -> assertThat(order.getDeliveryAddress()).isNull(),
-                    () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
-                    () -> assertThat(order.getType()).isEqualTo(OrderType.TAKEOUT),
-                    () -> assertThat(order.getOrderTable()).isNull()
+                    () -> assertThat(actual.getId()).isNotNull(),
+                    () -> assertThat(actual.getOrderDateTime()).isBeforeOrEqualTo(LocalDateTime.now()),
+                    () -> assertThat(actual.getDeliveryAddress()).isNull(),
+                    () -> assertThat(actual.getStatus()).isEqualTo(WAITING),
+                    () -> assertThat(actual.getType()).isEqualTo(TAKEOUT),
+                    () -> assertThat(actual.getOrderTable()).isNull()
             );
         }
 
@@ -107,8 +95,8 @@ class TakeOutOrderServiceTest {
                             null,
                             null,
                             null,
-                            OrderStatus.WAITING,
-                            OrderType.TAKEOUT,
+                            WAITING,
+                            null,
                             null,
                             List.of(orderLineItem))
             )).isInstanceOf(IllegalArgumentException.class);
@@ -122,7 +110,7 @@ class TakeOutOrderServiceTest {
                     takeoutOrder(
                             null,
                             null,
-                            OrderStatus.WAITING,
+                            WAITING,
                             orderLineItems
                     )
             )).isInstanceOf(IllegalArgumentException.class);
@@ -131,24 +119,19 @@ class TakeOutOrderServiceTest {
         @DisplayName("메뉴의 개수와 주문 항목의 개수가 다르면 예외가 발생합니다")
         @Test
         void createOrderWithDifferentMenuCount() {
-            final Menu otherMenu = menu(
-                    createMenuId(),
-                    "otherMenu",
-                    BigDecimal.valueOf(10000),
-                    menuGroup(),
-                    List.of(menuProduct()),
-                    true
+            final Menu otherMenu = menu(menuGroup(), List.of(menuProduct(product())));
+            final OrderLineItem otherOrderLineItem = orderLineItem(null, otherMenu);
+            final Order takeoutOrder = takeoutOrder(
+                    null,
+                    null,
+                    WAITING,
+                    List.of(orderLineItem, otherOrderLineItem)
             );
-            final OrderLineItem otherOrderLineItem = orderLineItem(null, otherMenu, 1L, otherMenu.getPrice());
+
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
 
             assertThatThrownBy(() -> orderService.create(
-                    takeoutOrder(
-                            null,
-                            null,
-                            OrderStatus.WAITING,
-                            List.of(orderLineItem, otherOrderLineItem)
-                    )
+                    takeoutOrder
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -156,88 +139,92 @@ class TakeOutOrderServiceTest {
         @ParameterizedTest(name = "수량: {0}")
         @ValueSource(longs = {-1L, -10L, -100L})
         void createOrderWithNegativeQuantity(final long negativeQuantity) {
-            final OrderLineItem negativeOrderLineItem = orderLineItem(null, menu, negativeQuantity, orderLineItemPrice(menu.getPrice(), negativeQuantity));
+            final OrderLineItem negativeOrderLineItem = orderLineItem(null, menu, negativeQuantity);
+            final Order takeoutOrder = takeoutOrder(null, null, WAITING, List.of(negativeOrderLineItem));
 
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
 
-            assertThatThrownBy(() -> orderService.create(
-                    takeoutOrder(null, null, OrderStatus.WAITING, List.of(negativeOrderLineItem))
-            )).isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> orderService.create(takeoutOrder))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("주문 항목의 메뉴가 존재하지 않으면 예외가 발생합니다")
         @Test
         void createOrderWithoutMenus() {
+            final Order takeoutOrder = takeoutOrder(null, null, WAITING, List.of(orderLineItem));
+
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of());
 
-            assertThatThrownBy(() -> orderService.create(
-                    takeoutOrder(null, null, OrderStatus.WAITING, List.of(orderLineItem))
-            )).isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> orderService.create(takeoutOrder))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("주문 항목의 메뉴의 가격이 일치하지 않으면 예외가 발생합니다")
         @Test
         void createOrderWithDifferentMenuPrice() {
-            final BigDecimal differentPrice = menu.getPrice().add(BigDecimal.ONE);
+            final BigDecimal differentPrice = BigDecimal.ONE.add(menu.getPrice());
             final Menu differentPriceMenu = menu(menu.getId(), menu.getName(), differentPrice, menu.getMenuGroup(), menu.getMenuProducts(), menu.isDisplayed());
+            final Order takeoutOrder = takeoutOrder(null, null, WAITING, List.of(orderLineItem));
+
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(differentPriceMenu));
             when(menuRepository.findById(differentPriceMenu.getId())).thenReturn(Optional.ofNullable(differentPriceMenu));
 
-            assertThatThrownBy(() -> orderService.create(
-                    takeoutOrder(null, null, OrderStatus.WAITING, List.of(orderLineItem))
-            )).isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> orderService.create(takeoutOrder))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("메뉴가 미노출 상태이면 예외가 발생합니다")
         @Test
         void createOrderWithNonDisplayedMenu() {
             final Menu nonDisplayedMenu = menu(menu.getId(), menu.getName(), menu.getPrice(), menu.getMenuGroup(), menu.getMenuProducts(), false);
+            final Order takeoutOrder = takeoutOrder(null, null, WAITING, List.of(orderLineItem));
+
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(nonDisplayedMenu));
             when(menuRepository.findById(nonDisplayedMenu.getId())).thenReturn(Optional.ofNullable(nonDisplayedMenu));
 
-            assertThatThrownBy(() -> orderService.create(
-                    takeoutOrder(null, null, OrderStatus.WAITING, List.of(orderLineItem))
-            )).isInstanceOf(IllegalStateException.class);
+            assertThatThrownBy(() -> orderService.create(takeoutOrder))
+                    .isInstanceOf(IllegalStateException.class);
         }
     }
 
     @DisplayName("포장 주문을 수락할 때")
     @Nested
     class Accept {
-        private UUID orderId;
-        private LocalDateTime orderDateTime;
+        private Menu menu;
         private OrderLineItem orderLineItem;
-        private Order order;
+        private Order takeOutOrder;
 
         @BeforeEach
         void setUp() {
-            this.orderId = createOrderId();
-            this.orderDateTime = LocalDateTime.now();
-            this.orderLineItem = orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000));
-            this.order = takeoutOrder(orderId, orderDateTime, OrderStatus.WAITING, List.of(orderLineItem));
+            this.menu = menu(menuGroup(), List.of(
+                    menuProduct(product(createMenuId(), SEASONED_CHICKEN, SEASONED_CHICKEN_PRICE)),
+                    menuProduct(product(createMenuId(), FRIED_CHICKEN, SEASONED_CHICKEN_PRICE))
+            ));
+            this.orderLineItem = orderLineItem(menu);
+            this.takeOutOrder = takeoutOrder(createOrderId(), createOrderDateTime(), WAITING, List.of(orderLineItem));
         }
 
         @DisplayName("포장 주문을 수락할 수 있습니다.")
         @Test
         void acceptTakeOutOrder() {
-            when(orderRepository.findById(order.getId())).thenReturn(Optional.ofNullable(order));
+            when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.ofNullable(takeOutOrder));
             doNothing().when(kitchenridersClient).requestDelivery(any(), any(), any());
 
-            final Order acceptedOrder = orderService.accept(order.getId());
+            final Order actual = orderService.accept(takeOutOrder.getId());
 
             assertAll(
-                    () -> assertThat(acceptedOrder.getId()).isEqualTo(order.getId()),
-                    () -> assertThat(acceptedOrder.getType()).isEqualTo(order.getType()),
-                    () -> assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
+                    () -> assertThat(actual.getId()).isEqualTo(takeOutOrder.getId()),
+                    () -> assertThat(actual.getType()).isEqualTo(takeOutOrder.getType()),
+                    () -> assertThat(actual.getStatus()).isEqualTo(ACCEPTED)
             );
         }
 
         @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
         @Test
         void acceptNonExistentOrder() {
-            when(orderRepository.findById(order.getId())).thenReturn(Optional.empty());
+            when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> orderService.accept(order.getId())).isInstanceOf(NoSuchElementException.class);
+            assertThatThrownBy(() -> orderService.accept(takeOutOrder.getId())).isInstanceOf(NoSuchElementException.class);
         }
 
         @DisplayName("대기 상태가 아닌 주문을 수락하려고 하면 예외가 발생합니다")
@@ -245,7 +232,7 @@ class TakeOutOrderServiceTest {
         @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "COMPLETED"})
         void acceptNonWaitingOrder(final OrderStatus orderStatus) {
             final Order nonWaitingOrder = takeoutOrder(
-                    orderId, orderDateTime, orderStatus, List.of(orderLineItem)
+                    takeOutOrder.getId(), takeOutOrder.getOrderDateTime(), orderStatus, takeOutOrder.getOrderLineItems()
             );
             when(orderRepository.findById(nonWaitingOrder.getId())).thenReturn(Optional.ofNullable(nonWaitingOrder));
 
@@ -256,39 +243,40 @@ class TakeOutOrderServiceTest {
     @DisplayName("포장 주문을 서빙할 때")
     @Nested
     class Server {
-        private UUID orderId;
-        private LocalDateTime orderDateTime;
+        private Menu menu;
         private OrderLineItem orderLineItem;
-        private Order order;
+        private Order takeOutOrder;
 
         @BeforeEach
         void setUp() {
-            this.orderId = createOrderId();
-            this.orderDateTime = LocalDateTime.now();
-            this.orderLineItem = orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000));
-            this.order = takeoutOrder(orderId, orderDateTime, OrderStatus.ACCEPTED, List.of(orderLineItem));
+            this.menu = menu(menuGroup(), List.of(
+                    menuProduct(product(SEASONED_CHICKEN, SEASONED_CHICKEN_PRICE)),
+                    menuProduct(product(FRIED_CHICKEN, SEASONED_CHICKEN_PRICE))
+            ));
+            this.orderLineItem = orderLineItem(menu);
+            this.takeOutOrder = takeoutOrder(createOrderId(), createOrderDateTime(), ACCEPTED, List.of(orderLineItem));
         }
 
         @DisplayName("포장 주문을 서빙할 수 있습니다.")
         @Test
         void serveTakeOutOrder() {
-            when(orderRepository.findById(order.getId())).thenReturn(Optional.ofNullable(order));
+            when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.ofNullable(takeOutOrder));
 
-            final Order servedOrder = orderService.serve(order.getId());
+            final Order actual = orderService.serve(takeOutOrder.getId());
 
             assertAll(
-                    () -> assertThat(servedOrder.getId()).isEqualTo(order.getId()),
-                    () -> assertThat(servedOrder.getType()).isEqualTo(order.getType()),
-                    () -> assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED)
+                    () -> assertThat(actual.getId()).isEqualTo(takeOutOrder.getId()),
+                    () -> assertThat(actual.getType()).isEqualTo(takeOutOrder.getType()),
+                    () -> assertThat(actual.getStatus()).isEqualTo(SERVED)
             );
         }
 
         @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
         @Test
         void serveNonExistentOrder() {
-            when(orderRepository.findById(order.getId())).thenReturn(Optional.empty());
+            when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> orderService.serve(order.getId())).isInstanceOf(NoSuchElementException.class);
+            assertThatThrownBy(() -> orderService.serve(takeOutOrder.getId())).isInstanceOf(NoSuchElementException.class);
         }
 
         @DisplayName("수락 상태가 아닌 주문을 서빙하려고 하면 예외가 발생합니다")
@@ -296,7 +284,7 @@ class TakeOutOrderServiceTest {
         @EnumSource(value = OrderStatus.class, names = {"WAITING", "SERVED", "COMPLETED"})
         void serveNonAcceptedOrder(final OrderStatus orderStatus) {
             final Order nonAcceptedOrder = takeoutOrder(
-                    orderId, orderDateTime, orderStatus, List.of(orderLineItem)
+                    takeOutOrder.getId(), takeOutOrder.getOrderDateTime(), orderStatus, takeOutOrder.getOrderLineItems()
             );
             when(orderRepository.findById(nonAcceptedOrder.getId())).thenReturn(Optional.ofNullable(nonAcceptedOrder));
 
@@ -307,30 +295,31 @@ class TakeOutOrderServiceTest {
     @DisplayName("포장 주문을 완료할 때")
     @Nested
     class Complete {
-        private UUID orderId;
-        private LocalDateTime orderDateTime;
+        private Menu menu;
         private OrderLineItem orderLineItem;
-        private Order order;
+        private Order takeOutOrder;
 
         @BeforeEach
         void setUp() {
-            this.orderId = createOrderId();
-            this.orderDateTime = LocalDateTime.now();
-            this.orderLineItem = orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000));
-            this.order = takeoutOrder(orderId, orderDateTime, OrderStatus.SERVED, List.of(orderLineItem));
+            this.menu = menu(menuGroup(), List.of(
+                    menuProduct(product(createMenuId(), SEASONED_CHICKEN, SEASONED_CHICKEN_PRICE)),
+                    menuProduct(product(createMenuId(), FRIED_CHICKEN, SEASONED_CHICKEN_PRICE))
+            ));
+            this.orderLineItem = orderLineItem(menu);
+            this.takeOutOrder = takeoutOrder(createOrderId(), createOrderDateTime(), SERVED, List.of(orderLineItem));
         }
 
         @DisplayName("포장 주문을 완료할 수 있습니다.")
         @Test
         void completeDeliveryOrder() {
-            when(orderRepository.findById(order.getId())).thenReturn(Optional.ofNullable(order));
+            when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.ofNullable(takeOutOrder));
 
-            final Order completedOrder = orderService.complete(order.getId());
+            final Order actual = orderService.complete(takeOutOrder.getId());
 
             assertAll(
-                    () -> assertThat(completedOrder.getId()).isEqualTo(order.getId()),
-                    () -> assertThat(completedOrder.getType()).isEqualTo(order.getType()),
-                    () -> assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED)
+                    () -> assertThat(actual.getId()).isEqualTo(takeOutOrder.getId()),
+                    () -> assertThat(actual.getType()).isEqualTo(takeOutOrder.getType()),
+                    () -> assertThat(actual.getStatus()).isEqualTo(COMPLETED)
             );
         }
 
@@ -339,7 +328,7 @@ class TakeOutOrderServiceTest {
         @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "COMPLETED"})
         void completeNonServedOrder(final OrderStatus orderStatus) {
             final Order nonServedOrder = takeoutOrder(
-                    orderId, orderDateTime, orderStatus, List.of(orderLineItem)
+                    takeOutOrder.getId(), takeOutOrder.getOrderDateTime(), orderStatus, List.of(orderLineItem)
             );
             when(orderRepository.findById(nonServedOrder.getId())).thenReturn(Optional.ofNullable(nonServedOrder));
 
@@ -349,13 +338,9 @@ class TakeOutOrderServiceTest {
         @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
         @Test
         void completeNonExistentOrder() {
-            when(orderRepository.findById(order.getId())).thenReturn(Optional.empty());
+            when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> orderService.complete(order.getId())).isInstanceOf(NoSuchElementException.class);
+            assertThatThrownBy(() -> orderService.complete(takeOutOrder.getId())).isInstanceOf(NoSuchElementException.class);
         }
-    }
-
-    private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
-        return price.multiply(BigDecimal.valueOf(quantity));
     }
 }

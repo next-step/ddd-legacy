@@ -4,16 +4,12 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -25,22 +21,22 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@ExtendWith(MockitoExtension.class)
-class OrderTableServiceTest {
+@DisplayName("가게 테이블 서비스 단위 테스트")
+class OrderTableServiceUnitTest {
 
-    @MockBean
-    @Autowired
-    OrderTableRepository orderTableRepository;
+    private OrderTableRepository orderTableRepository = mock(OrderTableRepository.class);
+    private OrderRepository orderRepository = mock(OrderRepository.class);
+    private OrderTableService orderTableService = new OrderTableService(orderTableRepository, orderRepository);
 
-    @MockBean
-    @Autowired
-    OrderRepository orderRepository;
-
-    @Autowired
-    OrderTableService orderTableService;
+    @BeforeEach
+    void setUp() {
+        orderTableRepository = mock(OrderTableRepository.class);
+        orderRepository = mock(OrderRepository.class);
+        orderTableService = new OrderTableService(orderTableRepository, orderRepository);
+    }
 
     @DisplayName("가게 테이블을 생성할 수 있습니다.")
     @Test
@@ -48,13 +44,13 @@ class OrderTableServiceTest {
         when(orderTableRepository.save(any(OrderTable.class))).then(returnsFirstArg());
 
         final OrderTable orderTable = orderTableService.create(orderTable(
-                DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, DEFAULT_OCCUPIED
+                ORDER_TABLE_NAME, EMPTY_GUESTS, IS_NOT_OCCUPIED
         ));
 
         assertAll(
                 () -> assertNotNull(orderTable.getId()),
-                () -> assertThat(orderTable.getName()).isEqualTo(DEFAULT_ORDER_TABLE_NAME),
-                () -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(DEFAULT_NUMBER_OF_GUESTS),
+                () -> assertThat(orderTable.getName()).isEqualTo(ORDER_TABLE_NAME),
+                () -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(EMPTY_GUESTS),
                 () -> assertThat(orderTable.isOccupied()).isFalse()
         );
     }
@@ -63,7 +59,7 @@ class OrderTableServiceTest {
     @ParameterizedTest(name = "입력값 {0}")
     @NullAndEmptySource
     void createOrderTableWithEmptyName(final String name) {
-        final OrderTable orderTable = orderTable(name, DEFAULT_NUMBER_OF_GUESTS, DEFAULT_OCCUPIED);
+        final OrderTable orderTable = orderTable(name, EMPTY_GUESTS, IS_NOT_OCCUPIED);
 
         assertThatThrownBy(() -> orderTableService.create(orderTable))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -94,7 +90,7 @@ class OrderTableServiceTest {
     @Test
     void clearOrderTable() {
         final OrderTable orderTable = orderTable(
-                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, true
+                createOrderTableId(), ORDER_TABLE_NAME, EMPTY_GUESTS, IS_OCCUPIED
         );
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
         when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(false);
@@ -112,7 +108,7 @@ class OrderTableServiceTest {
     @Test
     void clearOrderTableWithNonCompletedOrder() {
         final OrderTable orderTable = orderTable(
-                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, true
+                createOrderTableId(), ORDER_TABLE_NAME, EMPTY_GUESTS, IS_OCCUPIED
         );
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
         when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(true);
@@ -126,7 +122,7 @@ class OrderTableServiceTest {
     @ValueSource(ints = {1, 10, 100})
     void changeNumberOfGuests(final int numberOfGuests) {
         final OrderTable existedOrderTable = orderTable(
-                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, true
+                createOrderTableId(), ORDER_TABLE_NAME, EMPTY_GUESTS, IS_OCCUPIED
         );
         when(orderTableRepository.findById(existedOrderTable.getId())).thenReturn(Optional.of(existedOrderTable));
         when(orderTableRepository.save(any(OrderTable.class))).then(returnsFirstArg());
@@ -142,14 +138,13 @@ class OrderTableServiceTest {
     @ParameterizedTest(name = "손님 수 {0}")
     @ValueSource(ints = {1, 10, 100})
     void changeNumberOfGuestsWhenOrderTableIsEmpty(final int numberOfGuests) {
-        final OrderTable existedOrderTable = orderTable(
-                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, DEFAULT_OCCUPIED
-        );
+        final OrderTable existedOrderTable = orderTable(ORDER_TABLE_NAME, EMPTY_GUESTS, IS_NOT_OCCUPIED);
+
         when(orderTableRepository.findById(existedOrderTable.getId())).thenReturn(Optional.of(existedOrderTable));
+
         final OrderTable renewedOrderTable = orderTable(
                 existedOrderTable.getId(), existedOrderTable.getName(), numberOfGuests, existedOrderTable.isOccupied()
         );
-
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(existedOrderTable.getId(), renewedOrderTable))
                 .isInstanceOf(IllegalStateException.class);
     }
@@ -159,10 +154,10 @@ class OrderTableServiceTest {
     @ValueSource(ints = {1, 10, 100})
     void changeNumberOfGuestsWhenOrderTableIsNotExist(final int numberOfGuests) {
         when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
-        final OrderTable renewedOrderTable = orderTable(
-                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, numberOfGuests, true
-        );
 
+        final OrderTable renewedOrderTable = orderTable(
+                createOrderTableId(), ORDER_TABLE_NAME, numberOfGuests, IS_OCCUPIED
+        );
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(createOrderTableId(), renewedOrderTable))
                 .isInstanceOf(NoSuchElementException.class);
     }
@@ -171,14 +166,12 @@ class OrderTableServiceTest {
     @ParameterizedTest(name = "손님 수 {0}")
     @ValueSource(ints = {-1, -10, -100})
     void changeNumberOfGuestsWhenNumberOfGuestsIsNegative(final int numberOfGuests) {
-        final OrderTable existedOrderTable = orderTable(
-                createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, true
-        );
+        final OrderTable existedOrderTable = orderTable(ORDER_TABLE_NAME, EMPTY_GUESTS, IS_OCCUPIED);
+
         when(orderTableRepository.findById(existedOrderTable.getId())).thenReturn(Optional.of(existedOrderTable));
         final OrderTable renewedOrderTable = orderTable(
                 existedOrderTable.getId(), existedOrderTable.getName(), numberOfGuests, existedOrderTable.isOccupied()
         );
-
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(existedOrderTable.getId(), renewedOrderTable))
                 .isInstanceOf(IllegalArgumentException.class);
     }

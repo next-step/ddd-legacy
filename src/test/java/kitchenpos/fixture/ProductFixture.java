@@ -7,14 +7,20 @@ import java.util.UUID;
 
 public class ProductFixture {
 
-    public static final String DEFAULT_PRODUCT_NAME = "후라이드 치킨";
-    public static final BigDecimal DEFAULT_PRODUCT_PRICE = BigDecimal.valueOf(16000);
+    public static final String FRIED_CHICKEN = "후라이드 치킨";
+    public static final String SEASONED_CHICKEN = "양념 치킨";
+    public static final BigDecimal FRIED_CHICKEN_PRICE = BigDecimal.valueOf(16000);
+    public static final BigDecimal SEASONED_CHICKEN_PRICE = BigDecimal.valueOf(16000);
 
     private ProductFixture() {
     }
 
     public static Product product() {
-        return product(createProductId(), DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
+        return product(createProductId(), FRIED_CHICKEN, FRIED_CHICKEN_PRICE);
+    }
+
+    public static Product product(String name, BigDecimal price) {
+        return product(createProductId(), name, price);
     }
 
     public static Product product(UUID id, String name, int price) {

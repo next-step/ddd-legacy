@@ -8,26 +8,20 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
-import static kitchenpos.fixture.MenuProductFixture.menuProduct;
-import static kitchenpos.fixture.ProductFixture.product;
-
 public class MenuFixture {
 
-    private static final String DEFAULT_MENU_NAME = "양념 후라이드 세트";
-    private static final BigDecimal DEFAULT_MENU_PRICE = BigDecimal.valueOf(30_000L);
+    public static final String CHICKEN_SET_MENU = "양념 후라이드 세트";
+    public static final BigDecimal CHICKEN_SET_MENU_PRICE = BigDecimal.valueOf(30_000L);
 
     private MenuFixture() {
     }
 
-    public static Menu menu() {
-        return menu(createMenuId(), DEFAULT_MENU_NAME, DEFAULT_MENU_PRICE,
-                menuGroup(createMenuId(), "세트 메뉴"),
-                List.of(
-                        menuProduct(1L, 1L, product(createMenuId(), "양념 치킨", 16_000)),
-                        menuProduct(2L, 1L, product(createMenuId(), "후라이드 치킨", 16_000))
-                ),
-                true);
+    public static Menu menu(final MenuGroup menuGroup, final List<MenuProduct> menuProducts) {
+        return menu(createMenuId(), CHICKEN_SET_MENU, CHICKEN_SET_MENU_PRICE, menuGroup, menuProducts, true);
+    }
+
+    public static Menu menu(final MenuGroup menuGroup, final List<MenuProduct> menuProducts, final boolean isDisplayed) {
+        return menu(createMenuId(), CHICKEN_SET_MENU, CHICKEN_SET_MENU_PRICE, menuGroup, menuProducts, isDisplayed);
     }
 
     public static Menu menu(final UUID id, final String name, final BigDecimal price,
@@ -37,7 +31,6 @@ public class MenuFixture {
         menu.setName(name);
         menu.setPrice(price);
         menu.setMenuGroup(menuGroup);
-        menu.setMenuGroupId(menuGroup.getId());
         menu.setMenuProducts(menuProducts);
         menu.setDisplayed(isDisplayed);
         return menu;

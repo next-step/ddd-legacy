@@ -5,19 +5,21 @@ import kitchenpos.domain.OrderTable;
 import java.util.UUID;
 
 public class OrderTableFixture {
-    public static final String DEFAULT_ORDER_TABLE_NAME = "테이블";
-    public static final int DEFAULT_NUMBER_OF_GUESTS = 0;
-    public static final boolean DEFAULT_OCCUPIED = false;
+    public static final String ORDER_TABLE_NAME = "테이블";
+    public static final int EMPTY_GUESTS = 0;
+    public static final int COUPLE_GUESTS = 2;
+    public static final boolean IS_NOT_OCCUPIED = false;
+    public static final boolean IS_OCCUPIED = true;
 
     private OrderTableFixture() {
     }
 
     public static OrderTable orderTable() {
-        return orderTable(createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, DEFAULT_NUMBER_OF_GUESTS, DEFAULT_OCCUPIED);
+        return orderTable(createOrderTableId(), ORDER_TABLE_NAME, EMPTY_GUESTS, IS_NOT_OCCUPIED);
     }
 
-    public static OrderTable orderTable(final String name, int numberOfGuests, boolean empty) {
-        return orderTable(createOrderTableId(), name, numberOfGuests, empty);
+    public static OrderTable orderTable(final String name, int numberOfGuests, boolean occupied) {
+        return orderTable(createOrderTableId(), name, numberOfGuests, occupied);
     }
 
     public static OrderTable orderTable(final UUID id, final String name,

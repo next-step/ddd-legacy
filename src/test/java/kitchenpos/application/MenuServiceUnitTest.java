@@ -6,88 +6,78 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.AdditionalAnswers;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
-import static kitchenpos.fixture.MenuFixture.createMenuId;
-import static kitchenpos.fixture.MenuFixture.menu;
+import static kitchenpos.fixture.MenuFixture.*;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
+import static kitchenpos.fixture.MenuProductFixture.SINGLE_QUANTITY;
 import static kitchenpos.fixture.MenuProductFixture.menuProduct;
-import static kitchenpos.fixture.ProductFixture.createProductId;
-import static kitchenpos.fixture.ProductFixture.product;
+import static kitchenpos.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@DisplayName("메뉴 서비스 통합 테스트")
-@SpringBootTest
-@ExtendWith(MockitoExtension.class)
-class MenuServiceTest {
+@DisplayName("메뉴 서비스 단위 테스트")
+class MenuServiceUnitTest {
 
-    @Autowired
-    @MockBean
-    MenuRepository menuRepository;
+    private MenuRepository menuRepository = mock(MenuRepository.class);
+    private MenuGroupRepository menuGroupRepository = mock(MenuGroupRepository.class);
+    private ProductRepository productRepository = mock(ProductRepository.class);
+    private PurgomalumClient purgomalumClient = mock(PurgomalumClient.class);
+    private MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
 
-    @Autowired
-    @MockBean
-    MenuGroupRepository menuGroupRepository;
-
-    @Autowired
-    @MockBean
-    ProductRepository productRepository;
-
-    @Autowired
-    @MockBean
-    PurgomalumClient purgomalumClient;
-
-    @Autowired
-    private MenuService menuService;
+    @BeforeEach
+    void setUp() {
+        menuRepository = mock(MenuRepository.class);
+        menuGroupRepository = mock(MenuGroupRepository.class);
+        productRepository = mock(ProductRepository.class);
+        purgomalumClient = mock(PurgomalumClient.class);
+        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+    }
 
     @DisplayName("메뉴를 등록 할 때")
     @Nested
     class Create {
-        private String menuName = "양념 후라이드 세트";
-        private MenuGroup menuGroup = menuGroup();
-        private Product firstProduct = product(UUID.randomUUID(), "후라이드 치킨", new BigDecimal("16000"));
-        private Product secondProduct = product(UUID.randomUUID(), "양념 치킨", new BigDecimal("16000"));
+        private String menuName;
+        private MenuGroup menuGroup;
+        private Product firstProduct;
+        private Product secondProduct;
         private BigDecimal price;
         private MenuProduct firstMenuProduct;
         private MenuProduct secondMenuProduct;
-        private Menu menu;
 
         @BeforeEach
         void setUp() {
-            this.menuName = "양념 후라이드 세트";
+            this.menuName = CHICKEN_SET_MENU;
+            this.price = CHICKEN_SET_MENU_PRICE;
             this.menuGroup = menuGroup();
-            this.firstProduct = product(createProductId(), "후라이드 치킨", new BigDecimal("16000"));
-            this.secondProduct = product(createProductId(), "양념 치킨", new BigDecimal("16000"));
-            this.price = new BigDecimal("30000");
-            this.firstMenuProduct = menuProduct(1L, 1L, firstProduct);
-            this.secondMenuProduct = menuProduct(2L, 1L, secondProduct);
-            this.menu = menu(null, menuName, price, menuGroup, List.of(firstMenuProduct, secondMenuProduct), true);
+            this.firstProduct = product(FRIED_CHICKEN, FRIED_CHICKEN_PRICE);
+            this.secondProduct = product(SEASONED_CHICKEN, SEASONED_CHICKEN_PRICE);
+            this.firstMenuProduct = menuProduct(null, SINGLE_QUANTITY, firstProduct);
+            this.secondMenuProduct = menuProduct(null, SINGLE_QUANTITY, secondProduct);
         }
 
         @DisplayName("메뉴를 등록할 수 있습니다.")
         @Test
         void crate() {
+            final Menu menu = menu(
+                    null, menuName, price, menuGroup,
+                    List.of(firstMenuProduct, secondMenuProduct), true
+            );
             when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
             when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
             when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
@@ -109,11 +99,12 @@ class MenuServiceTest {
         }
 
         @DisplayName("메뉴 가격은 0원 이상이어야 합니다.")
-        @ParameterizedTest(name = "입력값 `{0}`")
+        @ParameterizedTest(name = "메뉴 가격 : `{0}`")
         @ValueSource(strings = {"-1", "-1000", "-100000"})
         void createWithNegativePrice(String price) {
-            final Menu menu = menu(null, menuName, new BigDecimal(price),
-                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+            final Menu menu = menu(
+                    null, menuName, new BigDecimal(price), menuGroup,
+                    List.of(firstMenuProduct, secondMenuProduct), true
             );
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -122,7 +113,8 @@ class MenuServiceTest {
         @DisplayName("메뉴 그룹이 존재하지 않으면 메뉴를 등록할 수 없습니다.")
         @Test
         void createWithNotExistsMenuGroup() {
-            final Menu menu = menu(null, menuName, price,
+            final Menu menu = menu(
+                    null, menuName, price,
                     menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
             );
             when(menuGroupRepository.findById(menu.getMenuGroupId()))
@@ -133,10 +125,11 @@ class MenuServiceTest {
         }
 
         @DisplayName("메뉴 상품이 없거나 비어있으면 메뉴를 등록할 수 없습니다.")
-        @ParameterizedTest(name = "입력값 `{0}`")
+        @ParameterizedTest(name = "메뉴 상품 목록 : `{0}`")
         @NullAndEmptySource
         void createWithEmptyMenuProducts(final List<MenuProduct> menuProducts) {
-            final Menu menu = menu(null, menuName, price,
+            final Menu menu = menu(
+                    null, menuName, price,
                     menuGroup, menuProducts, true
             );
             when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
@@ -164,27 +157,28 @@ class MenuServiceTest {
         void createWithNegativeMenuProductQuantity(final long firstQuantity, final long secondQuantity) {
             final Menu menu = menu(null, menuName, price,
                     menuGroup, List.of(
-                            menuProduct(1L, firstQuantity, firstProduct),
-                            menuProduct(2L, secondQuantity, secondProduct)
+                            menuProduct(null, firstQuantity, firstProduct),
+                            menuProduct(null, secondQuantity, secondProduct)
                     ), true
             );
             when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
             when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
-            when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
-            when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
-
+            if (firstQuantity >= 0) {
+                when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
+            }
+            if (secondQuantity >= 0) {
+                when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
+            }
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("메뉴의 가격이 메뉴 상품의 가격 합보다 크면 메뉴를 등록할 수 없습니다.")
-        @Test
-        void createWithPriceLessThanSumOfMenuProductPrice() {
-            final Menu menu = menu(null, menuName, new BigDecimal("32010"),
-                    menuGroup, List.of(
-                            menuProduct(1L, 1L, firstProduct),
-                            menuProduct(2L, 1L, secondProduct)
-                    ), true
+        @ParameterizedTest(name = "메뉴 가격 : `{0}`")
+        @ValueSource(strings = {"32010", "33000", "34000"})
+        void createWithPriceLessThanSumOfMenuProductPrice(final String price) {
+            final Menu menu = menu(null, menuName, new BigDecimal(price),
+                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
             );
             when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
             when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
@@ -195,7 +189,7 @@ class MenuServiceTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴의 이름이 없거나 비어있으면 메뉴를 등록할 수 없습니다.")
+        @DisplayName("메뉴 이름이 없거나 비어있으면 메뉴를 등록할 수 없습니다.")
         @ParameterizedTest(name = "메뉴 이름 : `{0}`")
         @NullAndEmptySource
         void createWithEmptyOrBlankMenuName(final String name) {
@@ -211,8 +205,8 @@ class MenuServiceTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴의 이름이 욕설이 포함되어 있으면 메뉴를 등록할 수 없습니다.")
-        @ParameterizedTest(name = "입력값 `{0}`")
+        @DisplayName("메뉴 이름이 욕설이 포함되어 있으면 메뉴를 등록할 수 없습니다.")
+        @ParameterizedTest(name = "메뉴 이름 : `{0}`")
         @ValueSource(strings = {"비속어", "욕설", "그XX"})
         void createWithEmptyOrProfanityMenuName(final String name) {
             final Menu menu = menu(null, name, price,
@@ -234,39 +228,30 @@ class MenuServiceTest {
     @Nested
     class ChangePrice {
 
-        private MenuGroup menuGroup;
-        private BigDecimal price;
-        private MenuProduct firstMenuProduct;
-        private MenuProduct secondMenuProduct;
-        private UUID menuId;
-        private String menuName;
         private Menu menu;
 
         @BeforeEach
         void setUp() {
-            this.price = new BigDecimal("30000");
-            this.menuId = createMenuId();
-            this.menuGroup = menuGroup();
-            this.firstMenuProduct = menuProduct(1L, 1L, product(createProductId(), "후라이드 치킨", new BigDecimal("16000")));
-            this.secondMenuProduct = menuProduct(2L, 1L, product(createProductId(), "양념 치킨", new BigDecimal("16000")));
-            this.menuName = "양념 후라이드 세트";
-            this.menu = menu(menuId, menuName, price, menuGroup, List.of(firstMenuProduct, secondMenuProduct), true);
+            this.menu = menu(menuGroup(), List.of(
+                    menuProduct(product(FRIED_CHICKEN, FRIED_CHICKEN_PRICE)),
+                    menuProduct(product(SEASONED_CHICKEN, SEASONED_CHICKEN_PRICE)))
+            );
         }
 
         @DisplayName("메뉴 가격을 수정할 수 있습니다.")
         @ParameterizedTest(name = "메뉴 가격 : `{0}`")
         @ValueSource(strings = {"31990", "31000", "32000"})
         void changePrice(final String price) {
-            final BigDecimal changePrice = new BigDecimal(price);
-            final Menu changedMenu = menu(menuId, menuName, changePrice,
-                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+            final BigDecimal changedPrice = new BigDecimal(price);
+            final Menu changedMenu = menu(menu.getId(), menu.getName(), changedPrice,
+                    menu.getMenuGroup(), menu.getMenuProducts(), menu.isDisplayed()
             );
             when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
 
             final Menu actual = menuService.changePrice(menu.getId(), changedMenu);
             assertAll(
                     () -> assertThat(actual).isNotNull(),
-                    () -> assertThat(actual.getPrice()).isEqualByComparingTo(changePrice)
+                    () -> assertThat(actual.getPrice()).isEqualByComparingTo(changedPrice)
             );
         }
 
@@ -274,11 +259,10 @@ class MenuServiceTest {
         @ParameterizedTest(name = "메뉴 가격 : `{0}`")
         @ValueSource(strings = {"-1", "-1000", "-10000"})
         void changePriceWithNegativePrice(final String price) {
-            final Menu changedMenu = menu(menuId, menuName, new BigDecimal(price),
-                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+            final BigDecimal negativePrice = new BigDecimal(price);
+            final Menu changedMenu = menu(menu.getId(), menu.getName(), negativePrice,
+                    menu.getMenuGroup(), menu.getMenuProducts(), menu.isDisplayed()
             );
-            when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
-
             assertThatThrownBy(() -> menuService.changePrice(menu.getId(), changedMenu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
@@ -287,11 +271,9 @@ class MenuServiceTest {
         @ParameterizedTest(name = "메뉴 가격 : `{0}`")
         @NullSource
         void changePriceWithNullPrice(final BigDecimal nullPrice) {
-            final Menu changedMenu = menu(menuId, menuName, nullPrice,
-                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+            final Menu changedMenu = menu(menu.getId(), menu.getName(), nullPrice,
+                    menu.getMenuGroup(), menu.getMenuProducts(), true
             );
-            when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
-
             assertThatThrownBy(() -> menuService.changePrice(menu.getId(), changedMenu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
@@ -309,8 +291,8 @@ class MenuServiceTest {
         @ParameterizedTest(name = "메뉴 가격 : `{0}`")
         @ValueSource(strings = {"32010", "33000", "34000"})
         void changePriceWithPriceLessThanSumOfMenuProductPrice(final String price) {
-            final Menu changedMenu = menu(menuId, menuName, new BigDecimal(price),
-                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+            final Menu changedMenu = menu(menu.getId(), menu.getName(), new BigDecimal(price),
+                    menu.getMenuGroup(), menu.getMenuProducts(), true
             );
             when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
 
@@ -322,23 +304,16 @@ class MenuServiceTest {
     @DisplayName("메뉴를 노출시킬 때")
     @Nested
     class Display {
-        private MenuGroup menuGroup;
-        private BigDecimal price;
-        private MenuProduct firstMenuProduct;
-        private MenuProduct secondMenuProduct;
-        private UUID menuId;
-        private String menuName;
+
         private Menu menu;
 
         @BeforeEach
         void setUp() {
-            this.price = new BigDecimal("30000");
-            this.menuId = UUID.randomUUID();
-            this.menuGroup = menuGroup();
-            this.firstMenuProduct = menuProduct(1L, 1L, product(UUID.randomUUID(), "후라이드 치킨", new BigDecimal("16000")));
-            this.secondMenuProduct = menuProduct(2L, 1L, product(UUID.randomUUID(), "양념 치킨", new BigDecimal("16000")));
-            this.menuName = "양념 후라이드 세트";
-            this.menu = menu(menuId, menuName, price, menuGroup, List.of(firstMenuProduct, secondMenuProduct), true);
+            this.menu = menu(menuGroup(), List.of(
+                            menuProduct(product(FRIED_CHICKEN, FRIED_CHICKEN_PRICE)),
+                            menuProduct(product(SEASONED_CHICKEN, SEASONED_CHICKEN_PRICE))),
+                    false
+            );
         }
 
         @DisplayName("메뉴를 노출할 수 있습니다.")
@@ -358,10 +333,10 @@ class MenuServiceTest {
         @ParameterizedTest(name = "메뉴 가격 : `{0}`")
         @ValueSource(strings = {"32010", "33000", "34000"})
         void displayWithPriceLessThanSumOfMenuProductPrice(final String price) {
-            final Menu menu = menu(menuId, menuName, new BigDecimal(price),
-                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), false
+            final Menu notDisplayedMenu = menu(menu.getId(), menu.getName(), new BigDecimal(price),
+                    menu.getMenuGroup(), menu.getMenuProducts(), menu.isDisplayed()
             );
-            when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
+            when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(notDisplayedMenu));
 
             assertThatThrownBy(() -> menuService.display(menu.getId()))
                     .isInstanceOf(IllegalStateException.class);
@@ -370,9 +345,9 @@ class MenuServiceTest {
         @DisplayName("메뉴가 존재하지 않으면 메뉴를 노출할 수 없습니다.")
         @Test
         void displayWithNotExistsMenu() {
-            when(menuRepository.findById(menuId)).thenReturn(Optional.empty());
+            when(menuRepository.findById(menu.getId())).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> menuService.display(menuId))
+            assertThatThrownBy(() -> menuService.display(menu.getId()))
                     .isInstanceOf(NoSuchElementException.class);
         }
     }
@@ -381,23 +356,14 @@ class MenuServiceTest {
     @Nested
     class Hide {
 
-        private MenuGroup menuGroup;
-        private BigDecimal price;
-        private MenuProduct firstMenuProduct;
-        private MenuProduct secondMenuProduct;
-        private UUID menuId;
-        private String menuName;
         private Menu menu;
 
         @BeforeEach
         void setUp() {
-            this.price = new BigDecimal("30000");
-            this.menuId = UUID.randomUUID();
-            this.menuGroup = menuGroup();
-            this.firstMenuProduct = menuProduct(1L, 1L, product(UUID.randomUUID(), "후라이드 치킨", new BigDecimal("16000")));
-            this.secondMenuProduct = menuProduct(2L, 1L, product(UUID.randomUUID(), "양념 치킨", new BigDecimal("16000")));
-            this.menuName = "양념 후라이드 세트";
-            this.menu = menu(menuId, menuName, price, menuGroup, List.of(firstMenuProduct, secondMenuProduct), true);
+            this.menu = menu(menuGroup(), List.of(
+                    menuProduct(product(FRIED_CHICKEN, FRIED_CHICKEN_PRICE)),
+                    menuProduct(product(SEASONED_CHICKEN, SEASONED_CHICKEN_PRICE))
+            ));
         }
 
         @DisplayName("메뉴를 숨길 수 있습니다.")
@@ -416,9 +382,9 @@ class MenuServiceTest {
         @DisplayName("메뉴가 존재하지 않으면 메뉴를 숨길 수 없습니다.")
         @Test
         void hideWithNotExistsMenu() {
-            when(menuRepository.findById(menuId)).thenReturn(Optional.empty());
+            when(menuRepository.findById(menu.getId())).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> menuService.hide(menuId))
+            assertThatThrownBy(() -> menuService.hide(menu.getId()))
                     .isInstanceOf(NoSuchElementException.class);
         }
     }
