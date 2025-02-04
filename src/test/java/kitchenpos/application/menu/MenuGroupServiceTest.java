@@ -4,7 +4,7 @@ import kitchenpos.application.MenuGroupService;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 
-import kitchenpos.fake.InMemoryMenuGroupRepository;
+import kitchenpos.fake.repository.InMemoryMenuGroupRepository;
 import kitchenpos.fixture.MenuGroupFixture;
 
 import org.junit.jupiter.api.BeforeEach;

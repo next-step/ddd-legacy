@@ -5,7 +5,7 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
-import kitchenpos.fake.InMemoryOrderTableRepository;
+import kitchenpos.fake.repository.InMemoryOrderTableRepository;
 
 import kitchenpos.fixture.OrderTableFixture;
 import org.junit.jupiter.api.BeforeEach;

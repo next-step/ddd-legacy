@@ -3,7 +3,7 @@ package kitchenpos.application.menu;
 
 import kitchenpos.application.MenuService;
 import kitchenpos.domain.*;
-import kitchenpos.fake.InMemoryMenuRepository;
+import kitchenpos.fake.repository.InMemoryMenuRepository;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.ProductFixture;
