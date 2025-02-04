@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -237,6 +238,18 @@ class TaekOutOrderServiceTest {
                     () -> assertThat(acceptedOrder.getType()).isEqualTo(order.getType()),
                     () -> assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
             );
+        }
+
+        @DisplayName("대기 상태가 아닌 주문을 수락하려고 하면 예외가 발생합니다")
+        @ParameterizedTest(name = "주문 상태: {0}")
+        @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "COMPLETED"})
+        void acceptNonWaitingOrder(final OrderStatus orderStatus) {
+            final Order nonWaitingOrder = takeoutOrder(
+                    orderId, orderDateTime, orderStatus, List.of(orderLineItem)
+            );
+            when(orderRepository.findById(nonWaitingOrder.getId())).thenReturn(Optional.ofNullable(nonWaitingOrder));
+
+            assertThatThrownBy(() -> orderService.accept(nonWaitingOrder.getId())).isInstanceOf(IllegalStateException.class);
         }
     }
 

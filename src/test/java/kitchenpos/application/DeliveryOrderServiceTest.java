@@ -256,10 +256,11 @@ class DeliveryOrderServiceTest {
         }
 
         @DisplayName("대기 상태가 아닌 주문을 수락하려고 하면 예외가 발생합니다")
-        @Test
-        void acceptNonWaitingOrder() {
+        @ParameterizedTest(name = "주문 상태: {0}")
+        @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "COMPLETED"})
+        void acceptNonWaitingOrder(final OrderStatus orderStatus) {
             final Order nonWaitingOrder = deliveryOrder(
-                    orderId, orderDateTime, deliverAddress, OrderStatus.ACCEPTED, List.of(orderLineItem)
+                    orderId, orderDateTime, deliverAddress, orderStatus, List.of(orderLineItem)
             );
             when(orderRepository.findById(nonWaitingOrder.getId())).thenReturn(Optional.ofNullable(nonWaitingOrder));
 
