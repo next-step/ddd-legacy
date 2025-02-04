@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,10 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kitchenpos.fixture.MenuFixture.createMenuId;
 import static kitchenpos.fixture.MenuFixture.menu;
+import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
+import static kitchenpos.fixture.MenuProductFixture.menuProduct;
 import static kitchenpos.fixture.OrderFixture.*;
 import static kitchenpos.fixture.OrderTableFixture.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -32,6 +36,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
+@DisplayName("매장 주문 서비스 통합 테스트")
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class EatInOrderServiceTest {
@@ -55,7 +60,7 @@ class EatInOrderServiceTest {
     @Autowired
     OrderService orderService;
 
-    @DisplayName("매장 식사 주문을 생성할 때")
+    @DisplayName("매장 주문을 생성할 때")
     @Nested
     class Create {
 
@@ -127,6 +132,31 @@ class EatInOrderServiceTest {
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
+        @DisplayName("메뉴의 개수와 주문 항목의 개수가 다르면 예외가 발생합니다")
+        @Test
+        void createOrderWithDifferentMenuCount() {
+            final Menu otherMenu = menu(
+                    createMenuId(),
+                    "otherMenu",
+                    BigDecimal.valueOf(10000),
+                    menuGroup(),
+                    List.of(menuProduct()),
+                    true
+            );
+            final OrderLineItem otherOrderLineItem = orderLineItem(null, otherMenu, 1L, otherMenu.getPrice());
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+
+            assertThatThrownBy(() -> orderService.create(
+                    eatInOrder(
+                            null,
+                            null,
+                            orderTable,
+                            OrderStatus.WAITING,
+                            List.of(orderLineItem, otherOrderLineItem)
+                    )
+            )).isInstanceOf(IllegalArgumentException.class);
+        }
+
         @DisplayName("주문 항목의 메뉴가 존재하지 않으면 예외가 발생합니다")
         @Test
         void createOrderWithoutMenus() {
@@ -188,15 +218,17 @@ class EatInOrderServiceTest {
         }
     }
 
-    @DisplayName("매장 식사 주문을 수락할 때")
+    @DisplayName("매장 주문이 대기 상태일 때")
     @Nested
-    class Accept {
+    class Waiting {
 
         private Menu menu;
         private long quantity;
         private BigDecimal price;
         private OrderLineItem orderLineItem;
         private OrderTable orderTable;
+        private UUID orderId;
+        private LocalDateTime orderDateTime;
         private Order order;
 
         @BeforeEach
@@ -206,7 +238,9 @@ class EatInOrderServiceTest {
             this.price = orderLineItemPrice(menu.getPrice(), quantity);
             this.orderLineItem = orderLineItem(1L, menu, quantity, price);
             this.orderTable = orderTable(createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, 2, true);
-            this.order = eatInOrder(UUID.randomUUID(), LocalDateTime.now(), orderTable, OrderStatus.WAITING, List.of(orderLineItem));
+            this.orderId = createOrderId();
+            this.orderDateTime = LocalDateTime.now();
+            this.order = eatInOrder(orderId, orderDateTime, orderTable, OrderStatus.WAITING, List.of(orderLineItem));
         }
 
         @DisplayName("대기 상태의 주문을 수락할 수 있습니다")
@@ -232,9 +266,12 @@ class EatInOrderServiceTest {
         }
 
         @DisplayName("대기 상태가 아닌 주문을 수락하려고 하면 예외가 발생합니다")
-        @Test
-        void acceptNotWaitingOrder() {
-            final Order acceptedOrder = eatInOrder(UUID.randomUUID(), LocalDateTime.now(), orderTable, OrderStatus.ACCEPTED, List.of(orderLineItem));
+        @ParameterizedTest(name = "주문 상태: {0}")
+        @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "COMPLETED"})
+        void acceptNotWaitingOrder(final OrderStatus orderStatus) {
+            final Order acceptedOrder = eatInOrder(
+                    orderId, orderDateTime, orderTable, orderStatus, List.of(orderLineItem)
+            );
             when(orderRepository.findById(acceptedOrder.getId())).thenReturn(Optional.of(acceptedOrder));
 
             assertThatThrownBy(() -> orderService.accept(acceptedOrder.getId()))
@@ -242,15 +279,17 @@ class EatInOrderServiceTest {
         }
     }
 
-    @DisplayName("매장 식사 주문을 서빙할 때")
+    @DisplayName("매장 주문이 접수 되었을 때")
     @Nested
-    class Serve {
+    class Accepted {
 
         private Menu menu;
         private long quantity;
         private BigDecimal price;
         private OrderLineItem orderLineItem;
         private OrderTable orderTable;
+        private UUID orderId;
+        private LocalDateTime orderDateTime;
         private Order order;
 
         @BeforeEach
@@ -260,7 +299,9 @@ class EatInOrderServiceTest {
             this.price = orderLineItemPrice(menu.getPrice(), quantity);
             this.orderLineItem = orderLineItem(1L, menu, quantity, price);
             this.orderTable = orderTable(createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, 2, true);
-            this.order = eatInOrder(UUID.randomUUID(), LocalDateTime.now(), orderTable, OrderStatus.ACCEPTED, List.of(orderLineItem));
+            this.orderId = createOrderId();
+            this.orderDateTime = LocalDateTime.now();
+            this.order = eatInOrder(orderId, orderDateTime, orderTable, OrderStatus.ACCEPTED, List.of(orderLineItem));
         }
 
         @DisplayName("접수 상태의 주문을 서빙할 수 있습니다")
@@ -286,9 +327,11 @@ class EatInOrderServiceTest {
         }
 
         @DisplayName("접수 상태가 아닌 주문을 서빙하려고 하면 예외가 발생합니다")
-        @Test
-        void serveNotAcceptedOrder() {
-            final Order servedOrder = eatInOrder(UUID.randomUUID(), LocalDateTime.now(), orderTable, OrderStatus.SERVED, List.of(orderLineItem));
+        @ParameterizedTest(name = "주문 상태: {0}")
+        @EnumSource(value = OrderStatus.class, names = {"WAITING", "SERVED", "COMPLETED"})
+        void serveNotAcceptedOrder(final OrderStatus orderStatus) {
+            final Order servedOrder = eatInOrder(orderId, orderDateTime, orderTable, orderStatus, List.of(orderLineItem));
+
             when(orderRepository.findById(servedOrder.getId())).thenReturn(Optional.of(servedOrder));
 
             assertThatThrownBy(() -> orderService.serve(servedOrder.getId()))
@@ -296,16 +339,19 @@ class EatInOrderServiceTest {
         }
     }
 
-    @DisplayName("매장 식사 주문을 완료할 때")
+    @DisplayName("매장 주문이 서빙 되었을 때")
     @Nested
-    class Complete {
+    class Served {
 
         private Menu menu;
         private long quantity;
         private BigDecimal price;
         private OrderLineItem orderLineItem;
         private OrderTable orderTable;
+        private UUID orderId;
+        private LocalDateTime orderDateTime;
         private Order order;
+
 
         @BeforeEach
         void setUp() {
@@ -314,7 +360,9 @@ class EatInOrderServiceTest {
             this.price = orderLineItemPrice(menu.getPrice(), quantity);
             this.orderLineItem = orderLineItem(1L, menu, quantity, price);
             this.orderTable = orderTable(createOrderTableId(), DEFAULT_ORDER_TABLE_NAME, 2, true);
-            this.order = eatInOrder(UUID.randomUUID(), LocalDateTime.now(), orderTable, OrderStatus.SERVED, List.of(orderLineItem));
+            this.orderId = createOrderId();
+            this.orderDateTime = LocalDateTime.now();
+            this.order = eatInOrder(orderId, orderDateTime, orderTable, OrderStatus.SERVED, List.of(orderLineItem));
         }
 
         @DisplayName("주문을 완료할 수 있습니다")
@@ -343,9 +391,11 @@ class EatInOrderServiceTest {
         }
 
         @DisplayName("서빙 상태가 아닌 주문을 완료하려고 하면 예외가 발생합니다")
-        @Test
-        void completeNotServedOrder() {
-            final Order completedOrder = eatInOrder(UUID.randomUUID(), LocalDateTime.now(), orderTable, OrderStatus.COMPLETED, List.of(orderLineItem));
+        @ParameterizedTest(name = "주문 상태: {0}")
+        @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "COMPLETED"})
+        void completeNotServedOrder(final OrderStatus orderStatus) {
+            final Order completedOrder = eatInOrder(orderId, orderDateTime, orderTable, orderStatus, List.of(orderLineItem));
+
             when(orderRepository.findById(completedOrder.getId())).thenReturn(Optional.of(completedOrder));
 
             assertThatThrownBy(() -> orderService.complete(completedOrder.getId()))
@@ -358,13 +408,13 @@ class EatInOrderServiceTest {
             when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
             when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(false);
 
-            final Order actual = orderService.complete(order.getId());
+            final Order completedOrder = orderService.complete(order.getId());
 
             assertAll(
-                    () -> assertThat(actual.getId()).isEqualTo(order.getId()),
-                    () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED),
-                    () -> assertThat(actual.getOrderTable().isOccupied()).isFalse(),
-                    () -> assertThat(actual.getOrderTable().getNumberOfGuests()).isEqualTo(0)
+                    () -> assertThat(completedOrder.getId()).isEqualTo(order.getId()),
+                    () -> assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                    () -> assertThat(completedOrder.getOrderTable().isOccupied()).isFalse(),
+                    () -> assertThat(completedOrder.getOrderTable().getNumberOfGuests()).isEqualTo(0)
             );
         }
     }

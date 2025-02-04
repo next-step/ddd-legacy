@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,9 +37,10 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+@DisplayName("포장 주문 서비스 통합 테스트")
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-class TaekOutOrderServiceTest {
+class TakeOutOrderServiceTest {
 
     @MockBean
     @Autowired
@@ -151,9 +153,9 @@ class TaekOutOrderServiceTest {
         }
 
         @DisplayName("주문 항목 중 하나라도 수량이 0보다 작으면 예외가 발생합니다")
-        @Test
-        void createOrderWithNegativeQuantity() {
-            final long negativeQuantity = -1L;
+        @ParameterizedTest(name = "수량: {0}")
+        @ValueSource(longs = {-1L, -10L, -100L})
+        void createOrderWithNegativeQuantity(final long negativeQuantity) {
             final OrderLineItem negativeOrderLineItem = orderLineItem(null, menu, negativeQuantity, orderLineItemPrice(menu.getPrice(), negativeQuantity));
 
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
@@ -163,24 +165,14 @@ class TaekOutOrderServiceTest {
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴가 존재하지 않으면 예외가 발생합니다")
+        @DisplayName("주문 항목의 메뉴가 존재하지 않으면 예외가 발생합니다")
         @Test
-        void createOrderWithNonExistentMenu() {
-            final Menu nonExistentMenu = menu(
-                    createMenuId(),
-                    "nonExistentMenu",
-                    BigDecimal.valueOf(10000),
-                    menuGroup(),
-                    List.of(menuProduct()),
-                    true
-            );
-            final OrderLineItem nonExistentOrderLineItem = orderLineItem(null, nonExistentMenu, 1L, nonExistentMenu.getPrice());
-            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
-            when(menuRepository.findById(nonExistentMenu.getId())).thenReturn(Optional.empty());
+        void createOrderWithoutMenus() {
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of());
 
             assertThatThrownBy(() -> orderService.create(
-                    takeoutOrder(null, null, OrderStatus.WAITING, List.of(nonExistentOrderLineItem))
-            )).isInstanceOf(NoSuchElementException.class);
+                    takeoutOrder(null, null, OrderStatus.WAITING, List.of(orderLineItem))
+            )).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("주문 항목의 메뉴의 가격이 일치하지 않으면 예외가 발생합니다")

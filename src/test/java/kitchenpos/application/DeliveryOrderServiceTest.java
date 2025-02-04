@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +37,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
+@DisplayName("배달 주문 서비스 통합 테스트")
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class DeliveryOrderServiceTest {
@@ -151,9 +153,9 @@ class DeliveryOrderServiceTest {
         }
 
         @DisplayName("주문 항목 중 하나라도 수량이 0보다 작으면 예외가 발생합니다")
-        @Test
-        void createOrderWithNegativeQuantity() {
-            final long negativeQuantity = -1L;
+        @ParameterizedTest(name = "수량: {0}")
+        @ValueSource(longs = {-1L, -10L, -100L})
+        void createOrderWithNegativeQuantity(final long negativeQuantity) {
             final OrderLineItem negativeOrderLineItem = orderLineItem(null, menu, negativeQuantity, orderLineItemPrice(menu.getPrice(), negativeQuantity));
 
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
@@ -163,24 +165,14 @@ class DeliveryOrderServiceTest {
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴가 존재하지 않으면 예외가 발생합니다")
+        @DisplayName("주문 항목의 메뉴가 존재하지 않으면 예외가 발생합니다")
         @Test
-        void createOrderWithNonExistentMenu() {
-            final Menu nonExistentMenu = menu(
-                    createMenuId(),
-                    "nonExistentMenu",
-                    BigDecimal.valueOf(10000),
-                    menuGroup(),
-                    List.of(menuProduct()),
-                    true
-            );
-            final OrderLineItem nonExistentOrderLineItem = orderLineItem(null, nonExistentMenu, 1L, nonExistentMenu.getPrice());
-            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
-            when(menuRepository.findById(nonExistentMenu.getId())).thenReturn(Optional.empty());
+        void createOrderWithoutMenus() {
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of());
 
             assertThatThrownBy(() -> orderService.create(
-                    deliveryOrder(null, null, deliverAddress, OrderStatus.WAITING, List.of(nonExistentOrderLineItem))
-            )).isInstanceOf(NoSuchElementException.class);
+                    deliveryOrder(null, null, deliverAddress, OrderStatus.WAITING, List.of(orderLineItem))
+            )).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("주문 항목의 메뉴의 가격이 일치하지 않으면 예외가 발생합니다")
@@ -221,9 +213,9 @@ class DeliveryOrderServiceTest {
         }
     }
 
-    @DisplayName("배달 주문을 수락할 때")
+    @DisplayName("배달 주문이 대기 되었을 때")
     @Nested
-    class Accept {
+    class Waited {
         private Order order;
         private UUID orderId;
         private LocalDateTime orderDateTime;
@@ -278,9 +270,9 @@ class DeliveryOrderServiceTest {
         }
     }
 
-    @DisplayName("배달 주문을 서빙할 때")
+    @DisplayName("배달 주문이 수락 되었을 때")
     @Nested
-    class Server {
+    class Accepted {
         private Order order;
         private UUID orderId;
         private LocalDateTime orderDateTime;
@@ -325,9 +317,9 @@ class DeliveryOrderServiceTest {
         }
     }
 
-    @DisplayName("배달 주문을 배달 시작할 때")
+    @DisplayName("배달 주문이 서빙 되었을 때")
     @Nested
-    class StartDelivery {
+    class SERVED {
         private Order order;
         private UUID orderId;
         private LocalDateTime orderDateTime;
@@ -369,11 +361,10 @@ class DeliveryOrderServiceTest {
         }
 
         @DisplayName("서빙 상태가 아닌 주문을 배달 시작하려고 하면 예외가 발생합니다")
-        @Test
-        void startDeliveryNonServedOrder() {
-            final Order nonServedOrder = deliveryOrder(
-                    createOrderId(), LocalDateTime.now(), "서울시 강남구", OrderStatus.ACCEPTED,
-                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+        @ParameterizedTest(name = "주문 상태: {0}")
+        @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERED", "DELIVERING", "COMPLETED"})
+        void startDeliveryNonServedOrder(final OrderStatus orderStatus) {
+            final Order nonServedOrder = deliveryOrder(orderId, orderDateTime, deliverAddress, orderStatus, List.of(orderLineItem));
 
             when(orderRepository.findById(nonServedOrder.getId())).thenReturn(Optional.ofNullable(nonServedOrder));
 
@@ -386,12 +377,14 @@ class DeliveryOrderServiceTest {
         @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
         void startDeliveryNonDeliveryOrder(final OrderType orderType) {
             final Order nonDeliveryOrder = order(
-                    createOrderId(), LocalDateTime.now(),
-                    "서울시 강남구",
+                    orderId,
+                    orderDateTime,
+                    deliverAddress,
                     OrderStatus.SERVED,
                     orderType,
                     null,
-                    List.of(orderLineItem(createOrderLineItemId(), menu(), 1L, BigDecimal.valueOf(10000))));
+                    List.of(orderLineItem)
+            );
 
             when(orderRepository.findById(nonDeliveryOrder.getId())).thenReturn(Optional.ofNullable(nonDeliveryOrder));
 
@@ -400,9 +393,9 @@ class DeliveryOrderServiceTest {
         }
     }
 
-    @DisplayName("배달 주문을 배달 완료할 때")
+    @DisplayName("배달 주문이 배달 중이 었을 때")
     @Nested
-    class CompleteDelivery {
+    class delivering {
         private Order order;
         private UUID orderId;
         private LocalDateTime orderDateTime;
@@ -455,9 +448,9 @@ class DeliveryOrderServiceTest {
         }
     }
 
-    @DisplayName("배달 주문을 완료할 때")
+    @DisplayName("배달 주문이 배달 완료 되었을 때")
     @Nested
-    class Complete {
+    class Delivered {
         private Order order;
         private UUID orderId;
         private LocalDateTime orderDateTime;
