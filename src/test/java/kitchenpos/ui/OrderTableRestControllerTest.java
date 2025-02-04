@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @WebMvcTest(OrderTableRestController.class)
 class OrderTableRestControllerTest {
 
@@ -36,7 +35,7 @@ class OrderTableRestControllerTest {
     private OrderTableService orderTableService;
 
     @Test
-    void 컨트롤러_오더_테이블_생성() throws Exception {
+    void 주문_테이블_생성_요청이_성공하면_테이블이_생성된다() throws Exception {
         final UUID tableId = UUID.fromString("6ab59e81-06eb-4416-84e9-9faabc87c9ca");
 
         when(orderTableService.create(any(OrderTable.class))).thenReturn(OrderTableFixture.orderTable(tableId, "8번", 0, false));
@@ -50,7 +49,7 @@ class OrderTableRestControllerTest {
     }
 
     @Test
-    void 컨트롤러_오더_테이블_앉기() throws Exception {
+    void 주문_테이블에_앉는_요청을_처리한다() throws Exception {
         final UUID tableId = UUID.fromString("6ab59e81-06eb-4416-84e9-9faabc87c9ca");
 
         when(orderTableService.sit(tableId)).thenReturn(OrderTableFixture.orderTable(tableId, "8번", 1, true));
@@ -65,7 +64,7 @@ class OrderTableRestControllerTest {
     }
 
     @Test
-    void 컨트롤러_오더_테이블_비우기() throws Exception {
+    void 주문_테이블_비우기_요청이_성공하면_테이블이_초기화된다() throws Exception {
         final UUID tableId = UUID.fromString("6ab59e81-06eb-4416-84e9-9faabc87c9ca");
 
         when(orderTableService.clear(tableId)).thenReturn(OrderTableFixture.orderTable(tableId, "8번", 0, false));
@@ -83,7 +82,7 @@ class OrderTableRestControllerTest {
     }
 
     @Test
-    void 컨트롤러_오더_테이블_게스트_숫자_변경() throws Exception {
+    void 주문_테이블_게스트_숫자_변경_요청이_성공하면_숫자가_변경된다() throws Exception {
         final UUID tableId = UUID.fromString("6ab59e81-06eb-4416-84e9-9faabc87c9ca");
 
         when(orderTableService.changeNumberOfGuests(eq(tableId), any(OrderTable.class))).thenReturn(OrderTableFixture.orderTable(tableId, "8번", 5, true));
@@ -101,7 +100,7 @@ class OrderTableRestControllerTest {
     }
 
     @Test
-    void 컨트롤러_오더_테이블_전체_조회() throws Exception {
+    void 주문_테이블_전체_조회_요청이_성공하면_테이블_목록을_반환한다() throws Exception {
         final UUID tableId = UUID.fromString("6ab59e81-06eb-4416-84e9-9faabc87c9ca");
 
         when(orderTableService.findAll()).thenReturn(List.of(OrderTableFixture.orderTable(tableId, "8번", 5, true)));

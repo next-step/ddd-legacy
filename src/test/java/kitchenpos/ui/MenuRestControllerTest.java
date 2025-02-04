@@ -68,7 +68,7 @@ class MenuRestControllerTest {
     }
 
     @Test
-    void 컨트롤러_메뉴_생성() throws Exception {
+    void 메뉴_생성_요청이_성공하면_메뉴정보를_반환한다() throws Exception {
         when(menuService.create(any(Menu.class))).thenReturn(MenuFixture.menu(menuId, "후라이드치킨", new BigDecimal(16000), menuGroup, List.of(menuProduct), true));
 
         mockMvc.perform(post("/api/menus")
@@ -81,7 +81,7 @@ class MenuRestControllerTest {
     }
 
     @Test
-    void 컨트롤러_메뉴_가격_변경() throws Exception {
+    void 메뉴_가격_변경_요청이_성공하면_가격이_변경된다() throws Exception {
         when(menuService.changePrice(eq(menuId), any(Menu.class))).thenReturn(MenuFixture.menu(menuId, "후라이드치킨", new BigDecimal(18000), menuGroup, List.of(menuProduct), true));
 
         mockMvc.perform(put("/api/menus/{menuId}/price", menuId)
@@ -95,7 +95,7 @@ class MenuRestControllerTest {
     }
 
     @Test
-    void 컨트롤러_메뉴_숨김에서_표시_변경() throws Exception {
+    void 메뉴_숨김에서_표시_변경_요청이_성공하면_상태가_변경된다() throws Exception {
         when(menuService.display(menuId)).thenReturn(MenuFixture.menu(menuId, "후라이드치킨", new BigDecimal(18000), menuGroup, List.of(menuProduct), true));
 
         mockMvc.perform(put("/api/menus/{menuId}/display", menuId)
@@ -109,7 +109,7 @@ class MenuRestControllerTest {
     }
 
     @Test
-    void 컨트롤러_메뉴_표시에서_숨김_변경() throws Exception {
+    void 메뉴_표시에서_숨김_변경_요청이_성공하면_상태가_변경된다() throws Exception {
         when(menuService.hide(menuId)).thenReturn(MenuFixture.menu(menuId, "후라이드치킨", new BigDecimal(18000), menuGroup, List.of(menuProduct), false));
 
         mockMvc.perform(put("/api/menus/{menuId}/hide", menuId)
@@ -123,7 +123,7 @@ class MenuRestControllerTest {
     }
 
     @Test
-    void 컨트롤러_메뉴_전체_조회() throws Exception {
+    void 메뉴_전체_조회_요청이_성공하면_메뉴_목록을_반환한다() throws Exception {
         Menu findMenu = MenuFixture.menu(menuId, "후라이드치킨", new BigDecimal(18000), menuGroup, List.of(menuProduct), true);
         when(menuService.findAll()).thenReturn(List.of(findMenu));
 

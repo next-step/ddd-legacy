@@ -36,7 +36,7 @@ class ProductRestControllerTest {
     private ProductService productService;
 
     @Test
-    void 컨트롤러_상품_생성_성공_테스트() throws Exception {
+    void 상품_생성_요청이_성공하면_생성된_상품정보를_반환한다() throws Exception {
         final UUID productId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
 
         when(productService.create(any(Product.class))).thenReturn(ProductFixture.product(productId, "테스트 상품", new BigDecimal(10000)));
@@ -53,7 +53,7 @@ class ProductRestControllerTest {
     }
 
     @Test
-    void 상품_가격_변경_성공_테스트() throws Exception {
+    void 상품_가격_변경_요청이_성공하면_변경된_상품정보를_반환한다() throws Exception {
         final UUID productId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
 
         when(productService.changePrice(eq(productId), any(Product.class))).thenReturn(ProductFixture.product(productId, "테스트 상품", new BigDecimal("18000")));
@@ -70,7 +70,7 @@ class ProductRestControllerTest {
     }
 
     @Test
-    void 상품_전체_찾기_성공_테스트() throws Exception {
+    void 상품_전체_찾기_요청이_성공하면_상품목록을_반환한다() throws Exception {
         Product product = ProductFixture.product(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"), "테스트 상품", new BigDecimal(15000));
 
         when(productService.findAll()).thenReturn(List.of(product));

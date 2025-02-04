@@ -34,7 +34,7 @@ class MenuGroupRestControllerTest {
     private MenuGroupService menuGroupService;
 
     @Test
-    void 메뉴_그룹_생성() throws Exception {
+    void 메뉴_그룹_생성_요청이_성공하면_메뉴_그룹정보를_반환한다() throws Exception {
         when(menuGroupService.create(any(MenuGroup.class))).thenReturn(MenuGroupFixture.menuGroup(UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded"), "한마리메뉴"));
 
         mockMvc.perform(post("/api/menu-groups")
@@ -44,7 +44,7 @@ class MenuGroupRestControllerTest {
     }
 
     @Test
-    void 메뉴_그룹_전체_조회() throws Exception {
+    void 메뉴_그룹_전체_조회_요청이_성공하면_그룹_목록을_반환한다() throws Exception {
         when(menuGroupService.findAll()).thenReturn(List.of(MenuGroupFixture.menuGroup(UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded"), "한마리메뉴")));
 
         mockMvc.perform(get("/api/menu-groups"))
