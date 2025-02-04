@@ -26,6 +26,7 @@ import kitchenpos.domain.OrderType;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.KitchenridersClient;
+import kitchenpos.testfixture.TestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -68,37 +69,18 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
 
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("menuGroup");
+        MenuGroup menuGroup = TestFixture.createMenuGroup("menuGroup");
         menuGroupRepository.save(menuGroup);
 
-        orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName("orderTable");
-        orderTable.setNumberOfGuests(2);
-        orderTable.setOccupied(true);
+        orderTable = TestFixture.createOrderTable("orderTable", 2, true);
         orderTableRepository.save(orderTable);
 
-        Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setName("product");
-        product.setPrice(BigDecimal.valueOf(1000));
+        Product product = TestFixture.createProduct("product", BigDecimal.valueOf(1000));
         productRepository.save(product);
 
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setProductId(product.getId());
-        menuProduct.setQuantity(1);
+        MenuProduct menuProduct = TestFixture.createMenuProduct(1, product);
 
-        menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setName("menu");
-        menu.setPrice(BigDecimal.valueOf(1000));
-        menu.setMenuGroupId(menuGroup.getId());
-        menu.setMenuGroup(menuGroup);
-        menu.setMenuProducts(List.of(menuProduct));
-        menu.setDisplayed(true);
+        menu = TestFixture.createMenu("menu", BigDecimal.valueOf(1000), menuGroup, menuProduct);
         menuRepository.save(menu);
 
         orderLineItemRequest = new OrderLineItem();
@@ -116,7 +98,7 @@ class OrderServiceTest {
     @Nested
     class Create {
 
-        @DisplayName("주문 방법이 존재하지 않을 경우 예외를 던진다.")
+        @DisplayName("주문의 주문방법(매장, 테이크아웃, 배달)은 필수 값 이다.")
         @Test
         void createWithNullOrderType() {
             // given
@@ -125,7 +107,7 @@ class OrderServiceTest {
             assertThrows(IllegalArgumentException.class, () -> orderService.create(orderRequest));
         }
 
-        @DisplayName("주문 항목이 존재하지 않을 경우 예외를 던진다.")
+        @DisplayName("주문의 주문항목(최소 1개)은 필수 값 이다.")
         @ParameterizedTest
         @MethodSource("provideInvalidOrderLineItems")
         void createWithInvalidOrderLineItems(List<OrderLineItem> invalidOrderLineItem) {
@@ -135,7 +117,7 @@ class OrderServiceTest {
             assertThrows(IllegalArgumentException.class, () -> orderService.create(orderRequest));
         }
 
-        @DisplayName("매장 이외의 주문에 대해 주문 항목의 매뉴의 갯수가 0개 미만일 경우 예외를 던진다.")
+        @DisplayName("매장 주문이 아닐 경우 주문의 주문항목의 수량은 0보다 큰 값이어야 한다.")
         @ParameterizedTest
         @ValueSource(strings = {"DELIVERY", "TAKEOUT"})
         void createWithNegativeQuantity(String orderType) {
@@ -156,7 +138,7 @@ class OrderServiceTest {
             assertThrows(IllegalArgumentException.class, () -> orderService.create(orderRequest));
         }
 
-        @DisplayName("주문 항목의 메뉴가 미노출 상태일 경우 예외를 던진다.")
+        @DisplayName("주문항목의 메뉴는 노출되어 있지 않을 경우 주문을 등록 할 수 없다")
         @Test
         void createWithNonDisplayedMenu() {
             // given
@@ -166,7 +148,7 @@ class OrderServiceTest {
             assertThrows(IllegalStateException.class, () -> orderService.create(orderRequest));
         }
 
-        @DisplayName("주문 항목의 가격과 메뉴의 가격아 다를 경우 예외를 던진다.")
+        @DisplayName("주문항목의 요청 금액과 메뉴의 가격이 다를 경우 주문을 등록 할 수 없다")
         @Test
         void createWithDifferentMenuPrice() {
             // given
@@ -175,7 +157,7 @@ class OrderServiceTest {
             assertThrows(IllegalArgumentException.class, () -> orderService.create(orderRequest));
         }
 
-        @DisplayName("배달 주문에 대해 배달 주소가 없을 경우 예외를 던진다.")
+        @DisplayName("배달 주문에 대해 주소는 필수요청 값 이다")
         @Test
         void createWithNullDeliveryAddress() {
             // given
@@ -185,7 +167,7 @@ class OrderServiceTest {
             assertThrows(IllegalArgumentException.class, () -> orderService.create(orderRequest));
         }
 
-        @DisplayName("매장 주문에 대해 주문 테이블이 존재하지 않을 경우 예외를 던진다.")
+        @DisplayName("매장 주문에 대해 주문 테이블은 필수요청 값 이다.")
         @Test
         void createWithNonExistentOrderTable() {
             // given
@@ -195,7 +177,7 @@ class OrderServiceTest {
             assertThrows(NoSuchElementException.class, () -> orderService.create(orderRequest));
         }
 
-        @DisplayName("매장 주문에 대해 해당 테이블의 착석 상태가 아닐 경우 예외를 던진다.")
+        @DisplayName("매장 주문에 대해 해당 테이블에 착석이 되어 있어야 한다")
         @Test
         void createWithNonOccupiedOrderTable() {
             // given
@@ -268,7 +250,7 @@ class OrderServiceTest {
             assertThrows(NoSuchElementException.class, () -> orderService.accept(UUID.randomUUID()));
         }
 
-        @DisplayName("주문 상태가 대기(WAITING) 상태가 아닐 경우 예외를 던진다.")
+        @DisplayName("대기 상태가 아닌 주문은 처리 할 수 없다.")
         @ParameterizedTest
         @ValueSource(strings = {"ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
         void acceptWithNonWaitingOrder(String orderStatus) {
@@ -279,7 +261,7 @@ class OrderServiceTest {
             assertThrows(IllegalStateException.class, () -> orderService.accept(order.getId()));
         }
 
-        @DisplayName("배달 주문에 대해 주문 항목의 총 가격을 계산하여 라이더에게 배달 요청한다.")
+        @DisplayName("배달 주문에 대해 라이더에게 배달 요청을 한다.")
         @Test
         void acceptWithDelivery() {
             // given
@@ -298,7 +280,7 @@ class OrderServiceTest {
             assertThat(accepted.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
         }
 
-        @DisplayName("매장 주문에 대해 주문 상태를 접수로 변경한다.")
+        @DisplayName("주문을 접수하면 주문 상태가 접수로 변경된다.")
         @Test
         void accept() {
             // when
@@ -327,7 +309,7 @@ class OrderServiceTest {
             assertThrows(NoSuchElementException.class, () -> orderService.serve(UUID.randomUUID()));
         }
 
-        @DisplayName("주문 상태가 접수(ACCEPTED) 상태가 아닐 경우 예외를 던진다.")
+        @DisplayName("접수 상태가 아닌 주문은 처리 할 수 없다.")
         @ParameterizedTest
         @ValueSource(strings = {"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
         void serveWithNonAcceptedOrder(String orderStatus) {
@@ -338,7 +320,7 @@ class OrderServiceTest {
             assertThrows(IllegalStateException.class, () -> orderService.serve(order.getId()));
         }
 
-        @DisplayName("주문 상태를 제공 상태로 변경한다.")
+        @DisplayName("주문을 서빙하면 주문 상태가 서빙으로 변경된다.")
         @Test
         void serve() {
             // when
@@ -372,7 +354,7 @@ class OrderServiceTest {
             assertThrows(NoSuchElementException.class, () -> orderService.startDelivery(UUID.randomUUID()));
         }
 
-        @DisplayName("주문 방법이 배달이 아닐 경우 예외를 던진다.")
+        @DisplayName("주문 방법이 배달이 아닌 경우 처리 할 수 없다")
         @ParameterizedTest
         @ValueSource(strings = {"EAT_IN", "TAKEOUT"})
         void startDeliveryWithNonDeliveryOrder(String orderType) {
@@ -383,7 +365,7 @@ class OrderServiceTest {
             assertThrows(IllegalStateException.class, () -> orderService.startDelivery(order.getId()));
         }
 
-        @DisplayName("주문 상태가 제공(SERVED) 상태가 아닐 경우 예외를 던진다.")
+        @DisplayName("접수 상태가 아닌 주문은 처리 할 수 없다.")
         @ParameterizedTest
         @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
         void startDeliveryWithNonServedOrder(String orderStatus) {
@@ -394,7 +376,7 @@ class OrderServiceTest {
             assertThrows(IllegalStateException.class, () -> orderService.startDelivery(order.getId()));
         }
 
-        @DisplayName("주문 상태를 배달 중 상태로 변경한다.")
+        @DisplayName("주문을 배달하면 주문 상태가 배달중으로 변경된다.")
         @Test
         void startDelivery() {
             // when
@@ -429,7 +411,7 @@ class OrderServiceTest {
             assertThrows(NoSuchElementException.class, () -> orderService.completeDelivery(UUID.randomUUID()));
         }
 
-        @DisplayName("주문 상태가 배달 중(DELIVERING) 상태가 아닐 경우 예외를 던진다.")
+        @DisplayName("배달중 상태가 아닌 주문은 처리 할 수 없다.")
         @ParameterizedTest
         @ValueSource(strings = {"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
         void completeDeliveryWithNonDeliveringOrder(String orderStatus) {
@@ -440,7 +422,7 @@ class OrderServiceTest {
             assertThrows(IllegalStateException.class, () -> orderService.completeDelivery(order.getId()));
         }
 
-        @DisplayName("주문 상태를 배달 완료 상태로 변경한다.")
+        @DisplayName("주문을 배달하면 주문 상태가 배달완료로 변경된다.")
         @Test
         void completeDelivery() {
             // when
@@ -463,7 +445,7 @@ class OrderServiceTest {
             assertThrows(NoSuchElementException.class, () -> orderService.complete(UUID.randomUUID()));
         }
 
-        @DisplayName("매장 주문이거나, 포장주문 일 경우 주문 상태가 제공(SERVED) 상태가 아닐 경우 예외를 던진다.")
+        @DisplayName("매장 주문이거나, 포장주문 일 경우 주문 상태가 서빙 상태가 아닌 주문은 처리 할 수 없다.")
         @ParameterizedTest
         @ValueSource(strings = {"EAT_IN", "TAKEOUT"})
         void completeWithNonServedOrder(String orderType) {
@@ -475,7 +457,7 @@ class OrderServiceTest {
             assertThrows(IllegalStateException.class, () -> orderService.complete(order.getId()));
         }
 
-        @DisplayName("배달 주문일 경우 주문 상태가 배달 완료 상태가 아닐 경우 예외를 던진다.")
+        @DisplayName("배달 주문일 경우 주문 상태가 배달완료 상태가 아닌 주문은 처리 할 수 없다.")
         @Test
         void completeWithNonDeliveredOrder() {
             // given
@@ -491,7 +473,7 @@ class OrderServiceTest {
             assertThrows(IllegalStateException.class, () -> orderService.complete(order.getId()));
         }
 
-        @DisplayName("매장 주문일 경우 완료 처리 후 주문 테이블의 착석 상태를 미착석으로 변경한다.")
+        @DisplayName("매장 주문일 경우 해당주문의 테이블의 주문이 남아있지 않은 경우 테이블을 비운다.")
         @Test
         void completeWithEatIn() {
             // given

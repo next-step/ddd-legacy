@@ -1,7 +1,6 @@
 package kitchenpos.application;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,17 +13,19 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.infra.TestClientConfig;
+import kitchenpos.testfixture.TestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
+@Import(TestClientConfig.class)
 @SpringBootTest
 @DisplayName("ProductService 클래스의")
 class ProductServiceTest {
@@ -39,18 +40,30 @@ class ProductServiceTest {
     @Autowired
     private MenuGroupRepository menuGroupRepository;
 
-    @MockBean
-    private PurgomalumClient purgomalumClient;
-
     @DisplayName("create 메소드는")
     @Nested
     class Create {
 
-        @DisplayName("상품의 가격이 존재하지 않으면 예외를 던진다.")
+        @DisplayName("상품을 생성한다.")
+        @Test
+        void create() {
+            // given
+            Product product = TestFixture.createProduct("product", BigDecimal.valueOf(10));
+
+            // when
+            Product createdProduct = productService.create(product);
+
+            // then
+            assertNotNull(createdProduct.getId());
+            assertEquals(product.getName(), createdProduct.getName());
+            assertEquals(product.getPrice(), createdProduct.getPrice());
+        }
+
+        @DisplayName("상품의 가격은 필수요청 값이다.")
         @Test
         void createWithEmptyPrice() {
             // given
-            final Product product = new Product();
+            final Product product = TestFixture.createProduct("product", null);
             product.setName("product");
             product.setPrice(null);
 
@@ -58,7 +71,7 @@ class ProductServiceTest {
             assertThrows(IllegalArgumentException.class, () -> productService.create(product));
         }
 
-        @DisplayName("상품의 이름이 존재하지 않으면 예외를 던진다.")
+        @DisplayName("상품의 이름은 필수요청 값이다.")
         @Test
         void createWithEmptyName() {
             // given
@@ -70,35 +83,16 @@ class ProductServiceTest {
             assertThrows(IllegalArgumentException.class, () -> productService.create(product));
         }
 
-        @DisplayName("상품의 이름에 욕설이 포함되어 있으면 예외를 던진다.")
+        @DisplayName("상품 이름에는 비속어를 넣을 수 없다.")
         @Test
         void createWithProfanity() {
             // given
             final Product product = new Product();
             product.setName("비속어");
             product.setPrice(BigDecimal.valueOf(10));
-            when(purgomalumClient.containsProfanity(product.getName())).thenReturn(true);
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> productService.create(product));
-        }
-
-        @DisplayName("상품을 생성한다.")
-        @Test
-        void create() {
-            // given
-            final Product product = new Product();
-            product.setName("product");
-            product.setPrice(BigDecimal.valueOf(10));
-            when(purgomalumClient.containsProfanity(product.getName())).thenReturn(false);
-
-            // when
-            final Product createdProduct = productService.create(product);
-
-            // then
-            assertNotNull(createdProduct.getId());
-            assertEquals(product.getName(), createdProduct.getName());
-            assertEquals(product.getPrice(), createdProduct.getPrice());
         }
     }
 
@@ -111,28 +105,14 @@ class ProductServiceTest {
 
         @BeforeEach
         void setUp() {
-            product = new Product();
-            product.setId(UUID.randomUUID());
-            product.setName("product");
-            product.setPrice(BigDecimal.valueOf(10));
+            product = TestFixture.createProduct("product", BigDecimal.valueOf(10));
             productRepository.save(product);
 
-            MenuGroup menuGroup = new MenuGroup();
-            menuGroup.setName("menuGroup");
-            menuGroup.setId(UUID.randomUUID());
+            MenuGroup menuGroup = TestFixture.createMenuGroup("menuGroup");
             menuGroupRepository.save(menuGroup);
 
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setQuantity(1);
-
-            menu = new Menu();
-            menu.setId(UUID.randomUUID());
-            menu.setName("menu");
-            menu.setPrice(BigDecimal.valueOf(10));
-            menu.setMenuProducts(List.of(menuProduct));
-            menu.setMenuGroup(menuGroup);
-
+            MenuProduct menuProduct = TestFixture.createMenuProduct(1, product);
+            menu = TestFixture.createMenu("menu", BigDecimal.valueOf(10), menuGroup, menuProduct);
             menuRepository.save(menu);
         }
 

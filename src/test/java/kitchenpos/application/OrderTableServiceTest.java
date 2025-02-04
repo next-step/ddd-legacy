@@ -10,6 +10,7 @@ import java.util.UUID;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
+import kitchenpos.testfixture.TestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,15 +34,14 @@ class OrderTableServiceTest {
 
     @BeforeEach
     void setUp() {
-        orderTableRequest = new OrderTable();
-        orderTableRequest.setName("orderTable");
+        orderTableRequest = TestFixture.createOrderTable("orderTable", 0, false);
     }
 
     @DisplayName("create 메소드는")
     @Nested
     class Create {
 
-        @DisplayName("테이블의 이름이 존재하지 않으면 예외를 던진다.")
+        @DisplayName("테이블의 이름은 필수요청 값 이다.")
         @Test
         void createWithEmptyName() {
             // given
@@ -51,7 +51,7 @@ class OrderTableServiceTest {
             assertThrows(IllegalArgumentException.class, () -> orderTableService.create(orderTableRequest));
         }
 
-        @DisplayName("테이블을 생성한다.")
+        @DisplayName("테이블을 등록 할 수 있다.")
         @Test
         void create() {
             // when
@@ -62,6 +62,54 @@ class OrderTableServiceTest {
             assertEquals(orderTableRequest.getName(), orderTable.getName());
             assertEquals(0, orderTable.getNumberOfGuests());
             assertFalse(orderTable.isOccupied());
+        }
+    }
+
+    @DisplayName("changeNumberOfGuests 메소드는")
+    @Nested
+    class ChangeNumberOfGuests {
+
+        @DisplayName("테이블을 찾을 수 없으면 예외를 던진다.")
+        @Test
+        void changeNumberOfGuestsWithNonExistOrderTable() {
+            // when & then
+            assertThrows(NoSuchElementException.class, () -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), orderTableRequest));
+        }
+
+        @DisplayName("테이블의 인원수는 0명보다는 큰 값이어야 한다.")
+        @Test
+        void changeNumberOfGuestsWithNegativeNumberOfGuests() {
+            // given
+            OrderTable savedOrderTable = orderTableService.create(orderTableRequest);
+            orderTableRequest.setNumberOfGuests(-1);
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> orderTableService.changeNumberOfGuests(savedOrderTable.getId(), orderTableRequest));
+        }
+
+        @DisplayName("테이블이 미착석인 경우에는 인원수를 변경 할 수 없다.")
+        @Test
+        void changeNumberOfGuestsWithEmptyOrderTable() {
+            // given
+            OrderTable savedOrderTable = orderTableService.create(orderTableRequest);
+
+            // when & then
+            assertThrows(IllegalStateException.class, () -> orderTableService.changeNumberOfGuests(savedOrderTable.getId(), orderTableRequest));
+        }
+
+        @DisplayName("테이블의 인원수를 변경 할 수 있다")
+        @Test
+        void changeNumberOfGuests() {
+            // given
+            OrderTable savedOrderTable = orderTableService.create(orderTableRequest);
+            orderTableService.sit(savedOrderTable.getId());
+            orderTableRequest.setNumberOfGuests(4);
+
+            // when
+            final OrderTable orderTable = orderTableService.changeNumberOfGuests(savedOrderTable.getId(), orderTableRequest);
+
+            // then
+            assertEquals(orderTableRequest.getNumberOfGuests(), orderTable.getNumberOfGuests());
         }
     }
 
@@ -76,7 +124,7 @@ class OrderTableServiceTest {
             assertThrows(NoSuchElementException.class, () -> orderTableService.sit(UUID.randomUUID()));
         }
 
-        @DisplayName("테이블에 착석한다.")
+        @DisplayName("테이블을 착석 할 수 있다.")
         @Test
         void sit() {
             // given
@@ -101,7 +149,7 @@ class OrderTableServiceTest {
             assertThrows(NoSuchElementException.class, () -> orderTableService.clear(UUID.randomUUID()));
         }
 
-        @DisplayName("완료되지 않은 주문이 존재하면 예외를 던진다.")
+        @DisplayName("해당 테이블에 완료되지 않은 주문이 남아 있을 경우 테이블을 비울 수 없다.")
         @Test
         void clearWithExistOrder() {
             // given
@@ -113,7 +161,7 @@ class OrderTableServiceTest {
             assertThrows(IllegalStateException.class, () -> orderTableService.clear(savedOrderTable.getId()));
         }
 
-        @DisplayName("테이블을 초기화한다.")
+        @DisplayName("인원수를 0명으로 변경하고, 착석여부를 미착석으로 변경한다.")
         @Test
         void clear() {
             // given
@@ -127,54 +175,6 @@ class OrderTableServiceTest {
             // then
             assertEquals(0, orderTable.getNumberOfGuests());
             assertFalse(orderTable.isOccupied());
-        }
-    }
-
-    @DisplayName("changeNumberOfGuests 메소드는")
-    @Nested
-    class ChangeNumberOfGuests {
-
-        @DisplayName("테이블을 찾을 수 없으면 예외를 던진다.")
-        @Test
-        void changeNumberOfGuestsWithNonExistOrderTable() {
-            // when & then
-            assertThrows(NoSuchElementException.class, () -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), orderTableRequest));
-        }
-
-        @DisplayName("인원 수가 음수이면 예외를 던진다.")
-        @Test
-        void changeNumberOfGuestsWithNegativeNumberOfGuests() {
-            // given
-            OrderTable savedOrderTable = orderTableService.create(orderTableRequest);
-            orderTableRequest.setNumberOfGuests(-1);
-
-            // when & then
-            assertThrows(IllegalArgumentException.class, () -> orderTableService.changeNumberOfGuests(savedOrderTable.getId(), orderTableRequest));
-        }
-
-        @DisplayName("테이블이 착석상태가 아니면 예외를 던진다.")
-        @Test
-        void changeNumberOfGuestsWithEmptyOrderTable() {
-            // given
-            OrderTable savedOrderTable = orderTableService.create(orderTableRequest);
-
-            // when & then
-            assertThrows(IllegalStateException.class, () -> orderTableService.changeNumberOfGuests(savedOrderTable.getId(), orderTableRequest));
-        }
-
-        @DisplayName("손님 수를 변경한다.")
-        @Test
-        void changeNumberOfGuests() {
-            // given
-            OrderTable savedOrderTable = orderTableService.create(orderTableRequest);
-            orderTableService.sit(savedOrderTable.getId());
-            orderTableRequest.setNumberOfGuests(4);
-
-            // when
-            final OrderTable orderTable = orderTableService.changeNumberOfGuests(savedOrderTable.getId(), orderTableRequest);
-
-            // then
-            assertEquals(orderTableRequest.getNumberOfGuests(), orderTable.getNumberOfGuests());
         }
     }
 

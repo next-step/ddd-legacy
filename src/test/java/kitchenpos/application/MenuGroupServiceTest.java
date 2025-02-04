@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
-import java.util.UUID;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.testfixture.TestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,22 +32,21 @@ class MenuGroupServiceTest {
     @Nested
     class Create {
 
-        @DisplayName("메뉴 그룹의 이름이 없는 경우 예외를 던진다.")
+        @DisplayName("메뉴그룹의 이름은 필수요청 값 이다.")
         @Test
         void createWithEmptyName() {
             // given
-            MenuGroup menuGroup = new MenuGroup();
+            MenuGroup menuGroup = TestFixture.createMenuGroup("");
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> menuGroupService.create(menuGroup));
         }
 
-        @DisplayName("메뉴 그룹을 생성한다.")
+        @DisplayName("메뉴 그룹을 등록 할 수 있다")
         @Test
         void create() {
             // given
-            MenuGroup menuGroup = new MenuGroup();
-            menuGroup.setName("menuGroup");
+            MenuGroup menuGroup = TestFixture.createMenuGroup("menuGroup");
             // when
             MenuGroup savedMenuGroup = menuGroupService.create(menuGroup);
             // then
@@ -61,16 +60,12 @@ class MenuGroupServiceTest {
 
         @BeforeEach
         public void setUp() {
-            MenuGroup menuGroup = new MenuGroup();
-            menuGroup.setName("menuGroup");
-            menuGroup.setId(UUID.randomUUID());
-            MenuGroup menuGroup1 = new MenuGroup();
-            menuGroup1.setName("menuGroup1");
-            menuGroup1.setId(UUID.randomUUID());
+            MenuGroup menuGroup = TestFixture.createMenuGroup("menuGroup");
+            MenuGroup menuGroup1 = TestFixture.createMenuGroup("menuGroup1");
             menuGroupRepository.saveAll(List.of(menuGroup, menuGroup1));
         }
 
-        @DisplayName("메뉴 그룹을 조회한다.")
+        @DisplayName("메뉴그룹을 조회 할 수 있다.")
         @Test
         void findAll() {
             // when
