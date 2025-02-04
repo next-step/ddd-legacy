@@ -151,7 +151,7 @@ class MenuServiceUnitTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("매뉴 상품의 수량이 0보다 작으면 메뉴를 등록할 수 없습니다.")
+        @DisplayName("메뉴 상품의 수량이 0보다 작으면 메뉴를 등록할 수 없습니다.")
         @ParameterizedTest(name = "수량 : `{0}`")
         @CsvSource(value = {"1:-1", "-1:1"}, delimiter = ':')
         void createWithNegativeMenuProductQuantity(final long firstQuantity, final long secondQuantity) {
