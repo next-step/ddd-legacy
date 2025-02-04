@@ -20,7 +20,7 @@ public class MenuGroupFixture {
     }
 
     public static MenuGroup menuGroup(final String name) {
-        return menuGroup(UUID.randomUUID(), name);
+        return menuGroup(createMenuGroupId(), name);
     }
 
     public static MenuGroup menuGroup(final UUID uuid, final String name) {
