@@ -55,8 +55,8 @@ class OrderTableServiceUnitTest {
         );
     }
 
-    @DisplayName("가게 테이블의 이름이 이름이 없거나 비어있으면 가게 테이블을 생성할 수 없습니다.")
-    @ParameterizedTest(name = "입력값 {0}")
+    @DisplayName("가게 테이블 이름이 없거나 비어있으면 가게 테이블을 생성할 수 없습니다.")
+    @ParameterizedTest(name = "가게 테이블 이름 : {0}")
     @NullAndEmptySource
     void createOrderTableWithEmptyName(final String name) {
         final OrderTable orderTable = orderTable(name, EMPTY_GUESTS, IS_NOT_OCCUPIED);
@@ -118,7 +118,7 @@ class OrderTableServiceUnitTest {
     }
 
     @DisplayName("가게 테이블의 손님 수를 변경할 수 있습니다.")
-    @ParameterizedTest(name = "손님 수 {0}")
+    @ParameterizedTest(name = "손님 수 : {0}")
     @ValueSource(ints = {1, 10, 100})
     void changeNumberOfGuests(final int numberOfGuests) {
         final OrderTable existedOrderTable = orderTable(
@@ -135,7 +135,7 @@ class OrderTableServiceUnitTest {
     }
 
     @DisplayName("가게 테이블이 비어있을 경우 손님 수를 변경할 수 없습니다.")
-    @ParameterizedTest(name = "손님 수 {0}")
+    @ParameterizedTest(name = "손님 수 : {0}")
     @ValueSource(ints = {1, 10, 100})
     void changeNumberOfGuestsWhenOrderTableIsEmpty(final int numberOfGuests) {
         final OrderTable existedOrderTable = orderTable(ORDER_TABLE_NAME, EMPTY_GUESTS, IS_NOT_OCCUPIED);
@@ -150,7 +150,7 @@ class OrderTableServiceUnitTest {
     }
 
     @DisplayName("가게 테이블이 없을 경우 손님 수를 변경할 수 없습니다.")
-    @ParameterizedTest(name = "손님 수 {0}")
+    @ParameterizedTest(name = "손님 수 : {0}")
     @ValueSource(ints = {1, 10, 100})
     void changeNumberOfGuestsWhenOrderTableIsNotExist(final int numberOfGuests) {
         when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
@@ -163,7 +163,7 @@ class OrderTableServiceUnitTest {
     }
 
     @DisplayName("가게 테이블의 손님 수를 0명 미만으로 변경할 수 없습니다.")
-    @ParameterizedTest(name = "손님 수 {0}")
+    @ParameterizedTest(name = "손님 수 : {0}")
     @ValueSource(ints = {-1, -10, -100})
     void changeNumberOfGuestsWhenNumberOfGuestsIsNegative(final int numberOfGuests) {
         final OrderTable existedOrderTable = orderTable(ORDER_TABLE_NAME, EMPTY_GUESTS, IS_OCCUPIED);

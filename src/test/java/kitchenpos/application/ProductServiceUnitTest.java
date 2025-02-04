@@ -140,7 +140,7 @@ class ProductServiceUnitTest {
         }
 
         @DisplayName("변경할 상품 가격이 0원 이상이어야 합니다.")
-        @ParameterizedTest(name = "입력값 `{0}`")
+        @ParameterizedTest(name = "상품 가격 : `{0}`")
         @ValueSource(strings = {"-1", "-1000", "-10000"})
         void changePriceWithNegativePrice(final String price) {
             final BigDecimal negativePrice = new BigDecimal(price);

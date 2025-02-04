@@ -136,7 +136,7 @@ class TakeOutOrderServiceUnitTest {
         }
 
         @DisplayName("주문 항목 중 하나라도 수량이 0보다 작으면 예외가 발생합니다")
-        @ParameterizedTest(name = "수량: {0}")
+        @ParameterizedTest(name = "수량 : {0}")
         @ValueSource(longs = {-1L, -10L, -100L})
         void createOrderWithNegativeQuantity(final long negativeQuantity) {
             final OrderLineItem negativeOrderLineItem = orderLineItem(null, menu, negativeQuantity);
