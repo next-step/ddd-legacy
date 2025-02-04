@@ -5,8 +5,6 @@ import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,7 +20,8 @@ import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
 import static kitchenpos.fixture.MenuProductFixture.*;
 import static kitchenpos.fixture.OrderFixture.DEFAULT_DELIVERY_ADDRESS;
 import static kitchenpos.fixture.OrderFixture.order;
-import static kitchenpos.fixture.OrderTableFixture.*;
+import static kitchenpos.fixture.OrderTableFixture.DEFAULT_ORDER_TABLE_NAME;
+import static kitchenpos.fixture.OrderTableFixture.orderTable;
 import static kitchenpos.fixture.ProductFixture.product;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,8 +31,6 @@ import static org.mockito.Mockito.*;
 @Transactional
 @SpringBootTest
 class OrderServiceTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(MenuServiceTest.class);
 
     @Autowired
     private OrderService orderService;
@@ -65,10 +62,10 @@ class OrderServiceTest {
         @Test
         void 포장_주문은_유효한_주문_라인_아이템이_주어지면_정상적으로_생성된다() {
             // given
-            Order request = order(OrderType.TAKEOUT, menu);
+            final Order request = order(OrderType.TAKEOUT, menu);
 
             // when
-            Order response = orderService.create(request);
+            final Order response = orderService.create(request);
 
             // then
             assertThat(response.getType()).isEqualTo(request.getType());
@@ -78,10 +75,10 @@ class OrderServiceTest {
 
         @Test
         void 배달_주문은_유효한_배송_주소가_주어지면_정상적으로_생성된다() {
-            Order request = order(OrderType.DELIVERY, menu, DEFAULT_DELIVERY_ADDRESS);
+            final Order request = order(OrderType.DELIVERY, menu, DEFAULT_DELIVERY_ADDRESS);
 
             // when
-            Order response = orderService.create(request);
+            final Order response = orderService.create(request);
 
             // then
             assertThat(response.getType()).isEqualTo(request.getType());
@@ -92,10 +89,10 @@ class OrderServiceTest {
         @Test
         void 매장_식사_주문은_착석된_주문_테이블이_주어지면_정상적으로_생성된다() {
             // given
-            Order request = order(OrderType.EAT_IN, menu, createOrderTable(4));
+            final Order request = order(OrderType.EAT_IN, menu, createOrderTable(4));
 
             // when
-            Order response = orderService.create(request);
+            final Order response = orderService.create(request);
 
             // then
             assertThat(response.getType()).isEqualTo(request.getType());
@@ -105,7 +102,7 @@ class OrderServiceTest {
         @Test
         void 주문_생성_시_필수_필드가_누락되면_예외가_발생한다() {
             // given
-            Order request = new Order();
+            final Order request = new Order();
             request.setOrderLineItems(new ArrayList<>());
 
             // when & then
@@ -126,10 +123,10 @@ class OrderServiceTest {
         @Test
         void WAITING_상태의_DELIVERY_주문은_accept를_통해_ACCEPTED_상태로_전환되고_배달_요청이_진행된다() {
             // given
-            Order request = orderService.create(order(OrderType.DELIVERY, menu, DEFAULT_DELIVERY_ADDRESS));
+            final Order request = orderService.create(order(OrderType.DELIVERY, menu, DEFAULT_DELIVERY_ADDRESS));
 
             // when
-            Order response = orderService.accept(request.getId());
+            final Order response = orderService.accept(request.getId());
 
             // then
             assertThat(response.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
@@ -140,7 +137,7 @@ class OrderServiceTest {
         @Test
         void WAITING_상태가_아닌_주문은_accept_시_예외가_발생한다() {
             // given
-            Order created = orderService.create(order(OrderType.TAKEOUT, menu));
+            final Order created = orderService.create(order(OrderType.TAKEOUT, menu));
             created.setStatus(OrderStatus.ACCEPTED);
 
             // when & then
@@ -151,11 +148,11 @@ class OrderServiceTest {
         @Test
         void ACCEPTED_상태의_주문은_serve를_통해_SERVED_상태로_전환된다() {
             // given
-            Order request = orderService.create(order(OrderType.TAKEOUT, menu));
+            final Order request = orderService.create(order(OrderType.TAKEOUT, menu));
             request.setStatus(OrderStatus.ACCEPTED);
 
             // when
-            Order response = orderService.serve(request.getId());
+            final Order response = orderService.serve(request.getId());
 
             // then
             assertThat(response.getStatus()).isEqualTo(OrderStatus.SERVED);
@@ -164,7 +161,7 @@ class OrderServiceTest {
         @Test
         void SERVED_상태의_TAKEOUT_주문은_startDelivery_시_예외가_발생한다() {
             // given
-            Order created = orderService.create(order(OrderType.TAKEOUT, menu));
+            final Order created = orderService.create(order(OrderType.TAKEOUT, menu));
             created.setStatus(OrderStatus.SERVED);
 
             // when & then
@@ -175,11 +172,11 @@ class OrderServiceTest {
         @Test
         void SERVED_상태의_DELIVERY_주문은_startDelivery를_통해_DELIVERING_상태로_전환된다() {
             // given
-            Order request = orderService.create(order(OrderType.DELIVERY, menu, DEFAULT_DELIVERY_ADDRESS));
+            final Order request = orderService.create(order(OrderType.DELIVERY, menu, DEFAULT_DELIVERY_ADDRESS));
             request.setStatus(OrderStatus.SERVED);
 
             // when
-            Order response = orderService.startDelivery(request.getId());
+            final Order response = orderService.startDelivery(request.getId());
 
             // then
             assertThat(response.getStatus()).isEqualTo(OrderStatus.DELIVERING);
@@ -188,11 +185,11 @@ class OrderServiceTest {
         @Test
         void 배달_중인_상태의_주문은_배달완료_상태로_전환된다() {
             // given
-            Order request = orderService.create(order(OrderType.DELIVERY, menu, DEFAULT_DELIVERY_ADDRESS));
+            final Order request = orderService.create(order(OrderType.DELIVERY, menu, DEFAULT_DELIVERY_ADDRESS));
             request.setStatus(OrderStatus.DELIVERING);
 
             // when
-            Order response = orderService.completeDelivery(request.getId());
+            final Order response = orderService.completeDelivery(request.getId());
 
             // then
             assertThat(response.getStatus()).isEqualTo(OrderStatus.DELIVERED);
@@ -201,7 +198,7 @@ class OrderServiceTest {
         @Test
         void DELIVERY_주문_완료_시_상태_조건을_만족하지_않으면_예외가_발생한다() {
             // given
-            Order createdDelivery = orderService.create(order(OrderType.DELIVERY, menu, DEFAULT_DELIVERY_ADDRESS));
+            final Order createdDelivery = orderService.create(order(OrderType.DELIVERY, menu, DEFAULT_DELIVERY_ADDRESS));
 
             // when & then
             assertThatIllegalStateException()
@@ -211,7 +208,7 @@ class OrderServiceTest {
         @Test
         void TAKEOUT_주문_완료_시_상태_조건을_만족하지_않으면_예외가_발생한다() {
             // given
-            Order request = orderService.create(order(OrderType.TAKEOUT, menu));
+            final Order request = orderService.create(order(OrderType.TAKEOUT, menu));
 
             // when & then
             assertThatIllegalStateException()
@@ -221,11 +218,11 @@ class OrderServiceTest {
         @Test
         void DELIVERY_주문은_DELIVERED_상태여야_완료되며_완료되면_COMPLETED_상태로_전환된다() {
             // given
-            Order request = orderService.create(order(OrderType.DELIVERY, menu, DEFAULT_DELIVERY_ADDRESS));
+            final Order request = orderService.create(order(OrderType.DELIVERY, menu, DEFAULT_DELIVERY_ADDRESS));
             request.setStatus(OrderStatus.DELIVERED);
 
             // when
-            Order response = orderService.complete(request.getId());
+            final Order response = orderService.complete(request.getId());
 
             // then
             assertThat(response.getStatus()).isEqualTo(OrderStatus.COMPLETED);
@@ -234,11 +231,11 @@ class OrderServiceTest {
         @Test
         void TAKEOUT_주문은_SERVED_상태여야_완료되며_완료되면_COMPLETED_상태로_전환된다() {
             // given
-            Order request = orderService.create(order(OrderType.TAKEOUT, menu));
+            final Order request = orderService.create(order(OrderType.TAKEOUT, menu));
             request.setStatus(OrderStatus.SERVED);
 
             // when
-            Order response = orderService.complete(request.getId());
+            final Order response = orderService.complete(request.getId());
 
             // then
             assertThat(response.getStatus()).isEqualTo(OrderStatus.COMPLETED);
@@ -247,17 +244,17 @@ class OrderServiceTest {
         @Test
         void EAT_IN_주문은_SERVED_상태여야_완료되며_완료되면_COMPLETED_상태로_전환되고_테이블이_초기화된다() {
             // given
-            Order request = orderService.create(order(OrderType.EAT_IN, menu, createOrderTable(4)));
+            final Order request = orderService.create(order(OrderType.EAT_IN, menu, createOrderTable(4)));
             request.setStatus(OrderStatus.SERVED);
 
 
             // when
-            Order response1 = orderService.complete(request.getId());
-            OrderTable response2 = orderTableRepository.findById(response1.getOrderTable().getId()).orElseThrow(NoSuchElementException::new);
+            final Order response1 = orderService.complete(request.getId());
+            final OrderTable response2 = orderTableRepository.findById(response1.getOrderTable().getId()).orElseThrow(NoSuchElementException::new);
 
             // then
             assertThat(response1.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-            assertThat(response2.getNumberOfGuests()).isEqualTo(0);
+            assertThat(response2.getNumberOfGuests()).isZero();
             assertThat(response2.isOccupied()).isFalse();
         }
     }
@@ -279,13 +276,13 @@ class OrderServiceTest {
     }
 
     private Menu createMenu(final String name, final BigDecimal price) {
-        MenuGroup menuGroup = menuGroup();
+        final MenuGroup menuGroup = menuGroup();
         menuGroupRepository.save(menuGroup);
 
-        Product product = product();
+        final Product product = product();
         productRepository.save(product);
 
-        MenuProduct menuProduct = menuProduct(seq(), DEFALUT_QUANTITY, product);
+        final MenuProduct menuProduct = menuProduct(seq(), DEFALUT_QUANTITY, product);
         return menuRepository.save(menu(createMenuId(), name, price, menuGroup, List.of(menuProduct), DEFAULT_DISPLAYED));
     }
 

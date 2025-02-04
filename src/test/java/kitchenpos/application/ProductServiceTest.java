@@ -37,10 +37,10 @@ class ProductServiceTest {
         @Test
         void 정상적으로_생성된다() {
             // given
-            Product request = product(null, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
+            final Product request = product(null, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
 
             // when
-            Product response = productService.create(request);
+            final Product response = productService.create(request);
 
             // then
             assertThat(response.getName()).isEqualTo(request.getName());
@@ -50,7 +50,7 @@ class ProductServiceTest {
         @Test
         void 음수_가격이_입력되면_예외가_발생한다() {
             // given
-            Product request = product(null, DEFAULT_PRODUCT_NAME, BigDecimal.valueOf(-10_000L));
+            final Product request = product(null, DEFAULT_PRODUCT_NAME, BigDecimal.valueOf(-10_000L));
 
             // when & then
             assertThatIllegalArgumentException()
@@ -61,7 +61,7 @@ class ProductServiceTest {
         @ValueSource(strings = {"bitch", "fuck"})
         void 욕설이_포함된_이름이_입력되면_예외가_발생한다(final String name) {
             // given
-            Product request = product(null, name, DEFAULT_PRODUCT_PRICE);
+            final Product request = product(null, name, DEFAULT_PRODUCT_PRICE);
 
             // when & then
             assertThatIllegalArgumentException()
@@ -71,7 +71,7 @@ class ProductServiceTest {
         @Test
         void 이름이_NULL이면_예외가_발생한다() {
             // given
-            Product request = product(null, null, DEFAULT_PRODUCT_PRICE);
+            final Product request = product(null, null, DEFAULT_PRODUCT_PRICE);
 
             // when & then
             assertThatIllegalArgumentException()
@@ -81,7 +81,7 @@ class ProductServiceTest {
         @Test
         void 가격이_NULL이면_예외가_발생한다() {
             // given
-            Product request = product(null, DEFAULT_PRODUCT_NAME, null);
+            final Product request = product(null, DEFAULT_PRODUCT_NAME, null);
 
             // when & then
             assertThatIllegalArgumentException()
@@ -94,7 +94,7 @@ class ProductServiceTest {
         @Test
         void 존재하지_않는_상품의_가격을_변경하면_예외가_발생한다() {
             // given
-            Product request = product();
+            final Product request = product();
 
             // when & then
             assertThatThrownBy(() -> productService.changePrice(request.getId(), request))
@@ -104,62 +104,48 @@ class ProductServiceTest {
         @Test
         void 음수_가격이_입력되면_예외가_발생한다() {
             // given
-            Product request = product(null, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
-            Product created = productService.create(request);
+            final Product request = productService.create(product(null, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE));
 
-            Product updateRequest = new Product();
+            final Product updateRequest = new Product();
             updateRequest.setPrice(BigDecimal.valueOf(-20_000L));
 
             // when & then
             assertThatIllegalArgumentException()
-                    .isThrownBy(() -> productService.changePrice(created.getId(), updateRequest));
+                    .isThrownBy(() -> productService.changePrice(request.getId(), updateRequest));
         }
 
         @Test
         void 메뉴에_포함되지_않은_상품도_가격을_정상적으로_변경한다() {
             // given
-            Product request = product(null, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
-            Product created = productService.create(request);
+            final Product request = productService.create(product(null, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE));
 
-            Product updateRequest = new Product();
+            final Product updateRequest = new Product();
             updateRequest.setPrice(BigDecimal.valueOf(20_000L));
 
             // when
-            Product response = productService.changePrice(created.getId(), updateRequest);
+            final Product response = productService.changePrice(request.getId(), updateRequest);
 
             // then
-            assertThat(response.getId()).isEqualTo(created.getId());
-            assertThat(response.getName()).isEqualTo(created.getName());
-            assertThat(response.getPrice()).isEqualTo(created.getPrice());
+            assertThat(response.getId()).isEqualTo(request.getId());
+            assertThat(response.getName()).isEqualTo(request.getName());
+            assertThat(response.getPrice()).isEqualTo(request.getPrice());
         }
 
         @Test
         void 메뉴_구성_상품의_가격_변경_시_메뉴_가격이_구성_상품_총_가격보다_높으면_메뉴가_숨김_처리된다() {
             // given
-            Product request = product(null, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
-            Product created = productService.create(request);
+            final Product request = productService.create(product(null, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE));
+            final MenuGroup menuGroup = menuGroupRepository.save(menuGroup());
+            final Menu menu = menuRepository.save(menu(createMenuId(), DEFAULT_MENU_NAME, DEFAULT_MENU_PRICE, menuGroup, List.of(menuProduct(seq(), DEFALUT_QUANTITY, request)), DEFAULT_DISPLAYED));
 
-            MenuGroup menuGroup = menuGroup();
-            menuGroupRepository.save(menuGroup);
-
-            Menu menu = menu(
-                    createMenuId(),
-                    DEFAULT_MENU_NAME,
-                    DEFAULT_MENU_PRICE,
-                    menuGroup,
-                    List.of(menuProduct(seq(), DEFALUT_QUANTITY, created)),
-                    DEFAULT_DISPLAYED
-            );
-            menuRepository.save(menu);
-
-            Product updateRequest = new Product();
+            final Product updateRequest = new Product();
             updateRequest.setPrice(BigDecimal.valueOf(8_000L));
 
             // when
-            productService.changePrice(created.getId(), updateRequest);
+            productService.changePrice(request.getId(), updateRequest);
 
             // then
-            Menu response = menuRepository.findById(menu.getId()).orElseThrow(NoSuchElementException::new);
+            final Menu response = menuRepository.findById(menu.getId()).orElseThrow(NoSuchElementException::new);
             assertThat(response.isDisplayed()).isFalse();
         }
     }
@@ -169,14 +155,11 @@ class ProductServiceTest {
         @Test
         void 전체_상품을_조회하면_생성된_모든_상품이_반환된다() {
             // given
-            Product request1 = product(null, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
-            productService.create(request1);
-
-            Product request2 = product(null, "후라이드 치킨", BigDecimal.valueOf(12_000L));
-            productService.create(request2);
+            productService.create(product(null, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE));
+            productService.create(product(null, "후라이드 치킨", BigDecimal.valueOf(12_000L)));
 
             // when
-            List<Product> response = productService.findAll();
+            final List<Product> response = productService.findAll();
 
             // then
             assertThat(response).hasSize(2);

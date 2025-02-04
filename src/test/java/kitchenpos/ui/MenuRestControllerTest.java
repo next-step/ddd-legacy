@@ -124,7 +124,7 @@ class MenuRestControllerTest {
 
     @Test
     void 메뉴_전체_조회_요청이_성공하면_메뉴_목록을_반환한다() throws Exception {
-        Menu findMenu = MenuFixture.menu(menuId, "후라이드치킨", new BigDecimal(18000), menuGroup, List.of(menuProduct), true);
+       final Menu findMenu = MenuFixture.menu(menuId, "후라이드치킨", new BigDecimal(18000), menuGroup, List.of(menuProduct), true);
         when(menuService.findAll()).thenReturn(List.of(findMenu));
 
         mockMvc.perform(get("/api/menus"))

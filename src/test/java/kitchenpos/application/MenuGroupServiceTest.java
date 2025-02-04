@@ -22,10 +22,10 @@ class MenuGroupServiceTest {
     @Test
     void 유효한_이름으로_메뉴_그룹을_생성하면_메뉴_그룹이_정상적으로_생성된다() {
         // given
-        MenuGroup request = menuGroup(null, DEFAULT_MENU_GROUP_NAME);
+        final MenuGroup request = menuGroup(null, DEFAULT_MENU_GROUP_NAME);
 
         // when
-        MenuGroup response = menuGroupService.create(request);
+        final MenuGroup response = menuGroupService.create(request);
 
         // then
         assertThat(response.getName()).isEqualTo(request.getName());
@@ -34,7 +34,7 @@ class MenuGroupServiceTest {
     @Test
     void 메뉴_그룹_생성_시_이름이_NULL이면_예외가_발생한다() {
         // given
-        MenuGroup request = menuGroup(null, null);
+        final MenuGroup request = menuGroup(null, null);
 
         // when & then
         assertThatIllegalArgumentException()
@@ -44,7 +44,7 @@ class MenuGroupServiceTest {
     @Test
     void 메뉴_그룹_생성_시_이름이_빈_문자열이면_예외가_발생한다() {
         // given
-        MenuGroup request = menuGroup(null, "");
+        final MenuGroup request = menuGroup(null, "");
 
         // when & then
         assertThatIllegalArgumentException()
@@ -54,10 +54,10 @@ class MenuGroupServiceTest {
     @Test
     void 전체_메뉴_그룹_조회_시_생성된_모든_메뉴_그룹이_반환된다() {
         // given
-        MenuGroup request1 = menuGroup(null, DEFAULT_MENU_GROUP_NAME);
+        final MenuGroup request1 = menuGroup(null, DEFAULT_MENU_GROUP_NAME);
         menuGroupService.create(request1);
 
-        MenuGroup request2 = menuGroup(null, "피자 메뉴");
+        final MenuGroup request2 = menuGroup(null, "피자 메뉴");
         menuGroupService.create(request2);
 
         // when
