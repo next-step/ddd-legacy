@@ -2,7 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.JpaMenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
@@ -18,16 +18,16 @@ import java.util.UUID;
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
-    private final MenuRepository menuRepository;
+    private final JpaMenuRepository jpaMenuRepository;
     private final PurgomalumClient purgomalumClient;
 
     public ProductService(
         final ProductRepository productRepository,
-        final MenuRepository menuRepository,
+        final JpaMenuRepository jpaMenuRepository,
         final PurgomalumClient purgomalumClient
     ) {
         this.productRepository = productRepository;
-        this.menuRepository = menuRepository;
+        this.jpaMenuRepository = jpaMenuRepository;
         this.purgomalumClient = purgomalumClient;
     }
 
@@ -57,7 +57,7 @@ public class ProductService {
         final Product product = productRepository.findById(productId)
             .orElseThrow(NoSuchElementException::new);
         product.setPrice(price);
-        final List<Menu> menus = menuRepository.findAllByProductId(productId);
+        final List<Menu> menus = jpaMenuRepository.findAllByProductId(productId);
         for (final Menu menu : menus) {
             BigDecimal sum = BigDecimal.ZERO;
             for (final MenuProduct menuProduct : menu.getMenuProducts()) {

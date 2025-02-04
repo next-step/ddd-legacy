@@ -1,14 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.Order;
-import kitchenpos.domain.OrderLineItem;
-import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderStatus;
-import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
-import kitchenpos.domain.OrderType;
+import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,18 +16,18 @@ import java.util.UUID;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final MenuRepository menuRepository;
+    private final MenuRepository jpaMenuRepository;
     private final OrderTableRepository orderTableRepository;
     private final KitchenridersClient kitchenridersClient;
 
     public OrderService(
         final OrderRepository orderRepository,
-        final MenuRepository menuRepository,
+        final MenuRepository jpaMenuRepository,
         final OrderTableRepository orderTableRepository,
         final KitchenridersClient kitchenridersClient
     ) {
         this.orderRepository = orderRepository;
-        this.menuRepository = menuRepository;
+        this.jpaMenuRepository = jpaMenuRepository;
         this.orderTableRepository = orderTableRepository;
         this.kitchenridersClient = kitchenridersClient;
     }
@@ -50,7 +42,7 @@ public class OrderService {
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
             throw new IllegalArgumentException();
         }
-        final List<Menu> menus = menuRepository.findAllByIdIn(
+        final List<Menu> menus = jpaMenuRepository.findAllByIdIn(
             orderLineItemRequests.stream()
                 .map(OrderLineItem::getMenuId)
                 .toList()
@@ -66,7 +58,7 @@ public class OrderService {
                     throw new IllegalArgumentException();
                 }
             }
-            final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
+            final Menu menu = jpaMenuRepository.findById(orderLineItemRequest.getMenuId())
                 .orElseThrow(NoSuchElementException::new);
             if (!menu.isDisplayed()) {
                 throw new IllegalStateException();
