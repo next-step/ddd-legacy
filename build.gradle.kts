@@ -43,6 +43,10 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    jvmArgs = (jvmArgs ?: emptyList()) + listOf(
+        "-XX:+EnableDynamicAgentLoading",
+        "-Xshare:off" // 동적 에이전트 로딩 추적
+    )
 }
 
 flyway {
