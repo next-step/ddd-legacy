@@ -5,6 +5,7 @@ import kitchenpos.domain.MenuGroup;
 import java.util.UUID;
 
 public class MenuGroupFixture {
+
     public static final String DEFAULT_MENU_GROUP_NAME = "치킨 메뉴";
 
     private MenuGroupFixture() {

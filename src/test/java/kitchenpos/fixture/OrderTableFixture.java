@@ -5,6 +5,7 @@ import kitchenpos.domain.OrderTable;
 import java.util.UUID;
 
 public class OrderTableFixture {
+
     public static final String DEFAULT_ORDER_TABLE_NAME = "테이블";
     public static final int DEFAULT_NUMBER_OF_GUESTS = 0;
     private static final boolean DEFAULT_OCCUPIED = false;
@@ -19,6 +20,10 @@ public class OrderTableFixture {
         orderTable.setNumberOfGuests(numberOfGuests);
         orderTable.setOccupied(occupied);
         return orderTable;
+    }
+
+    public static OrderTable orderTable(final String name, final int numberOfGuests) {
+        return orderTable(createOrderTableId(), name, numberOfGuests, true);
     }
 
     public static OrderTable orderTable() {

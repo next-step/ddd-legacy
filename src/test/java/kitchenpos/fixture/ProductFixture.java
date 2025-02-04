@@ -6,9 +6,10 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public class ProductFixture {
+
     public static final String DEFAULT_PRODUCT_NAME = "옛날통닭";
 
-    public static final BigDecimal DEFAULT_PRODUCT_PRICE = new BigDecimal(10_000);
+    public static final BigDecimal DEFAULT_PRODUCT_PRICE = new BigDecimal(10_000L);
 
     private ProductFixture() {
     }
@@ -21,7 +22,7 @@ public class ProductFixture {
         return product;
     }
 
-    public static Product product(final String name, final int price) {
+    public static Product product(final String name, final long price) {
         return product(getUuid(), name, BigDecimal.valueOf(price));
     }
 

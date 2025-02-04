@@ -12,6 +12,7 @@ import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
 import static kitchenpos.fixture.MenuProductFixture.menuProduct;
 
 public class MenuFixture {
+
     public static final String DEFAULT_MENU_NAME = "추억의 옛날 통닭";
     public static final String SECONDARY_MENU_NAME = "치킨 세트";
     public static final BigDecimal DEFAULT_MENU_PRICE = BigDecimal.valueOf(10_000);
@@ -40,7 +41,7 @@ public class MenuFixture {
         return menu;
     }
 
-    public static Menu menu(final String name, final int price, final MenuGroup menuGroup, final List<MenuProduct> menuProducts, final boolean isDisplayed) {
+    public static Menu menu(final String name, final long price, final MenuGroup menuGroup, final List<MenuProduct> menuProducts, final boolean isDisplayed) {
         return menu(null, name, BigDecimal.valueOf(price), menuGroup, menuProducts, isDisplayed);
     }
 

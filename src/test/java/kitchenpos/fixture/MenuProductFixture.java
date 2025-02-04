@@ -6,6 +6,7 @@ import kitchenpos.domain.Product;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class MenuProductFixture {
+
     public static final long DEFALUT_QUANTITY = 1L;
     private static final AtomicLong atomicLong = new AtomicLong(1L);
 
