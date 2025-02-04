@@ -145,5 +145,22 @@ class TaekOutOrderServiceTest {
                     )
             )).isInstanceOf(IllegalArgumentException.class);
         }
+
+        @DisplayName("주문 항목 중 하나라도 수량이 0보다 작으면 예외가 발생합니다")
+        @Test
+        void createOrderWithNegativeQuantity() {
+            final long negativeQuantity = -1L;
+            final OrderLineItem negativeOrderLineItem = orderLineItem(null, menu, negativeQuantity, orderLineItemPrice(menu.getPrice(), negativeQuantity));
+
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+
+            assertThatThrownBy(() -> orderService.create(
+                    takeoutOrder(null, null, OrderStatus.WAITING, List.of(negativeOrderLineItem))
+            )).isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
+        return price.multiply(BigDecimal.valueOf(quantity));
     }
 }
