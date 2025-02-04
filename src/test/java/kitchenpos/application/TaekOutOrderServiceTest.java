@@ -325,6 +325,18 @@ class TaekOutOrderServiceTest {
                     () -> assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED)
             );
         }
+
+        @DisplayName("서빙 상태가 아닌 주문을 완료하려고 하면 예외가 발생합니다")
+        @ParameterizedTest(name = "주문 상태: {0}")
+        @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "COMPLETED"})
+        void completeNonServedOrder(final OrderStatus orderStatus) {
+            final Order nonServedOrder = takeoutOrder(
+                    orderId, orderDateTime, orderStatus, List.of(orderLineItem)
+            );
+            when(orderRepository.findById(nonServedOrder.getId())).thenReturn(Optional.ofNullable(nonServedOrder));
+
+            assertThatThrownBy(() -> orderService.complete(nonServedOrder.getId())).isInstanceOf(IllegalStateException.class);
+        }
     }
 
     private BigDecimal orderLineItemPrice(final BigDecimal price, final long quantity) {
