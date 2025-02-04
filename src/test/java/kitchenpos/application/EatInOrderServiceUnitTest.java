@@ -179,7 +179,7 @@ class EatInOrderServiceUnitTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 테이블이 존재하지 않으면 예외가 발생합니다")
+        @DisplayName("가게 테이블이 존재하지 않으면 예외가 발생합니다")
         @Test
         void createOrderWithoutOrderTable() {
             final Order eatInOrder = eatInOrder(null, null, orderTable, WAITING, List.of(orderLineItem));
@@ -192,7 +192,7 @@ class EatInOrderServiceUnitTest {
                     .isInstanceOf(NoSuchElementException.class);
         }
 
-        @DisplayName("주문 테이블이 사용중인 상태가 아니라면 예외가 발생합니다.")
+        @DisplayName("가게 테이블이 사용중인 상태가 아니라면 예외가 발생합니다.")
         @Test
         void createOrderWithEmptyOrderTable() {
             final OrderTable emptyOrderTable = orderTable(createOrderTableId(), ORDER_TABLE_NAME, 0, false);
