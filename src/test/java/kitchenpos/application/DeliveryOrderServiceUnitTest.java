@@ -53,9 +53,9 @@ class DeliveryOrderServiceUnitTest {
         this.orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
 
-    @DisplayName("배달 주문을 생성할 때")
+    @DisplayName("배달 주문이 생성되지 않았다면")
     @Nested
-    class Create {
+    class OrderIsNotCreated {
         private Menu menu;
         private OrderLineItem orderLineItem;
 
@@ -201,9 +201,9 @@ class DeliveryOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("배달 주문이 대기 되었을 때")
+    @DisplayName("배달 주문이 대기 상태라면")
     @Nested
-    class Waited {
+    class OrderStatusIsWaited {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order deliveryOrder;
@@ -259,9 +259,9 @@ class DeliveryOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("배달 주문이 수락 되었을 때")
+    @DisplayName("배달 주문이 수락 상태라면")
     @Nested
-    class Accepted {
+    class OrderStatusIsAccepted {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order deliveryOrder;
@@ -305,9 +305,9 @@ class DeliveryOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("배달 주문이 서빙 되었을 때")
+    @DisplayName("배달 주문이 서빙된 상태라면")
     @Nested
-    class SERVED {
+    class OrderStatusIsServed {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order deliveryOrder;
@@ -379,9 +379,9 @@ class DeliveryOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("배달 주문이 배달 중이 었을 때")
+    @DisplayName("배달 주문이 배달중 상태라면")
     @Nested
-    class delivering {
+    class OrderStatusIsDelivering {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order deliveryOrder;
@@ -435,9 +435,9 @@ class DeliveryOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("배달 주문이 배달 완료 되었을 때")
+    @DisplayName("배달 주문이 배달 완료 상태라면")
     @Nested
-    class Delivered {
+    class OrderStatusIsDelivered {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order deliveryOrder;

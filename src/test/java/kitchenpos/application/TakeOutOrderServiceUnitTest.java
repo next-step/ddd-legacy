@@ -51,9 +51,9 @@ class TakeOutOrderServiceUnitTest {
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
 
-    @DisplayName("포장 주문을 생성할 때")
+    @DisplayName("포장 주문이 생성되지 않았다면")
     @Nested
-    class Create {
+    class OrderIsNotCreated {
 
         private Menu menu;
         private OrderLineItem orderLineItem;
@@ -187,9 +187,9 @@ class TakeOutOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("포장 주문을 수락할 때")
+    @DisplayName("포장 주문이 대기 상태라면")
     @Nested
-    class Accept {
+    class OrderStatusIsWaiting {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order takeOutOrder;
@@ -240,9 +240,9 @@ class TakeOutOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("포장 주문을 서빙할 때")
+    @DisplayName("포장 주문아 수락 상태라면")
     @Nested
-    class Server {
+    class OrderStatusIsAccepted {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order takeOutOrder;
@@ -292,9 +292,9 @@ class TakeOutOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("포장 주문을 완료할 때")
+    @DisplayName("포장 주문이 서빙된 상태라면")
     @Nested
-    class Complete {
+    class OrderStatusIsServed {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order takeOutOrder;

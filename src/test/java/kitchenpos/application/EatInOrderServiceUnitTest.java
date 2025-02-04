@@ -52,9 +52,9 @@ class EatInOrderServiceUnitTest {
         this.orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
 
-    @DisplayName("매장 식사 주문을 생성할 때")
+    @DisplayName("매장 식사 주문이 생성되지 않았다면")
     @Nested
-    class Create {
+    class OrderIsNotCreated {
 
         private Menu menu;
         private OrderLineItem orderLineItem;
@@ -207,9 +207,9 @@ class EatInOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("매장 식사 주문이 대기 상태일 때")
+    @DisplayName("매장 식사 주문이 대기 상태라면")
     @Nested
-    class Waiting {
+    class OrderStatusIsWaiting {
 
         private Menu menu;
         private OrderLineItem orderLineItem;
@@ -263,9 +263,9 @@ class EatInOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("매장 식사 주문이 접수 되었을 때")
+    @DisplayName("매장 식사 주문이 접수 상태라면")
     @Nested
-    class Accepted {
+    class OrderStatusIsAccepted {
 
         private Menu menu;
         private OrderLineItem orderLineItem;
@@ -320,9 +320,9 @@ class EatInOrderServiceUnitTest {
         }
     }
 
-    @DisplayName("매장 식사 주문이 서빙 되었을 때")
+    @DisplayName("매장 식사 주문 상태가 서빙된 상태라면")
     @Nested
-    class Served {
+    class OrderStatusIsServed {
 
         private Menu menu;
         private OrderLineItem orderLineItem;
