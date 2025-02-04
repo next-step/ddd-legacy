@@ -16,8 +16,8 @@ public class Car {
         return this.position;
     }
 
-    public void move(int value) {
-        if (value >= 4) {
+    public void move(final MovingStrategy strategy) {
+        if (strategy.movable()) {
             this.position++;
         }
     }
