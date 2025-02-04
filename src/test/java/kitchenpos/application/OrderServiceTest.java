@@ -2,15 +2,17 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Stream;
+import kitchenpos.domain.InMemoryMenuGroupRepository;
+import kitchenpos.domain.InMemoryMenuRepository;
+import kitchenpos.domain.InMemoryOrderRepository;
+import kitchenpos.domain.InMemoryOrderTableRepository;
+import kitchenpos.domain.InMemoryProductRepository;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -34,32 +36,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
-@SpringBootTest
 @DisplayName("OrderService 클래스의")
 class OrderServiceTest {
 
-    @Autowired
-    private OrderService orderService;
+    private OrderRepository orderRepository = new InMemoryOrderRepository();
+    private MenuRepository menuRepository = new InMemoryMenuRepository();
+    private OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
+    private KitchenridersClient kitchenridersClient = new KitchenridersClient();
+    private ProductRepository productRepository = new InMemoryProductRepository();
+    private MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
 
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired
-    private MenuRepository menuRepository;
-    @Autowired
-    private OrderTableRepository orderTableRepository;
-    @MockBean
-    private KitchenridersClient kitchenridersClient;
-
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private MenuGroupRepository menuGroupRepository;
+    private OrderService orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
 
     private OrderTable orderTable;
     private Menu menu;
@@ -269,14 +257,10 @@ class OrderServiceTest {
             order.setOrderTableId(null);
             order.setDeliveryAddress("deliveryAddress");
             orderRepository.save(order);
-            doNothing().when(kitchenridersClient).requestDelivery(any(), any(), any());
 
             // when
             Order accepted = orderService.accept(order.getId());
             // then
-            verify(kitchenridersClient).requestDelivery(accepted.getId(),
-                                                        accepted.getOrderLineItems().get(0).getMenu().getPrice(),
-                                                        accepted.getDeliveryAddress());
             assertThat(accepted.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
         }
 

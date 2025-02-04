@@ -6,7 +6,11 @@ import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderType;
 import kitchenpos.domain.Product;
 
 public class TestFixture {
@@ -55,4 +59,12 @@ public class TestFixture {
         return orderTable;
     }
 
+    public static Order createOrder(OrderType orderType, OrderStatus orderStatus, OrderTable orderTable) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setOrderTable(orderTable);
+        order.setType(orderType);
+        order.setStatus(orderStatus);
+        return order;
+    }
 }

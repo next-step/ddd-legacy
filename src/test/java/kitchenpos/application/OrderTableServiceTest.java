@@ -2,33 +2,29 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import kitchenpos.domain.InMemoryOrderRepository;
+import kitchenpos.domain.InMemoryOrderTableRepository;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.OrderType;
 import kitchenpos.testfixture.TestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
-@SpringBootTest
 @DisplayName("OrderTableService 클래스의")
 class OrderTableServiceTest {
 
-    @Autowired
-    private OrderTableService orderTableService;
-    @MockBean
-    private OrderRepository orderRepository;
+    private OrderRepository orderRepository = new InMemoryOrderRepository();
+    private OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
+    private OrderTableService orderTableService = new OrderTableService(orderTableRepository, orderRepository);
 
     private OrderTable orderTableRequest;
 
@@ -154,8 +150,8 @@ class OrderTableServiceTest {
         void clearWithExistOrder() {
             // given
             OrderTable savedOrderTable = orderTableService.create(orderTableRequest);
+            orderRepository.save(TestFixture.createOrder(OrderType.EAT_IN, OrderStatus.ACCEPTED, savedOrderTable));
             orderTableService.sit(savedOrderTable.getId());
-            when(orderRepository.existsByOrderTableAndStatusNot(savedOrderTable, OrderStatus.COMPLETED)).thenReturn(true);
 
             // when & then
             assertThrows(IllegalStateException.class, () -> orderTableService.clear(savedOrderTable.getId()));
@@ -167,7 +163,6 @@ class OrderTableServiceTest {
             // given
             OrderTable savedOrderTable = orderTableService.create(orderTableRequest);
             orderTableService.sit(savedOrderTable.getId());
-            when(orderRepository.existsByOrderTableAndStatusNot(savedOrderTable, OrderStatus.COMPLETED)).thenReturn(false);
 
             // when
             final OrderTable orderTable = orderTableService.clear(savedOrderTable.getId());

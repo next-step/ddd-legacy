@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Stream;
+import kitchenpos.domain.InMemoryMenuGroupRepository;
+import kitchenpos.domain.InMemoryMenuRepository;
+import kitchenpos.domain.InMemoryProductRepository;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -14,7 +17,8 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.TestClientConfig;
+import kitchenpos.infra.FakePurgomalumClient;
+import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.testfixture.TestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,25 +26,20 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 
-@Transactional
-@SpringBootTest
-@Import(TestClientConfig.class)
 @DisplayName("MenuService 클래스의")
 class MenuServiceTest {
 
-    @Autowired
-    private MenuRepository menuRepository;
-    @Autowired
-    private MenuGroupRepository menuGroupRepository;
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private MenuService menuService;
+    private MenuRepository menuRepository = new InMemoryMenuRepository();
+    private MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
+    private ProductRepository productRepository = new InMemoryProductRepository();
+    private PurgomalumClient purgomalumClient = new FakePurgomalumClient(new RestTemplateBuilder());
+
+    private MenuService menuService = new MenuService(menuRepository,
+                                                      menuGroupRepository,
+                                                      productRepository,
+                                                      purgomalumClient);
 
     private Product product;
     private MenuGroup menuGroup;

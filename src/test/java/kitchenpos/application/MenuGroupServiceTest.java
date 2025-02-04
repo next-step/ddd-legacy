@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
+import kitchenpos.domain.InMemoryMenuGroupRepository;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.testfixture.TestFixture;
@@ -13,20 +14,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
-@SpringBootTest
 @DisplayName("MenuGroupService 클래스의")
 class MenuGroupServiceTest {
 
-    @Autowired
-    private MenuGroupService menuGroupService;
-
-    @Autowired
-    private MenuGroupRepository menuGroupRepository;
+    private MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
+    private MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
 
     @DisplayName("create 메소드는")
     @Nested
@@ -61,8 +54,9 @@ class MenuGroupServiceTest {
         @BeforeEach
         public void setUp() {
             MenuGroup menuGroup = TestFixture.createMenuGroup("menuGroup");
+            menuGroupRepository.save(menuGroup);
             MenuGroup menuGroup1 = TestFixture.createMenuGroup("menuGroup1");
-            menuGroupRepository.saveAll(List.of(menuGroup, menuGroup1));
+            menuGroupRepository.save(menuGroup1);
         }
 
         @DisplayName("메뉴그룹을 조회 할 수 있다.")
