@@ -189,8 +189,8 @@ class MenuServiceUnitTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴 이름이 없거나 비어있으면 메뉴를 등록할 수 없습니다.")
-        @ParameterizedTest(name = "메뉴 이름 : `{0}`")
+        @DisplayName("메뉴명이 없거나 비어있으면 메뉴를 등록할 수 없습니다.")
+        @ParameterizedTest(name = "메뉴명 : `{0}`")
         @NullAndEmptySource
         void createWithEmptyOrBlankMenuName(final String name) {
             final Menu menu = menu(null, name, price,
@@ -205,8 +205,8 @@ class MenuServiceUnitTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴 이름이 욕설이 포함되어 있으면 메뉴를 등록할 수 없습니다.")
-        @ParameterizedTest(name = "메뉴 이름 : `{0}`")
+        @DisplayName("메뉴명이 욕설이 포함되어 있으면 메뉴를 등록할 수 없습니다.")
+        @ParameterizedTest(name = "메뉴명 : `{0}`")
         @ValueSource(strings = {"비속어", "욕설", "그XX"})
         void createWithEmptyOrProfanityMenuName(final String name) {
             final Menu menu = menu(null, name, price,
