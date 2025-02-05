@@ -2,15 +2,21 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
+
 import static kitchenpos.fixture.TestFixture.makeTestMenuGroup;
+import static kitchenpos.fixture.TestFixture.makeTestProduct;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -35,6 +41,18 @@ class MenuGroupServiceTest {
         // then
         assertThat(resultMenuGroup.getId()).isNotNull();
         assertThat(resultMenuGroup.getName()).isEqualTo(menuGroup.getName());
+    }
+
+    @DisplayName("메뉴 모음명은 비어있다면 에러를 발생시킨다.")
+    @ParameterizedTest
+    @NullSource
+    void nullName(String name) {
+        // given
+        MenuGroup menuGroup = makeTestMenuGroup(name);
+        when(menuGroupRepository.save(any(MenuGroup.class))).thenReturn(menuGroup);
+
+        // then
+        assertThatThrownBy(() -> menuGroupService.create(menuGroup)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
