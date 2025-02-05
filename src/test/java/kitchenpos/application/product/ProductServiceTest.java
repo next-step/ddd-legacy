@@ -4,6 +4,8 @@ import kitchenpos.application.ProductService;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.fake.FakePurogmalumClient;
+import kitchenpos.fake.repository.InMemoryMenuRepository;
 import kitchenpos.fake.repository.InMemoryProductRepository;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
@@ -19,20 +21,16 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 
 class ProductServiceTest {
-    private ProductRepository productRepository = new InMemoryProductRepository();
-    private final MenuRepository menuRepository = mock(MenuRepository.class);
-    private final PurgomalumClient purgomalumClient = mock(PurgomalumClient.class);
-    private ProductService productService = new ProductService(productRepository, menuRepository, purgomalumClient);
+    private ProductRepository productRepository;
+    private ProductService productService;
 
     @BeforeEach
     void setUp() {
         productRepository = new InMemoryProductRepository();
+        MenuRepository menuRepository = new InMemoryMenuRepository();
+        PurgomalumClient purgomalumClient = new FakePurogmalumClient();
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
@@ -43,7 +41,6 @@ class ProductServiceTest {
         @DisplayName("성공")
         void success() {
             Product request = ProductFixture.product("후라이드", 16000);
-            when(purgomalumClient.containsProfanity(any())).thenReturn(false);
 
             Product created = productService.create(request);
 
@@ -56,7 +53,6 @@ class ProductServiceTest {
         @DisplayName("음수 가격으로 생성 실패")
         void failWithNegativePrice() {
             Product request = ProductFixture.product("후라이드", -1000);
-            when(purgomalumClient.containsProfanity(any())).thenReturn(false);
 
             assertThatThrownBy(() -> productService.create(request))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -65,8 +61,7 @@ class ProductServiceTest {
         @Test
         @DisplayName("비속어 포함된 이름으로 생성 실패")
         void failWithProfanity() {
-            Product request = ProductFixture.product("비속어", 1000);
-            when(purgomalumClient.containsProfanity(any())).thenReturn(true);
+            Product request = ProductFixture.product("바보", 1000);
 
             assertThatThrownBy(() -> productService.create(request))
                     .isInstanceOf(IllegalArgumentException.class);
