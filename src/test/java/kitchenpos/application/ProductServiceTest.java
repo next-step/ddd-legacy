@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestConstructor;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -106,7 +107,7 @@ class ProductServiceTest {
         void modifyPrice() {
             Product product = productService.create(ProductFixture.createProduct(UUID.randomUUID(), "치킨버거", new BigDecimal(7000)));
 
-            product.setPrice(new BigDecimal(8000));
+            ReflectionTestUtils.setField(product, "price", new BigDecimal(8000));
             Product modifiedProduct = productService.changePrice(product.getId(), product);
 
             assertThat(modifiedProduct.getPrice()).isEqualTo(new BigDecimal(8000));
@@ -143,7 +144,7 @@ class ProductServiceTest {
             Menu chickenSet = menuService.create(menu);
             //when
             BigDecimal newPrice = chicken.getPrice().add(new BigDecimal(1000));
-            chicken.setPrice(newPrice);
+            ReflectionTestUtils.setField(chicken, "price", newPrice);
             productService.changePrice(chicken.getId(), chicken);
             //when
             assertThat(chickenSet.isDisplayed()).isFalse();

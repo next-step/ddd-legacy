@@ -20,6 +20,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -201,7 +202,7 @@ class MenuServiceTest {
                             new BigDecimal(7000),
                             List.of(chickenBurger)));
 
-            menu.setPrice(new BigDecimal(6500));
+            ReflectionTestUtils.setField(menu, "price", new BigDecimal(6500));
             Menu newPriceMenu = menuService.changePrice(menu.getId(), menu);
 
             assertThat(newPriceMenu.getPrice()).isEqualTo(new BigDecimal(6500));
@@ -218,7 +219,7 @@ class MenuServiceTest {
                             new BigDecimal(7000),
                             List.of(chickenBurger)));
 
-            menu.setPrice(new BigDecimal(-1));
+            ReflectionTestUtils.setField(menu, "price", new BigDecimal(-1));
 
             assertThatIllegalArgumentException()
                     .isThrownBy(() -> menuService.changePrice(menu.getId(), menu));
@@ -240,7 +241,7 @@ class MenuServiceTest {
             );
             Menu resultMenu = menuService.create(menu);
 
-            resultMenu.setPrice(new BigDecimal(11001));
+            ReflectionTestUtils.setField(resultMenu, "price", new BigDecimal(11001));
             assertThatIllegalArgumentException()
                     .isThrownBy(() -> menuService.changePrice(resultMenu.getId(), resultMenu));
         }
@@ -285,7 +286,7 @@ class MenuServiceTest {
             );
             Menu resultMenu = menuService.create(menu);
 
-            resultMenu.setPrice(new BigDecimal(11001));
+            ReflectionTestUtils.setField(resultMenu, "price", new BigDecimal(11001));
             assertThatIllegalStateException()
                     .isThrownBy(() -> menuService.display(resultMenu.getId()));
         }

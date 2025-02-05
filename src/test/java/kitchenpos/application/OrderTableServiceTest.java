@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -97,12 +98,12 @@ class OrderTableServiceTest {
             //given
             OrderTable orderTable = orderTableService.create(OrderTableFixture.createOrderTable("1번테이블"));
             orderTableService.sit(orderTable.getId());
-            orderTable.setNumberOfGuests(4);
+            ReflectionTestUtils.setField(orderTable, "numberOfGuests", 4);
             orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
 
             Order order = createUnnamedOrder(orderTable.getId());
             //when, then
-            order.setStatus(status);
+            ReflectionTestUtils.setField(order, "status", status);
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderTableService.clear(orderTable.getId()));
         }
@@ -113,12 +114,12 @@ class OrderTableServiceTest {
             //given
             OrderTable orderTable = orderTableService.create(OrderTableFixture.createOrderTable("1번테이블"));
             orderTableService.sit(orderTable.getId());
-            orderTable.setNumberOfGuests(4);
+            ReflectionTestUtils.setField(orderTable, "numberOfGuests", 4);
             orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
 
             Order order = createUnnamedOrder(orderTable.getId());
             //when
-            order.setStatus(OrderStatus.COMPLETED);
+            ReflectionTestUtils.setField(order, "status", OrderStatus.COMPLETED);
             OrderTable clearOrder = orderTableService.clear(orderTable.getId());
             //then
             assertThat(clearOrder.getNumberOfGuests()).isZero();
@@ -135,7 +136,7 @@ class OrderTableServiceTest {
         void changeNumberOfGuestsByNegative() {
             OrderTable orderTable = orderTableService.create(OrderTableFixture.createOrderTable("1번테이블"));
 
-            orderTable.setNumberOfGuests(-1);
+            ReflectionTestUtils.setField(orderTable, "numberOfGuests", -1);
 
             assertThatIllegalArgumentException()
                     .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
@@ -146,8 +147,8 @@ class OrderTableServiceTest {
         void changeNumberOfGuestsByUnUse() {
             OrderTable orderTable = orderTableService.create(OrderTableFixture.createOrderTable("1번테이블"));
 
-            orderTable.setOccupied(false);
-            orderTable.setNumberOfGuests(10);
+            ReflectionTestUtils.setField(orderTable, "occupied", false);
+            ReflectionTestUtils.setField(orderTable, "numberOfGuests", 10);
 
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));

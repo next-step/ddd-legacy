@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -273,7 +274,7 @@ class OrderServiceTest {
             Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
             Order takeOutOrder = orderService.create(takeOutRequest);
 
-            takeOutOrder.setStatus(orderStatus);
+            ReflectionTestUtils.setField(takeOutOrder, "status", orderStatus);
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.accept(takeOutOrder.getId()));
         }
@@ -305,7 +306,7 @@ class OrderServiceTest {
             Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
             Order takeOutOrder = orderService.create(takeOutRequest);
 
-            takeOutOrder.setStatus(orderStatus);
+            ReflectionTestUtils.setField(takeOutOrder, "status", orderStatus);
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.serve(takeOutOrder.getId()));
         }
@@ -323,7 +324,7 @@ class OrderServiceTest {
             Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
             Order order = orderService.create(deliveryOrderRequest);
 
-            order.setStatus(OrderStatus.SERVED);
+            ReflectionTestUtils.setField(order, "status", OrderStatus.SERVED);
             Order deliveryStartorder = orderService.startDelivery(order.getId());
 
             assertThat(deliveryStartorder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
@@ -337,7 +338,7 @@ class OrderServiceTest {
             Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
             Order order = orderService.create(deliveryOrderRequest);
 
-            order.setStatus(orderStatus);
+            ReflectionTestUtils.setField(order, "status", orderStatus);
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.startDelivery(order.getId()));
         }
@@ -354,7 +355,7 @@ class OrderServiceTest {
             Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
             Order order = orderService.create(deliveryOrderRequest);
 
-            order.setStatus(OrderStatus.DELIVERING);
+            ReflectionTestUtils.setField(order, "status", OrderStatus.DELIVERING);
             Order deliveryStartorder = orderService.completeDelivery(order.getId());
 
             assertThat(deliveryStartorder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
@@ -368,7 +369,7 @@ class OrderServiceTest {
             Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
             Order order = orderService.create(deliveryOrderRequest);
 
-            order.setStatus(orderStatus);
+            ReflectionTestUtils.setField(order, "status", orderStatus);
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.completeDelivery(order.getId()));
         }
@@ -399,7 +400,7 @@ class OrderServiceTest {
             Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
             Order order = orderService.create(deliveryOrderRequest);
 
-            order.setStatus(orderStatus);
+            ReflectionTestUtils.setField(order, "status", orderStatus);
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.complete(order.getId()));
         }
@@ -444,8 +445,8 @@ class OrderServiceTest {
             Order takeoutOrder = orderService.create(takeOutRequest);
             Order eatInOrder = orderService.create(eatInRequest);
             //when
-            takeoutOrder.setStatus(orderStatus);
-            eatInOrder.setStatus(orderStatus);
+            ReflectionTestUtils.setField(takeoutOrder, "status", orderStatus);
+            ReflectionTestUtils.setField(eatInOrder, "status", orderStatus);
             //then
             assertAll(
                     () -> assertThatIllegalStateException()
