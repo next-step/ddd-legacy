@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.application.fixture.*;
 import kitchenpos.domain.*;
+import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,10 +12,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,32 +25,30 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@Transactional
-@SpringBootTest
 class OrderServiceTest {
 
     private static final UUID DISPLAY_MENU_ID = UUID.randomUUID();
     private static final UUID UNDISPLAYED_MENU_ID = UUID.randomUUID();
     private static final UUID ORDER_TABLE_ID = UUID.randomUUID();
 
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
+    private OrderRepository orderRepository;
     private MenuRepository menuRepository;
-
-    @Autowired
     private MenuGroupRepository menuGroupRepository;
-
-    @Autowired
+    private ProductRepository productRepository;
     private OrderTableRepository orderTableRepository;
-
-    @Autowired
+    private KitchenridersClient kitchenridersClient;
     private OrderService orderService;
-
 
     @BeforeEach
     void setUp() {
+        this.orderRepository = new InMemoryOrderRepository();
+        this.menuRepository = new InMemoryMenuRepository();
+        this.menuGroupRepository = new InMemoryMenuGroupRepository();
+        this.productRepository = new InMemoryProductRepository();
+        this.orderTableRepository = new InMemoryOrderTableRepository();
+        this.kitchenridersClient = new FakeKitchenridersClient();
+        this.orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
+
         Product product1 = productRepository.save(ProductFixture.createProduct(UUID.randomUUID(), "전시", new BigDecimal(25000)));
         Product product2 = productRepository.save(ProductFixture.createProduct(UUID.randomUUID(), "비전시", new BigDecimal(7000)));
 

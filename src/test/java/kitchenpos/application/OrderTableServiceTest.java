@@ -2,16 +2,15 @@ package kitchenpos.application;
 
 import kitchenpos.application.fixture.*;
 import kitchenpos.domain.*;
+import kitchenpos.infra.KitchenridersClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,24 +19,28 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
-@Transactional
-@SpringBootTest
 class OrderTableServiceTest {
 
-    @Autowired
+    private OrderRepository orderRepository;
+    private MenuRepository menuRepository;
+    private MenuGroupRepository menuGroupRepository;
+    private ProductRepository productRepository;
+    private OrderTableRepository orderTableRepository;
+    private KitchenridersClient kitchenridersClient;
+    private OrderService orderService;
     private OrderTableService orderTableService;
 
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private MenuRepository menuRepository;
-
-    @Autowired
-    private MenuGroupRepository menuGroupRepository;
+    @BeforeEach
+    void setUp() {
+        this.orderRepository = new InMemoryOrderRepository();
+        this.menuRepository = new InMemoryMenuRepository();
+        this.menuGroupRepository = new InMemoryMenuGroupRepository();
+        this.productRepository = new InMemoryProductRepository();
+        this.orderTableRepository = new InMemoryOrderTableRepository();
+        this.kitchenridersClient = new FakeKitchenridersClient();
+        this.orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
+        this.orderTableService = new OrderTableService(orderTableRepository, orderRepository);
+    }
 
     @DisplayName("주문 테이블을 등록할 수 있다")
     @Nested
