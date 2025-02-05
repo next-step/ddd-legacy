@@ -1,15 +1,20 @@
 package kitchenpos.domain;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public interface MenuRepository extends JpaRepository<Menu, UUID> {
-    List<Menu> findAllByIdIn(List<UUID> ids);
+@Repository
+public interface MenuRepository {
+   Menu save(Menu menu);
 
-    @Query("select m from Menu m join m.menuProducts mp where mp.product.id = :productId")
-    List<Menu> findAllByProductId(@Param("productId") UUID productId);
+   Optional<Menu> findById(UUID menuId);
+
+   List<Menu> findAll();
+
+   List<Menu> findAllByIdIn(List<UUID> ids);
+
+   List<Menu> findAllByProductId(UUID productId);
 }
