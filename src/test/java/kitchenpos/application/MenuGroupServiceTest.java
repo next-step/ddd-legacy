@@ -2,14 +2,13 @@ package kitchenpos.application;
 
 import kitchenpos.application.fixture.MenuGroupFixture;
 import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,12 +16,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@Transactional
-@SpringBootTest
 class MenuGroupServiceTest {
 
-    @Autowired
+    private MenuGroupRepository menuGroupRepository;
     private MenuGroupService menuGroupService;
+
+    @BeforeEach
+    void setUp() {
+        this.menuGroupRepository = new InMemoryMenuGroupRepository();
+        this.menuGroupService = new MenuGroupService(menuGroupRepository);
+    }
 
     @DisplayName("메뉴 그룹을 생성할 수 있다")
     @Nested
