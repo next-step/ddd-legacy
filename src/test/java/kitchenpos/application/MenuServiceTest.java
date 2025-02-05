@@ -4,10 +4,7 @@ import kitchenpos.application.fixture.MenuFixture;
 import kitchenpos.application.fixture.MenuGroupFixture;
 import kitchenpos.application.fixture.MenuProductFixture;
 import kitchenpos.application.fixture.ProductFixture;
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +13,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,8 +23,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@Transactional
-@SpringBootTest
 class MenuServiceTest {
 
     private static final UUID BURGER_PRODUCT_ID = UUID.randomUUID();
@@ -39,20 +30,20 @@ class MenuServiceTest {
     private static final UUID COKE_PRODUCT_ID = UUID.randomUUID();
     private static final UUID MENU_GROUP_ID = UUID.randomUUID();
 
-    @Autowired
-    private MenuService menuService;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
+    private MenuRepository menuRepository;
     private MenuGroupRepository menuGroupRepository;
-
-    @MockBean
+    private ProductRepository productRepository;
     private PurgomalumClient purgomalumClient;
+    private MenuService menuService;
 
     @BeforeEach
     void setUp() {
+        this.menuRepository = new InMemoryMenuRepository();
+        this.menuGroupRepository = new InMemoryMenuGroupRepository();
+        this.productRepository = new InMemoryProductRepository();
+        this.purgomalumClient = new FakePurgomalumClient(List.of("비속어", "욕설"));
+        this.menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+
         productRepository.save(ProductFixture.createProduct(BURGER_PRODUCT_ID, "치킨버거", new BigDecimal(7000)));
         productRepository.save(ProductFixture.createProduct(SIDE_PRODUCT_ID, "감자튀김", new BigDecimal(2000)));
         productRepository.save(ProductFixture.createProduct(COKE_PRODUCT_ID, "콜라", new BigDecimal(2000)));
@@ -135,12 +126,11 @@ class MenuServiceTest {
         }
 
         @DisplayName("메뉴명에 비속어가 있으면 등록할 수 없다")
-        @Test
-        void validateMenuName() {
-            Mockito.when(purgomalumClient.containsProfanity("bad word")).thenReturn(true);
-
+        @ValueSource(strings = {"비속어", "욕설이 포함된 메뉴명"})
+        @ParameterizedTest
+        void validateMenuName(String name) {
             MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);
-            Menu menu = MenuFixture.createMenu(MENU_GROUP_ID, "bad word", new BigDecimal(7000), List.of(chickenBurger));
+            Menu menu = MenuFixture.createMenu(MENU_GROUP_ID, name, new BigDecimal(7000), List.of(chickenBurger));
 
             assertThatIllegalArgumentException()
                     .isThrownBy(() -> menuService.create(menu));
