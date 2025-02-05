@@ -63,7 +63,7 @@ class ProductRestControllerTest {
         given(productService.changePrice(any(), any())).willReturn(product);
         product.setPrice(BigDecimal.valueOf(20000));
 
-        mockMvc.perform(put("/api/products/"+product.getId().toString()+"/price")
+        mockMvc.perform(put("/api/products/" + product.getId().toString() + "/price")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(product)))
                 .andExpect(status().isOk())
