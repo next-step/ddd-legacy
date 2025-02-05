@@ -1,24 +1,24 @@
 package kitchenpos.application.order;
 
 import kitchenpos.application.OrderTableService;
-import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderStatus;
-import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.*;
+import kitchenpos.fake.repository.InMemoryOrderRepository;
 import kitchenpos.fake.repository.InMemoryOrderTableRepository;
 
+import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.OrderTableFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class OrderTableServiceTest {
     private OrderTableService orderTableService;
@@ -28,7 +28,7 @@ class OrderTableServiceTest {
     @BeforeEach
     void setUp() {
         this.orderTableRepository = new InMemoryOrderTableRepository();
-        this.orderRepository = mock(OrderRepository.class);
+        this.orderRepository = new InMemoryOrderRepository();
         this.orderTableService = new OrderTableService(orderTableRepository, orderRepository);
     }
 
@@ -117,14 +117,24 @@ class OrderTableServiceTest {
         @Test
         void failWithStatusNotCompleted() {
             // given
+            Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(), 10000, UUID.randomUUID());
+            menu.setId(UUID.randomUUID());
+            menu.setDisplayed(true);
+
+            OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.orderTable("테이블", 0, true));
 
-            // when
-            when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(true);
+            Order order = OrderFixture.order(
+                    OrderType.EAT_IN,
+                    OrderStatus.ACCEPTED,
+                    List.of(orderLineItem)
+            );
+            order.setOrderTable(orderTable);  // OrderTable 설정
+            orderRepository.save(order);
 
             // then
             assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
-                .isInstanceOf(IllegalStateException.class);
+                    .isInstanceOf(IllegalStateException.class);
         }
     }
 
