@@ -14,7 +14,8 @@ public class FakeOrderTableRepository implements OrderTableRepository {
 
     @Override
     public OrderTable save(OrderTable orderTable) {
-        return memory.put(orderTable.getId(), orderTable);
+        memory.put(orderTable.getId(), orderTable);
+        return memory.get(orderTable.getId());
     }
 
     @Override
