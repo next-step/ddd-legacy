@@ -5,8 +5,8 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 
 import kitchenpos.fake.repository.InMemoryMenuGroupRepository;
-import kitchenpos.fixture.MenuGroupFixture;
 
+import kitchenpos.fixture.MenuFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ class MenuGroupServiceTest {
     @Test
     @DisplayName("메뉴 그룹을 생성한다")
     void createMenuGroup() {
-        MenuGroup request = MenuGroupFixture.menuGroup("나의 메뉴 그룹");
+        MenuGroup request = MenuFixture.menuGroup("나의 메뉴 그룹");
 
         MenuGroup created = menuGroupService.create(request);
 
@@ -43,8 +43,8 @@ class MenuGroupServiceTest {
     @Test
     @DisplayName("메뉴 그룹 목록을 조회한다")
     void findAllMenuGroups() {
-        MenuGroup group1 = MenuGroupFixture.menuGroup("메뉴 1");
-        MenuGroup group2 = MenuGroupFixture.menuGroup("메뉴 2");
+        MenuGroup group1 = MenuFixture.menuGroup("메뉴 1");
+        MenuGroup group2 = MenuFixture.menuGroup("메뉴 2");
         menuGroupRepository.save(group1);
         menuGroupRepository.save(group2);
 
@@ -59,7 +59,7 @@ class MenuGroupServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void cannotMenuGroupWithoutName(String name) {
-        MenuGroup request = MenuGroupFixture.menuGroup(name);
+        MenuGroup request = MenuFixture.menuGroup(name);
 
         assertThatThrownBy(() -> menuGroupService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);

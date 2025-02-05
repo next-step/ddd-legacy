@@ -1,4 +1,4 @@
-package kitchenpos.fake.repository;
+package kitchenpos.fake;
 
 import kitchenpos.infra.KitchenridersClient;
 
@@ -8,6 +8,6 @@ import java.util.UUID;
 public class KitchenridersClientImpl implements KitchenridersClient {
     @Override
     public void requestDelivery(UUID orderId, BigDecimal amount, String deliveryAddress) {
-
+        // do nothing
     }
 }

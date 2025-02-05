@@ -8,8 +8,10 @@ import java.util.UUID;
 
 
 @Repository
-public interface MenuGroupRepository{
+public interface MenuGroupRepository {
     MenuGroup save(MenuGroup menuGroup);
+
     Optional<MenuGroup> findById(UUID id);
+
     List<MenuGroup> findAll();
 }
