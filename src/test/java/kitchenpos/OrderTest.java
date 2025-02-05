@@ -1,8 +1,6 @@
 package kitchenpos;
 
-import kitchenpos.application.InMemoryOrderRepository;
-import kitchenpos.application.InMemoryOrderTableRepository;
-import kitchenpos.application.OrderService;
+import kitchenpos.application.*;
 import kitchenpos.domain.*;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,20 +8,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import static kitchenpos.domain.OrderStatus.*;
 import static kitchenpos.domain.OrderType.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.*;
 
 
 @DisplayName(value = " Order 테스트")
@@ -52,27 +50,25 @@ public class OrderTest {
     private static final OrderType ORDER_TYPE_매장내식사주문 = EAT_IN;
     private static final LocalDateTime ORDER_DATE_TIME_주문요청시간  = LocalDateTime.now();
 
-
-
-    @SpyBean
-    private ProductRepository productRepository;
-
     @SpyBean
     private MenuRepository menuRepository;
     @SpyBean
     private MenuGroupRepository menuGroupRepository;
+    private FakeKitchenridersClient fakeKitchenridersClient;
+    private OrderRepository orderRepository;
 
-    private InMemoryOrderRepository inMemoryOrderRepository;
-    @SpyBean
     private OrderService orderService;
 
-    private InMemoryOrderTableRepository inMemoryOrderTableRepository;
+    private OrderTableRepository orderTableRepository;
 
     @BeforeEach
     void setUp() {
-        inMemoryOrderRepository = new InMemoryOrderRepository();
-        inMemoryOrderTableRepository = new InMemoryOrderTableRepository();
-
+        orderRepository = spy(new InMemoryOrderRepository());
+        orderTableRepository = new InMemoryOrderTableRepository();
+        menuRepository = new InMemoryMenuRepository();
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        fakeKitchenridersClient = new FakeKitchenridersClient();
+        orderService = spy(new OrderService(orderRepository,menuRepository,orderTableRepository,fakeKitchenridersClient));
     }
 
     @DisplayName(value = "주문 추가 기능")
@@ -88,47 +84,32 @@ public class OrderTest {
         public static final boolean TABLE_USABLE = true;
         private static final boolean TABLE_UNUSABLE = false;
 
-        @BeforeEach
-        void initialize() {
-            Product product = createProduct(후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
-            productRepository.save(product);
-            MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
-            menuGroupRepository.save(menuGroup);
-            List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
-            Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
-            menuRepository.save(menu);
-            Menu hidedMenu = createMenu(후라이드치킨_MENU_HIDE_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID,false);
-            menuRepository.save(hidedMenu);
-
-
-        }
-
-
         @DisplayName(value = "주문 추가기능 & 주문 검증이 끝나면 주문대기(WAITING) 상태가 됩니다")
         @Test
         void validateStateWaiting() {
-            Mockito.clearInvocations(orderService,inMemoryOrderRepository);
-            List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, DEFAULT_QUANTITY, 후라이드치킨_DEFAULT_PRICE));
-
-            Order order = createOrder(ORDER_UUID, ORDER_TYPE_배달주문, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
-                    orderLineItems, "강남구",null,null);
-
-            Order orderResponse = orderService.create(order);
-
+            Mockito.clearInvocations(orderService, orderRepository);
+            menuRepository.save(createMenu(후라이드치킨_DEFAULT_PRICE, true, createMenuProduct()));
+            Order orderRequest = createOrder();
+            Order orderResponse = orderService.create(orderRequest);
             verify(orderService,times(1)).create(Mockito.any());
-            verify(inMemoryOrderRepository,times(1)).save(Mockito.any());
-            assertThat(orderResponse.getStatus()).isEqualTo(WAITING);
+            verify(orderRepository,times(1)).save(Mockito.any());
 
+            assertAll(
+                    () -> assertThat(orderResponse).isNotNull(),
+                    () -> assertThat(orderResponse.getDeliveryAddress()).isEqualTo(orderRequest.getDeliveryAddress()),
+                    () -> assertThat(orderResponse.getId()).isNotNull(),
+                    () -> assertThat(orderResponse.getType()).isEqualTo(orderRequest.getType()),
+                    () -> assertThat(orderResponse.getOrderDateTime()).isNotNull(),
+                    () -> assertThat(orderResponse.getOrderLineItems()).hasSize(1),
+                    () -> assertThat(orderResponse.getStatus()).isEqualTo(WAITING)
+            );
         }
 
         @DisplayName(value = "주문 타입이 없으면 안됩니다.")
         @Test
         void invalidOrderType() {
-            List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, DEFAULT_QUANTITY, 후라이드치킨_DEFAULT_PRICE));
-
             Order order = createOrder(ORDER_UUID, ORDER_TYPE_미선택, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
-                     orderLineItems, "강남구",null,null);
-
+                    createOrderLineItem(), "강남구");
             ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(order);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
         }
@@ -136,9 +117,7 @@ public class OrderTest {
         @DisplayName(value = "주문은 최소한 1개 이상의 주문상품을 선택해야 합니다.")
         @Test
         void invalidOrderLineItems() {
-            Order order = createOrder(ORDER_UUID, ORDER_TYPE_미선택, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
-                    null, "강남구",null,null);
-
+            Order order = createOrder(ORDER_TYPE_미선택);
             ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(order);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
         }
@@ -146,11 +125,8 @@ public class OrderTest {
         @DisplayName(value = "주문상품의 개수와 주문상품속 메뉴들의 총 개수는 같아야 합니다.")
         @Test
         void notEqualMenuAndOrderLineItemSize() {
-            List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(null, DEFAULT_QUANTITY, 후라이드치킨_DEFAULT_PRICE));
-
-            Order order = createOrder(ORDER_UUID, ORDER_TYPE_배달주문, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
-                    orderLineItems, "강남구",null,null);
-
+            OrderLineItem orderLineItem = createOrderLineItem(null, DEFAULT_QUANTITY, 후라이드치킨_DEFAULT_PRICE);
+            Order order = createOrder(orderLineItem, "강남구");
             ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(order);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
         }
@@ -158,10 +134,8 @@ public class OrderTest {
         @DisplayName(value = "배달이거나 포장주문일 경우, 주문상품의 수량은 0개 이상이어야 합니다.")
         @Test
         void invalidOrderLineItemSize() {
-            List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, MINUS_QUANTITY, 후라이드치킨_DEFAULT_PRICE));
-
-            Order order = createOrder(ORDER_UUID, ORDER_TYPE_배달주문, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
-                    orderLineItems, "강남구",null,null);
+            OrderLineItem orderLineItem = createOrderLineItem(후라이드치킨_MENU_UUID, MINUS_QUANTITY, 후라이드치킨_DEFAULT_PRICE);
+            Order order = createOrder(orderLineItem, "강남구");
 
             ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(order);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
@@ -170,11 +144,8 @@ public class OrderTest {
         @DisplayName(value = "선택된 메뉴가 비노출되어 있는 상태면 안됩니다.")
         @Test
         void selectedMenuNotDisplayed() {
-            List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_HIDE_UUID, DEFAULT_QUANTITY, 후라이드치킨_DEFAULT_PRICE));
-
-            Order order = createOrder(ORDER_UUID, ORDER_TYPE_배달주문, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
-                    orderLineItems, "강남구",null,null);
-
+            var menuId = menuRepository.save(createMenu(후라이드치킨_DEFAULT_PRICE, false, createMenuProduct())).getId();
+            Order order = createOrder(createOrderLineItem(menuId), "강남구");
             ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(order);
             assertThatIllegalStateException().isThrownBy(throwingCallable);
         }
@@ -182,39 +153,31 @@ public class OrderTest {
         @DisplayName(value = "선택된 메뉴의 금액과 주문요청한 메뉴의 금액은 같아야 합니다.")
         @Test
         void notEqualMenuAndOrderMenuPrice() {
-            List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, DEFAULT_QUANTITY, 후라이드치킨_OVER_PRICE));
-
-            Order order = createOrder(ORDER_UUID, ORDER_TYPE_배달주문, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
-                    orderLineItems, "강남구",null,null);
-
-            ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(order);
+            OrderLineItem orderLineItem = createOrderLineItem(후라이드치킨_MENU_UUID, DEFAULT_QUANTITY, 후라이드치킨_OVER_PRICE);
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(createOrder(orderLineItem, "강남구"));
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
         }
 
         @DisplayName(value = "배달주문인 경우, 반드시 배달 주소를 입력하여 배달기사에게 전달합니다.")
         @Test
         void validateDeliveryAddress() {
-            List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, DEFAULT_QUANTITY, 후라이드치킨_DEFAULT_PRICE));
-
-            Order order = createOrder(ORDER_UUID, ORDER_TYPE_배달주문, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
-                    orderLineItems, "",null,null);
-
-            ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(order);
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(createOrder(createOrderLineItem(), ""));
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
         }
 
         @DisplayName(value = "매장내 식사일 경우, 배정요청한 주문 테이블이 사용가능이어야 합니다.")
         @Test
         void validateEatInOrderTable() {
-            List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, DEFAULT_QUANTITY, 후라이드치킨_DEFAULT_PRICE));
+            var menuId = menuRepository.save(createMenu(후라이드치킨_DEFAULT_PRICE, false, createMenuProduct())).getId();
             OrderTable orderTable = createOrderTable(ORDER_TABLE_ID, ORDER_TABLE_NAME, 0, TABLE_UNUSABLE);
-            inMemoryOrderTableRepository.save(orderTable);
+            orderTableRepository.save(orderTable);
             Order order = createOrder(ORDER_UUID, ORDER_TYPE_매장내식사주문, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
-                    orderLineItems, "강남구",orderTable,orderTable.getId());
-
+                    createOrderLineItem(menuId), "강남구",orderTable,orderTable.getId());
             ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(order);
             assertThatIllegalStateException().isThrownBy(throwingCallable);
         }
+
+
 
 
         /*@DisplayName(value = "메뉴를 등록할 수 있다.")
@@ -307,6 +270,9 @@ public class OrderTest {
         return menuProduct;
     }
 
+    private MenuProduct createMenuProduct() {
+        return createMenuProduct(createProduct(), 1, 후라이드치킨_PRODUCT_UUID);
+    }
 
     private static Product createProduct(final UUID uuid, final String name, final BigDecimal price) {
         Product product = new Product();
@@ -314,7 +280,16 @@ public class OrderTest {
         product.setName(name);
         product.setPrice(price);
         return product;
+
     }
+    private Product createProduct() {
+        Product product = new Product();
+        product.setId(후라이드치킨_PRODUCT_UUID);
+        product.setName(TEST_PRODUCT_NAME);
+        product.setPrice(후라이드치킨_DEFAULT_PRICE);
+        return product;
+    }
+
 
     private static MenuGroup createMenuGroup(final String name, final UUID id) {
         MenuGroup menuGroup = new MenuGroup();
@@ -322,44 +297,82 @@ public class OrderTest {
         menuGroup.setId(id);
         return menuGroup;
     }
+    private static MenuGroup createMenuGroup() {
+         return createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
+    }
 
-    private static Menu createMenu(final UUID id, final String name, final BigDecimal price, final MenuGroup menuGroup, final List<MenuProduct> menuProducts, final UUID menugroupId) {
+    private static Menu createMenu(final UUID id, final String name, final BigDecimal price, final MenuGroup menuGroup, final MenuProduct menuProducts, final UUID menugroupId) {
         Menu menu = new Menu();
         menu.setId(id);
         menu.setName(name);
         menu.setPrice(price);
         menu.setMenuGroup(menuGroup);
         menu.setDisplayed(true);
-        menu.setMenuProducts(menuProducts);
+        menu.setMenuProducts(Arrays.asList(menuProducts));
         menu.setMenuGroupId(menugroupId);
         return menu;
     }
 
-    private static Menu createMenu(final UUID id, final String name, final BigDecimal price, final MenuGroup menuGroup, final List<MenuProduct> menuProducts, final UUID menugroupId, boolean displayed) {
+    private static Menu createMenu(final BigDecimal price, final boolean displayed, final MenuProduct menuProducts) {
         Menu menu = new Menu();
-        menu.setId(id);
-        menu.setName(name);
+        menu.setId(후라이드치킨_MENU_UUID);
+        menu.setName(후라이드치킨_MENU_NAME);
         menu.setPrice(price);
-        menu.setMenuGroup(menuGroup);
+        menu.setMenuGroup(createMenuGroup());
         menu.setDisplayed(displayed);
-        menu.setMenuProducts(menuProducts);
-        menu.setMenuGroupId(menugroupId);
+        menu.setMenuProducts(Arrays.asList(menuProducts));
         return menu;
     }
 
     private static Order createOrder(final UUID id, final OrderType orderType, final OrderStatus orderStatus, final LocalDateTime orderDateTime,
-                                     final List<OrderLineItem> orderLineItems, final String deliveryAddress, final OrderTable orderTable, final UUID orderTableId) {
+                                     final OrderLineItem orderLineItem, final String deliveryAddress) {
         Order order = new Order();
         order.setId(id);
         order.setType(orderType);
         order.setStatus(orderStatus);
-        order.setOrderLineItems(orderLineItems);
+        order.setOrderLineItems(Arrays.asList(orderLineItem));
+        order.setOrderDateTime(orderDateTime);
+        order.setDeliveryAddress(deliveryAddress);
+        return order;
+    }
+
+    private Order createOrder(final UUID id, final OrderType orderType, final OrderStatus orderStatus, final LocalDateTime orderDateTime,
+                              final OrderLineItem orderLineItem, final String deliveryAddress, OrderTable orderTable, UUID orderTableId) {
+        Order order = new Order();
+        order.setId(id);
+        order.setType(orderType);
+        order.setStatus(orderStatus);
+        order.setOrderLineItems(Arrays.asList(orderLineItem));
         order.setOrderDateTime(orderDateTime);
         order.setDeliveryAddress(deliveryAddress);
         order.setOrderTable(orderTable);
         order.setOrderTableId(orderTableId);
         return order;
     }
+
+    private Order createOrder(OrderLineItem orderLineItem, String deliveryAddress) {
+        Order order = new Order();
+        order.setId(ORDER_UUID);
+        order.setType(ORDER_TYPE_배달주문);
+        order.setStatus(ORDER_STATUS_주문대기);
+        order.setOrderLineItems(Arrays.asList(orderLineItem));
+        order.setDeliveryAddress(deliveryAddress);
+        return order;
+    }
+
+
+
+    private static Order createOrder() {
+        return createOrder(ORDER_UUID, ORDER_TYPE_배달주문, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
+                createOrderLineItem(), "강남구");
+    }
+
+    private static Order createOrder(OrderType orderType) {
+        return createOrder(ORDER_UUID, orderType, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
+                createOrderLineItem(), "강남구");
+    }
+
+
 
 
     private static OrderLineItem createOrderLineItem(UUID menuId, long quantity, BigDecimal price) {
@@ -369,6 +382,14 @@ public class OrderTest {
         orderLineItem.setPrice(price);
         return orderLineItem;
     }
+    private static OrderLineItem createOrderLineItem() {
+        return createOrderLineItem(후라이드치킨_MENU_UUID, OrderCreateTest.DEFAULT_QUANTITY, 후라이드치킨_DEFAULT_PRICE);
+    }
+
+    private OrderLineItem createOrderLineItem(UUID menuId) {
+        return createOrderLineItem(menuId, OrderCreateTest.DEFAULT_QUANTITY, 후라이드치킨_DEFAULT_PRICE);
+    }
+
     private static OrderTable createOrderTable(UUID orderTableId, String orderTableName, int numberOfGuest, boolean istableUsable) {
         OrderTable orderTable = new OrderTable();
         orderTable.setId(orderTableId);
