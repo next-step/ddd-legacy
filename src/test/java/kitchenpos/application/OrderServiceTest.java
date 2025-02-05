@@ -37,17 +37,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-@DisplayName("OrderService 클래스의")
 class OrderServiceTest {
 
-    private OrderRepository orderRepository = new InMemoryOrderRepository();
-    private MenuRepository menuRepository = new InMemoryMenuRepository();
-    private OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
-    private KitchenridersClient kitchenridersClient = new KitchenridersClient();
-    private ProductRepository productRepository = new InMemoryProductRepository();
-    private MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
+    private OrderRepository orderRepository;
+    private MenuRepository menuRepository;
+    private OrderTableRepository orderTableRepository;
+    private KitchenridersClient kitchenridersClient;
+    private ProductRepository productRepository;
+    private MenuGroupRepository menuGroupRepository;
 
-    private OrderService orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
+    private OrderService orderService;
 
     private OrderTable orderTable;
     private Menu menu;
@@ -56,6 +55,14 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
+        orderRepository = new InMemoryOrderRepository();
+        menuRepository = new InMemoryMenuRepository();
+        orderTableRepository = new InMemoryOrderTableRepository();
+        kitchenridersClient = new KitchenridersClient();
+        productRepository = new InMemoryProductRepository();
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+
+        orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
 
         MenuGroup menuGroup = TestFixture.createMenuGroup("menuGroup");
         menuGroupRepository.save(menuGroup);
@@ -82,7 +89,6 @@ class OrderServiceTest {
         orderRequest.setOrderLineItems(List.of(orderLineItemRequest));
     }
 
-    @DisplayName("create 메소드는")
     @Nested
     class Create {
 
@@ -220,7 +226,6 @@ class OrderServiceTest {
         }
     }
 
-    @DisplayName("accept 메소드는")
     @Nested
     class Accept {
 
@@ -274,7 +279,6 @@ class OrderServiceTest {
         }
     }
 
-    @DisplayName("serve 메소드는")
     @Nested
     class Serve {
 
@@ -314,7 +318,6 @@ class OrderServiceTest {
         }
     }
 
-    @DisplayName("startDelivery 메소드는")
     @Nested
     class StartDelivery {
 
@@ -370,7 +373,6 @@ class OrderServiceTest {
         }
     }
 
-    @DisplayName("completeDelivery 메소드는")
     @Nested
     class CompleteDelivery {
 
@@ -416,7 +418,6 @@ class OrderServiceTest {
         }
     }
 
-    @DisplayName("complete 메소드는")
     @Nested
     class Complete {
 
@@ -510,7 +511,6 @@ class OrderServiceTest {
         }
     }
 
-    @DisplayName("findAll 메소드는")
     @Nested
     class FindAll {
 

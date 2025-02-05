@@ -6,6 +6,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import kitchenpos.domain.InMemoryMenuGroupRepository;
+import kitchenpos.domain.InMemoryMenuRepository;
+import kitchenpos.domain.InMemoryProductRepository;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -13,34 +16,30 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.TestClientConfig;
+import kitchenpos.infra.FakePurgomalumClient;
 import kitchenpos.testfixture.TestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 
-@Transactional
-@Import(TestClientConfig.class)
-@SpringBootTest
-@DisplayName("ProductService 클래스의")
 class ProductServiceTest {
 
-    @Autowired
     private ProductService productService;
 
-    @Autowired
     private ProductRepository productRepository;
-    @Autowired
     private MenuRepository menuRepository;
-    @Autowired
     private MenuGroupRepository menuGroupRepository;
 
-    @DisplayName("create 메소드는")
+    @BeforeEach
+    void setUp() {
+        productRepository = new InMemoryProductRepository();
+        menuRepository = new InMemoryMenuRepository();
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        productService = new ProductService(productRepository, menuRepository, new FakePurgomalumClient(new RestTemplateBuilder()));
+    }
+
     @Nested
     class Create {
 
@@ -96,7 +95,6 @@ class ProductServiceTest {
         }
     }
 
-    @DisplayName("changePrice 메소드는")
     @Nested
     class ChangePrice {
 
@@ -164,7 +162,6 @@ class ProductServiceTest {
         }
     }
 
-    @DisplayName("findAll 메소드는")
     @Nested
     class FindAll {
 

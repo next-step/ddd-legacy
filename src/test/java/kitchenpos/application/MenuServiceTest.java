@@ -28,18 +28,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 
-@DisplayName("MenuService 클래스의")
 class MenuServiceTest {
 
-    private MenuRepository menuRepository = new InMemoryMenuRepository();
-    private MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
-    private ProductRepository productRepository = new InMemoryProductRepository();
-    private PurgomalumClient purgomalumClient = new FakePurgomalumClient(new RestTemplateBuilder());
+    private MenuRepository menuRepository;
+    private MenuGroupRepository menuGroupRepository;
+    private ProductRepository productRepository;
+    private PurgomalumClient purgomalumClient;
 
-    private MenuService menuService = new MenuService(menuRepository,
-                                                      menuGroupRepository,
-                                                      productRepository,
-                                                      purgomalumClient);
+    private MenuService menuService;
 
     private Product product;
     private MenuGroup menuGroup;
@@ -48,13 +44,22 @@ class MenuServiceTest {
 
     @BeforeEach
     void setUp() {
+        menuRepository = new InMemoryMenuRepository();
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        productRepository = new InMemoryProductRepository();
+        purgomalumClient = new FakePurgomalumClient(new RestTemplateBuilder());
+
+        menuService = new MenuService(menuRepository,
+                                      menuGroupRepository,
+                                      productRepository,
+                                      purgomalumClient);
+
         product = TestFixture.createProduct("product", BigDecimal.valueOf(10));
         menuGroup = TestFixture.createMenuGroup("menuGroup");
         menuProduct = TestFixture.createMenuProduct(1, product);
         menu = TestFixture.createMenu("menu", BigDecimal.valueOf(10), menuGroup, menuProduct);
     }
 
-    @DisplayName("create 메서드는")
     @Nested
     class Create {
 
@@ -159,7 +164,6 @@ class MenuServiceTest {
         }
     }
 
-    @DisplayName("changePrice 메서드는")
     @Nested
     class ChangePrice {
 
@@ -213,7 +217,6 @@ class MenuServiceTest {
         }
     }
 
-    @DisplayName("display 메서드는")
     @Nested
     class Display {
 
@@ -259,7 +262,6 @@ class MenuServiceTest {
         }
     }
 
-    @DisplayName("hide 메서드는")
     @Nested
     class Hide {
 

@@ -19,21 +19,22 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("OrderTableService 클래스의")
 class OrderTableServiceTest {
 
-    private OrderRepository orderRepository = new InMemoryOrderRepository();
-    private OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
-    private OrderTableService orderTableService = new OrderTableService(orderTableRepository, orderRepository);
+    private OrderRepository orderRepository;
+    private OrderTableRepository orderTableRepository;
+    private OrderTableService orderTableService;
 
     private OrderTable orderTableRequest;
 
     @BeforeEach
     void setUp() {
+        orderRepository = new InMemoryOrderRepository();
+        orderTableRepository = new InMemoryOrderTableRepository();
+        orderTableService = new OrderTableService(orderTableRepository, orderRepository);
         orderTableRequest = TestFixture.createOrderTable("orderTable", 0, false);
     }
 
-    @DisplayName("create 메소드는")
     @Nested
     class Create {
 
@@ -61,7 +62,6 @@ class OrderTableServiceTest {
         }
     }
 
-    @DisplayName("changeNumberOfGuests 메소드는")
     @Nested
     class ChangeNumberOfGuests {
 
@@ -109,7 +109,6 @@ class OrderTableServiceTest {
         }
     }
 
-    @DisplayName("sit 메소드는")
     @Nested
     class Sit {
 
@@ -134,7 +133,6 @@ class OrderTableServiceTest {
         }
     }
 
-    @DisplayName("clear 메소드는")
     @Nested
     class Clear {
 
@@ -173,7 +171,6 @@ class OrderTableServiceTest {
         }
     }
 
-    @DisplayName("findAll 메소드는")
     @Nested
     class FindAll {
 

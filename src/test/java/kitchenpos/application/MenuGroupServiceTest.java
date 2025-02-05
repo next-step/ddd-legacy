@@ -15,13 +15,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("MenuGroupService 클래스의")
 class MenuGroupServiceTest {
 
-    private MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
-    private MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
+    private MenuGroupRepository menuGroupRepository;
+    private MenuGroupService menuGroupService;
 
-    @DisplayName("create 메소드는")
+    @BeforeEach
+    void setUp() {
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        menuGroupService = new MenuGroupService(menuGroupRepository);
+    }
+
     @Nested
     class Create {
 
@@ -47,7 +51,6 @@ class MenuGroupServiceTest {
         }
     }
 
-    @DisplayName("findAll 메소드는")
     @Nested
     class FindAll {
 
