@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.application.Exception.*;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
@@ -44,11 +45,11 @@ public class OrderService {
     public Order create(final Order request) {
         final OrderType type = request.getType();
         if (Objects.isNull(type)) {
-            throw new IllegalArgumentException();
+            throw new OrderTypeNotFoundException();
         }
         final List<OrderLineItem> orderLineItemRequests = request.getOrderLineItems();
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new OrderLineItemNotFoundException();
         }
         final List<Menu> menus = menuRepository.findAllByIdIn(
             orderLineItemRequests.stream()
@@ -56,23 +57,23 @@ public class OrderService {
                 .toList()
         );
         if (menus.size() != orderLineItemRequests.size()) {
-            throw new IllegalArgumentException();
+            throw new OrderLineSizeNotMatched();
         }
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (final OrderLineItem orderLineItemRequest : orderLineItemRequests) {
             final long quantity = orderLineItemRequest.getQuantity();
             if (type != OrderType.EAT_IN) {
                 if (quantity < 0) {
-                    throw new IllegalArgumentException();
+                    throw new OrderLineQuantityNegativeException();
                 }
             }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                 .orElseThrow(NoSuchElementException::new);
             if (!menu.isDisplayed()) {
-                throw new IllegalStateException();
+                throw new MenuDisplayFalseException();
             }
             if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
-                throw new IllegalArgumentException();
+                throw new MenuPriceNotMatchedException();
             }
             final OrderLineItem orderLineItem = new OrderLineItem();
             orderLineItem.setMenu(menu);
@@ -88,7 +89,7 @@ public class OrderService {
         if (type == OrderType.DELIVERY) {
             final String deliveryAddress = request.getDeliveryAddress();
             if (Objects.isNull(deliveryAddress) || deliveryAddress.isEmpty()) {
-                throw new IllegalArgumentException();
+                throw new DeliveryAddressNotFoundException();
             }
             order.setDeliveryAddress(deliveryAddress);
         }
@@ -96,7 +97,7 @@ public class OrderService {
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
                 .orElseThrow(NoSuchElementException::new);
             if (!orderTable.isOccupied()) {
-                throw new IllegalStateException();
+                throw new OrderTableNotOccupiedException();
             }
             order.setOrderTable(orderTable);
         }
@@ -167,12 +168,12 @@ public class OrderService {
         final OrderStatus status = order.getStatus();
         if (type == OrderType.DELIVERY) {
             if (status != OrderStatus.DELIVERED) {
-                throw new IllegalStateException();
+                throw new OrderNotDeliveredYetException();
             }
         }
         if (type == OrderType.TAKEOUT || type == OrderType.EAT_IN) {
             if (status != OrderStatus.SERVED) {
-                throw new IllegalStateException();
+                throw new OrderNotServedYetException();
             }
         }
         order.setStatus(OrderStatus.COMPLETED);

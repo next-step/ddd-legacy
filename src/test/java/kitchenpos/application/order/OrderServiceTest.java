@@ -1,17 +1,23 @@
 package kitchenpos.application.order;
 
+import kitchenpos.application.Exception.OrderLineItemNotFoundException;
+import kitchenpos.application.Exception.OrderLineSizeNotMatched;
+import kitchenpos.application.Exception.OrderTypeNotFoundException;
 import kitchenpos.application.OrderService;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.fake.FakechenridersClientImpl;
+import kitchenpos.fake.repository.InMemoryMenuRepository;
 import kitchenpos.fake.repository.InMemoryOrderRepository;
+import kitchenpos.fake.repository.InMemoryOrderTableRepository;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.OrderTableFixture;
+import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 
-import static org.mockito.Mockito.mock;
 
 
 import kitchenpos.domain.*;
@@ -19,14 +25,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 class OrderServiceTest {
     private OrderService orderService;
@@ -37,9 +41,9 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
         orderRepository = new InMemoryOrderRepository();
-        menuRepository = mock(MenuRepository.class);
-        orderTableRepository = mock(OrderTableRepository.class);
-        KitchenridersClient kitchenridersClient = mock(KitchenridersClient.class);
+        menuRepository = new InMemoryMenuRepository();
+        orderTableRepository = new InMemoryOrderTableRepository();
+        KitchenridersClient kitchenridersClient = new FakechenridersClientImpl();
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
 
@@ -50,15 +54,16 @@ class OrderServiceTest {
         @DisplayName("배달 주문 성공")
         void createDeliveryOrderSuccess() {
             // given
-            Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(),10000, UUID.randomUUID());
+            Product product = ProductFixture.product("돈까스", 10000);
+            MenuGroup menuGroup = MenuFixture.menuGroup("메인 메뉴");
+            MenuProduct menuProduct = MenuFixture.menuProduct(product, 1);
+            Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
             menu.setId(UUID.randomUUID());
-            menu.setDisplayed(true);
+
+            menuRepository.save(menu);
 
             OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
             Order request = OrderFixture.deliveryOrder("서울시 강남구", List.of(orderLineItem));
-
-            when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-            when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
             // when
             Order created = orderService.create(request);
@@ -75,18 +80,18 @@ class OrderServiceTest {
         void createEatInOrderSuccess() {
             // given
             OrderTable orderTable = OrderTableFixture.orderTable("1번 테이블", 4, true);
-            orderTable.setId(UUID.randomUUID());
+            orderTableRepository.save(orderTable);
 
-            Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(),10000, UUID.randomUUID());
+            Product product = ProductFixture.product("돈까스", 10000);
+            MenuGroup menuGroup = MenuFixture.menuGroup("메인 메뉴");
+            MenuProduct menuProduct = MenuFixture.menuProduct(product, 1);
+            Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
             menu.setId(UUID.randomUUID());
-            menu.setDisplayed(true);
+
+            menuRepository.save(menu);
 
             OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
             Order request = OrderFixture.eatInOrder(orderTable.getId(), List.of(orderLineItem));
-
-            when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-            when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-            when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
 
             // when
             Order created = orderService.create(request);
@@ -95,7 +100,7 @@ class OrderServiceTest {
             assertThat(created.getId()).isNotNull();
             assertThat(created.getType()).isEqualTo(OrderType.EAT_IN);
             assertThat(created.getStatus()).isEqualTo(OrderStatus.WAITING);
-            assertThat(created.getOrderTable()).isEqualTo(orderTable);
+            assertThat(created.getOrderTable().getId()).isEqualTo(orderTable.getId());
         }
 
         @Test
@@ -105,7 +110,7 @@ class OrderServiceTest {
             request.setOrderLineItems(List.of(new OrderLineItem()));
 
             assertThatThrownBy(() -> orderService.create(request))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(OrderTypeNotFoundException.class);
         }
 
         @Test
@@ -115,23 +120,24 @@ class OrderServiceTest {
             request.setType(OrderType.TAKEOUT);
 
             assertThatThrownBy(() -> orderService.create(request))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(OrderLineItemNotFoundException.class);
         }
 
         @Test
         @DisplayName("메뉴가 존재하지 않으면 실패")
         void failWithNonExistentMenu() {
-            OrderLineItem orderLineItem = new OrderLineItem();
-            orderLineItem.setMenuId(UUID.randomUUID());
+            OrderLineItem orderLineItem = OrderFixture.orderLineItem(
+                    UUID.randomUUID(),
+                    1,
+                    BigDecimal.valueOf(10000)
+            );
 
             Order request = new Order();
             request.setType(OrderType.TAKEOUT);
             request.setOrderLineItems(List.of(orderLineItem));
 
-            when(menuRepository.findAllByIdIn(any())).thenReturn(List.of());
-
             assertThatThrownBy(() -> orderService.create(request))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(OrderLineSizeNotMatched.class);
         }
     }
 
@@ -142,10 +148,13 @@ class OrderServiceTest {
         @DisplayName("주문 접수 성공")
         void acceptOrderSuccess() {
             // given
-            Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setType(OrderType.TAKEOUT);
-            order.setStatus(OrderStatus.WAITING);
+            Product product = ProductFixture.product("돈까스", 10000);
+            MenuGroup menuGroup = MenuFixture.menuGroup("메인 메뉴");
+            MenuProduct menuProduct = MenuFixture.menuProduct(product, 1);
+            Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
+
+            OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
+            Order order = OrderFixture.takeoutOrder(List.of(orderLineItem));
             orderRepository.save(order);
 
             // when
@@ -158,9 +167,14 @@ class OrderServiceTest {
         @Test
         @DisplayName("대기 상태가 아닌 주문은 접수할 수 없다")
         void cannotAcceptNonWaitingOrder() {
-            Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.ACCEPTED);
+            // given
+            Product product = ProductFixture.product("돈까스", 10000);
+            MenuGroup menuGroup = MenuFixture.menuGroup("메인 메뉴");
+            MenuProduct menuProduct = MenuFixture.menuProduct(product, 1);
+            Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
+
+            OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
+            Order order = OrderFixture.order(OrderType.TAKEOUT, OrderStatus.ACCEPTED, List.of(orderLineItem));
             orderRepository.save(order);
 
             assertThatThrownBy(() -> orderService.accept(order.getId()))
@@ -171,9 +185,13 @@ class OrderServiceTest {
         @DisplayName("주문 서빙 성공")
         void serveOrderSuccess() {
             // given
-            Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.ACCEPTED);
+            Product product = ProductFixture.product("돈까스", 10000);
+            MenuGroup menuGroup = MenuFixture.menuGroup("메인 메뉴");
+            MenuProduct menuProduct = MenuFixture.menuProduct(product, 1);
+            Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
+
+            OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
+            Order order = OrderFixture.order(OrderType.TAKEOUT, OrderStatus.ACCEPTED, List.of(orderLineItem));
             orderRepository.save(order);
 
             // when
@@ -186,9 +204,14 @@ class OrderServiceTest {
         @Test
         @DisplayName("접수 상태가 아닌 주문은 서빙할 수 없다")
         void cannotServeNonAcceptedOrder() {
-            Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.WAITING);
+            // given
+            Product product = ProductFixture.product("돈까스", 10000);
+            MenuGroup menuGroup = MenuFixture.menuGroup("메인 메뉴");
+            MenuProduct menuProduct = MenuFixture.menuProduct(product, 1);
+            Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
+
+            OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
+            Order order = OrderFixture.order(OrderType.TAKEOUT, OrderStatus.WAITING, List.of(orderLineItem));
             orderRepository.save(order);
 
             assertThatThrownBy(() -> orderService.serve(order.getId()))
@@ -203,10 +226,14 @@ class OrderServiceTest {
         @DisplayName("배달 시작 성공")
         void startDeliverySuccess() {
             // given
-            Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setType(OrderType.DELIVERY);
-            order.setStatus(OrderStatus.SERVED);
+            Product product = ProductFixture.product("돈까스", 10000);
+            MenuGroup menuGroup = MenuFixture.menuGroup("메인 메뉴");
+            MenuProduct menuProduct = MenuFixture.menuProduct(product, 1);
+            Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
+
+            OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
+            Order order = OrderFixture.order(OrderType.DELIVERY, OrderStatus.SERVED, List.of(orderLineItem));
+            order.setDeliveryAddress("서울시 강남구");
             orderRepository.save(order);
 
             // when
@@ -220,10 +247,14 @@ class OrderServiceTest {
         @DisplayName("배달 완료 성공")
         void completeDeliverySuccess() {
             // given
-            Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setType(OrderType.DELIVERY);
-            order.setStatus(OrderStatus.DELIVERING);
+            Product product = ProductFixture.product("돈까스", 10000);
+            MenuGroup menuGroup = MenuFixture.menuGroup("메인 메뉴");
+            MenuProduct menuProduct = MenuFixture.menuProduct(product, 1);
+            Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
+
+            OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
+            Order order = OrderFixture.order(OrderType.DELIVERY, OrderStatus.DELIVERING, List.of(orderLineItem));
+            order.setDeliveryAddress("서울시 강남구");
             orderRepository.save(order);
 
             // when
@@ -238,10 +269,16 @@ class OrderServiceTest {
     @DisplayName("주문 목록 조회")
     void findAllOrders() {
         // given
-        Order order1 = new Order();
-        order1.setType(OrderType.TAKEOUT);
-        Order order2 = new Order();
-        order2.setType(OrderType.DELIVERY);
+        Product product = ProductFixture.product("돈까스", 10000);
+        MenuGroup menuGroup = MenuFixture.menuGroup("메인 메뉴");
+        MenuProduct menuProduct = MenuFixture.menuProduct(product, 1);
+        Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
+
+        OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
+
+        Order order1 = OrderFixture.takeoutOrder(List.of(orderLineItem));
+        Order order2 = OrderFixture.deliveryOrder("서울시 강남구", List.of(orderLineItem));
+
         orderRepository.save(order1);
         orderRepository.save(order2);
 
