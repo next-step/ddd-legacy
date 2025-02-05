@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Transactional
 @SpringBootTest
@@ -69,12 +70,14 @@ class MenuServiceTest {
 
             Menu resultMenu = menuService.create(menu);
 
-            assertThat(resultMenu.getName()).isEqualTo("치킨버거");
-            assertThat(resultMenu.getPrice()).isEqualTo(new BigDecimal(7000));
-            assertThat(resultMenu.isDisplayed()).isFalse();
-            assertThat(resultMenu.getMenuProducts()).hasSize(1);
-            assertThat(resultMenu.getMenuGroup()).isNotNull();
-            assertThat(resultMenu.getMenuGroup().getId()).isEqualTo(MENU_GROUP_ID);
+            assertAll(
+                    () -> assertThat(resultMenu.getName()).isEqualTo("치킨버거"),
+                    () -> assertThat(resultMenu.getPrice()).isEqualTo(new BigDecimal(7000)),
+                    () -> assertThat(resultMenu.isDisplayed()).isFalse(),
+                    () -> assertThat(resultMenu.getMenuProducts()).hasSize(1),
+                    () -> assertThat(resultMenu.getMenuGroup()).isNotNull(),
+                    () -> assertThat(resultMenu.getMenuGroup().getId()).isEqualTo(MENU_GROUP_ID)
+            );
         }
 
         @DisplayName("여러 상품으로 조합하여 하나의 메뉴를 등록할 수 있다")
@@ -94,11 +97,13 @@ class MenuServiceTest {
             //when
             Menu resultMenu = menuService.create(menu);
             //then
-            assertThat(resultMenu.getName()).isEqualTo("치킨버거세트");
-            assertThat(resultMenu.getPrice()).isEqualTo(new BigDecimal(10000));
-            assertThat(resultMenu.getMenuProducts()).hasSize(3);
-            assertThat(resultMenu.getMenuGroup()).isNotNull();
-            assertThat(resultMenu.getMenuGroup().getId()).isEqualTo(MENU_GROUP_ID);
+            assertAll(
+                    () -> assertThat(resultMenu.getName()).isEqualTo("치킨버거세트"),
+                    () -> assertThat(resultMenu.getPrice()).isEqualTo(new BigDecimal(10000)),
+                    () -> assertThat(resultMenu.getMenuProducts()).hasSize(3),
+                    () -> assertThat(resultMenu.getMenuGroup()).isNotNull(),
+                    () -> assertThat(resultMenu.getMenuGroup().getId()).isEqualTo(MENU_GROUP_ID)
+            );
         }
 
         @DisplayName("각 메뉴를 구성하는 상품의 수량은 0이상이어야 한다")
@@ -317,14 +322,17 @@ class MenuServiceTest {
         menuService.create(MenuFixture.createMenu(MENU_GROUP_ID, "콜라", new BigDecimal(2000), List.of(coke)));
 
         List<Menu> allMenus = menuService.findAll();
-        assertThat(allMenus.size()).isEqualTo(3);
-        assertThat(allMenus)
-                .extracting(Menu::getName, menu -> menu.getPrice().intValue())
-                .contains(
-                        Tuple.tuple("치킨버거", 7000),
-                        Tuple.tuple("감자튀김", 2000),
-                        Tuple.tuple("콜라", 2000)
-                );
+
+        assertAll(
+                () -> assertThat(allMenus.size()).isEqualTo(3),
+                () -> assertThat(allMenus)
+                        .extracting(Menu::getName, menu -> menu.getPrice().intValue())
+                        .contains(
+                                Tuple.tuple("치킨버거", 7000),
+                                Tuple.tuple("감자튀김", 2000),
+                                Tuple.tuple("콜라", 2000)
+                        )
+        );
     }
     //endregion
 }

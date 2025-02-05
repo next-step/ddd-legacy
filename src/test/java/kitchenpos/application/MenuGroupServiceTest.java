@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Transactional
 @SpringBootTest
@@ -58,9 +59,11 @@ class MenuGroupServiceTest {
 
         List<MenuGroup> menuGroups = menuGroupService.findAll();
 
-        assertThat(menuGroups.size()).isEqualTo(3);
-        assertThat(menuGroups).extracting(MenuGroup::getName)
-                .contains("버거", "세트메뉴", "사이드");
+        assertAll(
+                () -> assertThat(menuGroups.size()).isEqualTo(3),
+                () -> assertThat(menuGroups).extracting(MenuGroup::getName)
+                        .contains("버거", "세트메뉴", "사이드")
+        );
 
     }
 }

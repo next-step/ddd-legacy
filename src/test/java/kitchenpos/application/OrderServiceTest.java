@@ -24,6 +24,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Transactional
 @SpringBootTest
@@ -87,11 +88,13 @@ class OrderServiceTest {
 
             Order orderResult = orderService.create(orderRequest);
 
-            assertThat(orderResult.getType()).isEqualTo(OrderType.TAKEOUT);
-            assertThat(orderResult.getOrderLineItems()).isNotNull();
-            assertThat(orderResult.getOrderLineItems()).hasSize(1);
-            assertThat(orderResult.getDeliveryAddress()).isNull();
-            assertThat(orderResult.getStatus()).isEqualTo(OrderStatus.WAITING);
+            assertAll(
+                    () -> assertThat(orderResult.getType()).isEqualTo(OrderType.TAKEOUT),
+                    () -> assertThat(orderResult.getOrderLineItems()).isNotNull(),
+                    () -> assertThat(orderResult.getOrderLineItems()).hasSize(1),
+                    () -> assertThat(orderResult.getDeliveryAddress()).isNull(),
+                    () -> assertThat(orderResult.getStatus()).isEqualTo(OrderStatus.WAITING)
+            );
         }
 
         @DisplayName("배달 주문을 생성한다. 주문이 정상적으로 생성되면 상태는 대기 중으로 변경된다")
@@ -102,12 +105,14 @@ class OrderServiceTest {
 
             Order orderResult = orderService.create(orderRequest);
 
-            assertThat(orderResult.getType()).isEqualTo(OrderType.DELIVERY);
-            assertThat(orderResult.getOrderLineItems()).isNotNull();
-            assertThat(orderResult.getOrderLineItems()).hasSize(1);
-            assertThat(orderResult.getDeliveryAddress()).isNotNull();
-            assertThat(orderResult.getDeliveryAddress()).isEqualTo("경기도 고양시..XX동 XX호");
-            assertThat(orderResult.getStatus()).isEqualTo(OrderStatus.WAITING);
+            assertAll(
+                    () -> assertThat(orderResult.getType()).isEqualTo(OrderType.DELIVERY),
+                    () -> assertThat(orderResult.getOrderLineItems()).isNotNull(),
+                    () -> assertThat(orderResult.getOrderLineItems()).hasSize(1),
+                    () -> assertThat(orderResult.getDeliveryAddress()).isNotNull(),
+                    () -> assertThat(orderResult.getDeliveryAddress()).isEqualTo("경기도 고양시..XX동 XX호"),
+                    () -> assertThat(orderResult.getStatus()).isEqualTo(OrderStatus.WAITING)
+            );
         }
 
         @DisplayName("매장 내 식사 주문을 생성한다. 주문이 정상적으로 생성되면 상태는 대기 중으로 변경된다")
@@ -121,11 +126,13 @@ class OrderServiceTest {
 
             Order orderResult = orderService.create(orderRequest);
 
-            assertThat(orderResult.getType()).isEqualTo(OrderType.EAT_IN);
-            assertThat(orderResult.getOrderLineItems()).isNotNull();
-            assertThat(orderResult.getOrderLineItems()).hasSize(1);
-            assertThat(orderResult.getDeliveryAddress()).isNull();
-            assertThat(orderResult.getStatus()).isEqualTo(OrderStatus.WAITING);
+            assertAll(
+                    () -> assertThat(orderResult.getType()).isEqualTo(OrderType.EAT_IN),
+                    () -> assertThat(orderResult.getOrderLineItems()).isNotNull(),
+                    () -> assertThat(orderResult.getOrderLineItems()).hasSize(1),
+                    () -> assertThat(orderResult.getDeliveryAddress()).isNull(),
+                    () -> assertThat(orderResult.getStatus()).isEqualTo(OrderStatus.WAITING)
+            );
         }
 
         @DisplayName("어떤 메뉴를 몇 개 시킬지에 대한 주문 상세 내역이 1개 이상 있어야 한다")
@@ -137,12 +144,14 @@ class OrderServiceTest {
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
             Order eatInOrderRequest = createEatInOrder(orderLineItems, orderTable.getId(), LocalDateTime.now());
 
-            assertThatIllegalArgumentException()
-                    .isThrownBy(() -> orderService.create(takeOutRequest));
-            assertThatIllegalArgumentException()
-                    .isThrownBy(() -> orderService.create(deliveryOrderRequest));
-            assertThatIllegalArgumentException()
-                    .isThrownBy(() -> orderService.create(eatInOrderRequest));
+            assertAll(
+                    () -> assertThatIllegalArgumentException()
+                            .isThrownBy(() -> orderService.create(takeOutRequest)),
+                    () -> assertThatIllegalArgumentException()
+                            .isThrownBy(() -> orderService.create(deliveryOrderRequest)),
+                    () -> assertThatIllegalArgumentException()
+                            .isThrownBy(() -> orderService.create(eatInOrderRequest))
+            );
         }
 
         private static Stream<List> nullOrEmptyList() {
@@ -157,10 +166,12 @@ class OrderServiceTest {
             Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
             Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
 
-            assertThatIllegalArgumentException()
-                    .isThrownBy(() -> orderService.create(takeOutRequest));
-            assertThatIllegalArgumentException()
-                    .isThrownBy(() -> orderService.create(deliveryOrderRequest));
+            assertAll(
+                    () -> assertThatIllegalArgumentException()
+                            .isThrownBy(() -> orderService.create(takeOutRequest)),
+                    () -> assertThatIllegalArgumentException()
+                            .isThrownBy(() -> orderService.create(deliveryOrderRequest))
+            );
         }
 
         @DisplayName("메뉴판에 전시하지 않은 메뉴는 주문할 수 없다")
@@ -172,12 +183,14 @@ class OrderServiceTest {
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
             Order eatInOrderRequest = createEatInOrder(List.of(undisplayMenuOrderItem), orderTable.getId(), LocalDateTime.now());
 
-            assertThatIllegalStateException()
-                    .isThrownBy(() -> orderService.create(takeOutRequest));
-            assertThatIllegalStateException()
-                    .isThrownBy(() -> orderService.create(deliveryOrderRequest));
-            assertThatIllegalStateException()
-                    .isThrownBy(() -> orderService.create(eatInOrderRequest));
+            assertAll(
+                    () -> assertThatIllegalStateException()
+                            .isThrownBy(() -> orderService.create(takeOutRequest)),
+                    () -> assertThatIllegalStateException()
+                            .isThrownBy(() -> orderService.create(deliveryOrderRequest)),
+                    () -> assertThatIllegalStateException()
+                            .isThrownBy(() -> orderService.create(eatInOrderRequest))
+            );
         }
 
         @DisplayName("메뉴의 가격과 주문 내역의 가격은 동일해야 한다")
@@ -191,12 +204,14 @@ class OrderServiceTest {
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
             Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), orderTable.getId(), LocalDateTime.now());
 
-            assertThatIllegalArgumentException()
-                    .isThrownBy(() -> orderService.create(takeOutRequest));
-            assertThatIllegalArgumentException()
-                    .isThrownBy(() -> orderService.create(deliveryOrderRequest));
-            assertThatIllegalArgumentException()
-                    .isThrownBy(() -> orderService.create(eatInOrderRequest));
+            assertAll(
+                    () -> assertThatIllegalArgumentException()
+                            .isThrownBy(() -> orderService.create(takeOutRequest)),
+                    () -> assertThatIllegalArgumentException()
+                            .isThrownBy(() -> orderService.create(deliveryOrderRequest)),
+                    () -> assertThatIllegalArgumentException()
+                            .isThrownBy(() -> orderService.create(eatInOrderRequest))
+            );
         }
 
         @DisplayName("배달의 경우, 배달 주소가 반드시 입력되어야 하며, 공백만 입력되어서는 안된다")
@@ -432,10 +447,12 @@ class OrderServiceTest {
             takeoutOrder.setStatus(orderStatus);
             eatInOrder.setStatus(orderStatus);
             //then
-            assertThatIllegalStateException()
-                    .isThrownBy(() -> orderService.complete(takeoutOrder.getId()));
-            assertThatIllegalStateException()
-                    .isThrownBy(() -> orderService.complete(eatInOrder.getId()));
+            assertAll(
+                    () -> assertThatIllegalStateException()
+                            .isThrownBy(() -> orderService.complete(takeoutOrder.getId())),
+                    () -> assertThatIllegalStateException()
+                            .isThrownBy(() -> orderService.complete(eatInOrder.getId()))
+            );
         }
 
         @DisplayName("매장 내 식사의 경우, 주문 테이블의 모든 주문이 완료 상태가 아닐 때 테이블은 사용 중이며 손님의 수는 0으로 초기화되지 않는다")
@@ -453,9 +470,11 @@ class OrderServiceTest {
             Order complete = orderService.complete(servedOrder1.getId());
 
             //then
-            assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-            assertThat(complete.getOrderTable().isOccupied()).isTrue();
-            assertThat(complete.getOrderTable().getNumberOfGuests()).isNotZero();
+            assertAll(
+                    () -> assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                    () -> assertThat(complete.getOrderTable().isOccupied()).isTrue(),
+                    () -> assertThat(complete.getOrderTable().getNumberOfGuests()).isNotZero()
+            );
         }
 
         @DisplayName("매장 내 취식의 경우, 주문 테이블에의 모든 주문이 완료되면 테이블의 사용유무를 안함으로 변경하고 고객의 수를 0명으로 변경한다")
@@ -474,15 +493,16 @@ class OrderServiceTest {
             Order complete2 = orderService.complete(servedOrder2.getId());
 
             //then
-            assertThat(complete1.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-            assertThat(complete1.getOrderTable().isOccupied()).isFalse();
-            assertThat(complete1.getOrderTable().getNumberOfGuests()).isZero();
+            assertAll(
+                    () -> assertThat(complete1.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                    () -> assertThat(complete1.getOrderTable().isOccupied()).isFalse(),
+                    () -> assertThat(complete1.getOrderTable().getNumberOfGuests()).isZero(),
 
-            assertThat(complete2.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-            assertThat(complete2.getOrderTable().isOccupied()).isFalse();
-            assertThat(complete2.getOrderTable().getNumberOfGuests()).isZero();
+                    () -> assertThat(complete2.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                    () -> assertThat(complete2.getOrderTable().isOccupied()).isFalse(),
+                    () -> assertThat(complete2.getOrderTable().getNumberOfGuests()).isZero()
+            );
         }
-
     }
 
     //region [주문 조회]
