@@ -23,17 +23,17 @@ public class OrderFixture {
             DEFAULT_ORDER_TABLE
     );
 
-    public static Order makeOrder(OrderType type,  List<OrderLineItem> orderLIneItems){
-        return makeOrder(type, orderLIneItems, DEFAULT_ORDER_TABLE);
+    public static Order makeOrder(OrderType type,  List<OrderLineItem> orderLineItems){
+        return makeOrder(type, orderLineItems, DEFAULT_ORDER_TABLE);
     }
 
-    public static Order makeOrder(OrderType type,  List<OrderLineItem> orderLIneItems, OrderTable orderTable){
+    public static Order makeOrder(OrderType type,  List<OrderLineItem> orderLineItems, OrderTable orderTable){
         Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setType(type);
         order.setStatus(OrderStatus.WAITING);
         order.setOrderDateTime(LocalDateTime.now());
-        order.setOrderLineItems(orderLIneItems);
+        order.setOrderLineItems(orderLineItems);
         order.setOrderTable(orderTable);
         order.setOrderTableId(orderTable.getId());
         return order;

@@ -16,18 +16,18 @@ import java.util.UUID;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final MenuRepository jpaMenuRepository;
+    private final MenuRepository menuRepository;
     private final OrderTableRepository orderTableRepository;
     private final KitchenridersClient kitchenridersClient;
 
     public OrderService(
         final OrderRepository orderRepository,
-        final MenuRepository jpaMenuRepository,
+        final MenuRepository menuRepository,
         final OrderTableRepository orderTableRepository,
         final KitchenridersClient kitchenridersClient
     ) {
         this.orderRepository = orderRepository;
-        this.jpaMenuRepository = jpaMenuRepository;
+        this.menuRepository = menuRepository;
         this.orderTableRepository = orderTableRepository;
         this.kitchenridersClient = kitchenridersClient;
     }
@@ -42,7 +42,7 @@ public class OrderService {
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
             throw new IllegalArgumentException();
         }
-        final List<Menu> menus = jpaMenuRepository.findAllByIdIn(
+        final List<Menu> menus = menuRepository.findAllByIdIn(
             orderLineItemRequests.stream()
                 .map(OrderLineItem::getMenuId)
                 .toList()
@@ -58,7 +58,7 @@ public class OrderService {
                     throw new IllegalArgumentException();
                 }
             }
-            final Menu menu = jpaMenuRepository.findById(orderLineItemRequest.getMenuId())
+            final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                 .orElseThrow(NoSuchElementException::new);
             if (!menu.isDisplayed()) {
                 throw new IllegalStateException();

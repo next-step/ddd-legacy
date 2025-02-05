@@ -35,6 +35,7 @@ class OrderServiceWithFakeObjectTest {
         orderRepository = new FakeOrderRepository();
         menuRepository = new FakeMenuRepository();
         orderTableRepository = new FakeOrderTableRepository();
+        kitchenridersClient = new KitchenridersClient();
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
 
@@ -79,28 +80,160 @@ class OrderServiceWithFakeObjectTest {
         Menu menu1 = MenuFixture.create("menu1", "10000");
         Menu menu2 = MenuFixture.create("menu2", "10000");
 
-        List<OrderLineItem> orderLineItems = OrderLineItemFixture.moreMenuLine(1, menu1, menu2);
         //given
+        List<OrderLineItem> orderLineItems = OrderLineItemFixture.moreMenuLine(1, menu1, menu2);
         menuRepository.save(menu1);
         menuRepository.save(menu2);
 
+        //when
         Order order = OrderFixture.makeOrder(OrderType.EAT_IN, orderLineItems,OrderFixture.DEFAULT_ORDER_TABLE);
 
+        // then
         assertThatThrownBy(() -> orderService.create(order)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @ParameterizedTest
-    @DisplayName("주문시에 주문메뉴 리스트의 수량은 1개 이상이어야 한다.")
-    @ValueSource(ints = {-1, 0})
+    @DisplayName("매장식사가 아닌 주문시에는 주문메뉴 리스트의 수량은 0개 이상이어야 한다.")
+    @ValueSource(ints = {-1, -2, -3})
     void throwExceptionWhenQuantityIsUnderOne(int quantity) {
-        Order order = OrderFixture.makeOrder(OrderType.EAT_IN, List.of(OrderLineItemFixture.createOrderLineItem(quantity)), OrderFixture.DEFAULT_ORDER_TABLE);
 
-        menuRepository.save(MenuFixture.DEFAULT_MENU);
-        orderTableRepository.save(OrderFixture.DEFAULT_ORDER_TABLE);
+        //given
+        Order order = readyToOrder(OrderType.TAKEOUT, quantity);
 
-        assertThatThrownBy(() -> orderService.create(order)).isInstanceOf(IllegalArgumentException.class);
+        //when
+        //then
+        assertThatThrownBy(() -> orderService.create(order))
+              .isInstanceOf(IllegalArgumentException.class);
 
     }
 
+    @Test
+    @DisplayName("준비상태의 주문은 수락할수 있다.")
+    void canAcceptWaitingOrder(){
 
+        Order acceptedOrder = getAcceptedOrder(OrderType.EAT_IN);
+
+        //then
+        assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
+
+
+    @ParameterizedTest
+    @DisplayName("배달 주문은 주소지가 비어있으면 안된다.")
+    @NullAndEmptySource
+    void deliveryAddressCannotBeNullOrEmpty(String address){
+        //given
+        Order order = readyToOrder(OrderType.DELIVERY);
+        //when
+        //then
+        assertThatThrownBy(() -> orderService.create(order))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("서빙된 배달 주문은 배달중으로 준비될 수 있다.")
+    void servedOrderCanBeDelivering(){
+        //given
+        //when
+        Order deliveringOrder = deliveringOrder(OrderType.DELIVERY, "주소지");
+        //then
+        assertThat(deliveringOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+    }
+
+    @Test
+    @DisplayName("배달주문의 경우 배달이 완료되지 않으면 완료될수 없다.")
+    void cannotCompletedDeliveryOrder(){
+        //given
+        //when
+        Order deliveringOrder = deliveringOrder(OrderType.DELIVERY, "주소지");
+
+        //then
+        assertThatThrownBy(() -> orderService.complete(deliveringOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("배달이 완료되면 주문이 완료될수 있다.")
+    void canCompleteOrderDelivery(){
+        //given
+        Order deliveringCompletedOrder = compltedDeliveryOrder(OrderType.DELIVERY);
+
+        //when
+        Order completeOrder = orderService.complete(deliveringCompletedOrder.getId());
+
+        //then
+        assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("포장은 서빙이 완료되면 완료될수 있다.")
+    void canCompleteTakeOutOrder(){
+        //given
+        Order takeOutOrder = createOrder(OrderType.TAKEOUT);
+        //when
+        Order acceptedOrder = orderService.accept(takeOutOrder.getId());
+        Order servedOrder = orderService.serve(acceptedOrder.getId());
+        Order complete = orderService.complete(servedOrder.getId());
+        //then
+        assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("매장식사는 식사가 완료된뒤 완료될수 있다.")
+    void canCompleteEatInOrder(){
+        //given
+        Order eatInOrder = createOrder(OrderType.EAT_IN);
+        //when
+        Order acceptedOrder = orderService.accept(eatInOrder.getId());
+        Order servedOrder = orderService.serve(acceptedOrder.getId());
+        Order complete = orderService.complete(servedOrder.getId());
+        //then
+        assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    private Order compltedDeliveryOrder(OrderType type){
+        Order deliveringOrder = deliveringOrder(type, "adress");
+        return orderService.completeDelivery(deliveringOrder.getId());
+    }
+
+    private Order getAcceptedOrder(OrderType type) {
+        //given
+        Order createdOrder = createOrder(type);
+
+        //when
+        return orderService.accept(createdOrder.getId());
+    }
+
+    private Order deliveringOrder(OrderType type, String address) {
+        Order createdOrder = createOrder(type, address);
+        //when
+        Order acceptedOrder = orderService.accept(createdOrder.getId());
+        Order servedOrder = orderService.serve(acceptedOrder.getId());
+        return orderService.startDelivery(servedOrder.getId());
+    }
+
+
+
+    private Order readyToOrder(OrderType type){
+        return readyToOrder(type, 1);
+    }
+
+    private Order readyToOrder(OrderType type, int quantity){
+        Order order = OrderFixture.makeOrder(type, OrderLineItemFixture.createOrderLineItems(quantity), OrderFixture.DEFAULT_ORDER_TABLE);
+        menuRepository.save(MenuFixture.DEFAULT_MENU);
+        orderTableRepository.save(OrderFixture.DEFAULT_ORDER_TABLE);
+        return order;
+    }
+
+    private Order createOrder(OrderType type){
+        Order order = readyToOrder(type);
+        return orderService.create(order);
+    }
+
+    private Order createOrder(OrderType type, String deliveryAddress){
+        Order order = readyToOrder(type);
+        order.setDeliveryAddress(deliveryAddress);
+        return orderService.create(order);
+    }
 }
