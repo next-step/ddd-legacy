@@ -1,16 +1,14 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -36,7 +34,7 @@ class ProductServiceTest {
     @DisplayName("상품을 등록할 수 있다.")
     @ParameterizedTest
     @CsvSource(value = {"짜장면:7000", "우동:6000"}, delimiter = ':')
-     void create(String name, BigDecimal price) {
+    void create(String name, BigDecimal price) {
         // given
         Product product = makeTestProduct(name, price);
         // Mock 객체가 save() 호출 시 product를 반환하도록 설정
@@ -98,7 +96,7 @@ class ProductServiceTest {
         // then
         assertThatThrownBy(() -> productService.create(product)).isInstanceOf(IllegalArgumentException.class);
     }
-    
+
     @DisplayName("상품의 가격이 비어있다면 에러를 발생시킨다.")
     @ParameterizedTest
     @NullSource
@@ -130,8 +128,28 @@ class ProductServiceTest {
 
         // then
         assertThat(product.getPrice()).isEqualTo(toProduct.getPrice());
-
     }
+
+    @DisplayName("메뉴에 있는 상품들의 가격의 총합이 메뉴의 전체 가격보다 낮으면 메뉴를 노출하지 않는다.")
+    @ValueSource(longs = {9900L, 4000L})
+    @ParameterizedTest
+    void compareMenuPrice(Long price) {
+        // given
+
+        Product firstProduct = makeTestProduct("짜장면", BigDecimal.valueOf(price));
+        MenuProduct firstMenuProduct = makeTestMenuProduct(firstProduct);
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(10000), makeTestMenuGroup("추천메뉴"), firstMenuProduct);
+
+        // when
+        when(productRepository.findById(any())).thenReturn(Optional.of(firstProduct));
+        when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
+
+        productService.changePrice(firstProduct.getId(), firstProduct);
+
+        // then
+        assertThat(menu.isDisplayed()).isFalse();
+    }
+
 
     @Test
     void findAll() {
@@ -143,5 +161,33 @@ class ProductServiceTest {
         product.setName(name);
         product.setPrice(price);
         return product;
+    }
+
+    MenuProduct makeTestMenuProduct(Product product) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProductId(product.getId());
+        menuProduct.setQuantity(1);
+        menuProduct.setSeq(1L);
+        menuProduct.setProduct(product);
+        return menuProduct;
+    }
+
+    Menu makeTestMenu(String name, BigDecimal price, MenuGroup menuGroup, MenuProduct menuProduct) {
+        Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
+        menu.setName(name);
+        menu.setPrice(price);
+        menu.setMenuGroup(menuGroup);
+        menu.setDisplayed(true);
+        menu.setMenuGroupId(menuGroup.getId());
+        menu.setMenuProducts(List.of(menuProduct));
+        return menu;
+    }
+
+    MenuGroup makeTestMenuGroup(String name) {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(UUID.randomUUID());
+        menuGroup.setName(name);
+        return menuGroup;
     }
 }
