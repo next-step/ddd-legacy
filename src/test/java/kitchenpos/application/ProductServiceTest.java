@@ -14,8 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
+import static kitchenpos.fixture.TestFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -135,7 +135,6 @@ class ProductServiceTest {
     @ParameterizedTest
     void compareMenuPrice(Long price) {
         // given
-
         Product firstProduct = makeTestProduct("짜장면", BigDecimal.valueOf(price));
         MenuProduct firstMenuProduct = makeTestMenuProduct(firstProduct);
         Menu menu = makeTestMenu("중식", BigDecimal.valueOf(10000), makeTestMenuGroup("추천메뉴"), firstMenuProduct);
@@ -150,44 +149,9 @@ class ProductServiceTest {
         assertThat(menu.isDisplayed()).isFalse();
     }
 
-
+    @DisplayName("모든 상품을 조회할 수 있다.")
     @Test
     void findAll() {
-    }
 
-    Product makeTestProduct(String name, BigDecimal price) {
-        Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setName(name);
-        product.setPrice(price);
-        return product;
-    }
-
-    MenuProduct makeTestMenuProduct(Product product) {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(product.getId());
-        menuProduct.setQuantity(1);
-        menuProduct.setSeq(1L);
-        menuProduct.setProduct(product);
-        return menuProduct;
-    }
-
-    Menu makeTestMenu(String name, BigDecimal price, MenuGroup menuGroup, MenuProduct menuProduct) {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setName(name);
-        menu.setPrice(price);
-        menu.setMenuGroup(menuGroup);
-        menu.setDisplayed(true);
-        menu.setMenuGroupId(menuGroup.getId());
-        menu.setMenuProducts(List.of(menuProduct));
-        return menu;
-    }
-
-    MenuGroup makeTestMenuGroup(String name) {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName(name);
-        return menuGroup;
     }
 }
