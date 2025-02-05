@@ -1,40 +1,46 @@
 package kitchenpos.application
 
-import kitchenpos.domain.OrderRepository
-import kitchenpos.domain.OrderStatus
-import kitchenpos.domain.OrderType
+import kitchenpos.domain.*
 import kitchenpos.infra.KitchenridersClient
+import kitchenpos.infra.KitchenridersClientFake
 import kitchenpos.order.OrderFixture
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.mockito.BDDMockito.*
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.transaction.annotation.Transactional
+import org.mockito.BDDMockito.then
+import org.mockito.Mockito.any
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.times
+import org.mockito.junit.jupiter.MockitoExtension
 import java.util.*
 
-@SpringBootTest
+@ExtendWith(MockitoExtension::class)
 class OrderServiceTest {
+    private var orderRepository: OrderRepository = InMemoryOrderRepositoryFake()
+    private var menuRepository: MenuRepository = InMemoryMenuRepositoryFake()
+    private var orderTableRepository: OrderTableRepository = InMemoryOrderTableRepositoryFake()
+    private var kitchenridersClient: KitchenridersClient = KitchenridersClientFake()
 
-    @Autowired
     private lateinit var orderService: OrderService
 
-    @Autowired
-    private lateinit var orderRepository: OrderRepository
-
-    @MockBean
-    private lateinit var kitchenridersClient: KitchenridersClient
+    @BeforeEach
+    fun setUp() {
+        orderService = OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient)
+    }
 
     @Test
     @DisplayName("배달주문 접수를 할 때 배달라이더에게 배달요청을 보낸다")
-    @Transactional
     fun requestDelivery() {
         // given
+        val kitchenRidersMock = mock(KitchenridersClient::class.java)
+        val orderService =
+            OrderService(orderRepository, menuRepository, orderTableRepository, kitchenRidersMock)
+
         val order = OrderFixture.fixture(type = OrderType.DELIVERY)
         order.id = UUID.randomUUID()
         orderRepository.save(order)
@@ -43,7 +49,7 @@ class OrderServiceTest {
         orderService.accept(order.id)
 
         // then
-        then(kitchenridersClient).should(times(1)).requestDelivery(any(), any(), any())
+        then(kitchenRidersMock).should(times(1)).requestDelivery(any(), any(), any())
     }
 
     @CsvSource(
