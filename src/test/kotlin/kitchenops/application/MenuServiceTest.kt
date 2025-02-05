@@ -357,7 +357,7 @@ internal class MenuServiceTest : BaseUnitSpec({
         }
     }
 
-    context("메뉴를 표시하게 변경할 수 있다") {
+    context("메뉴를 노출되게 변경할 수 있다") {
         test("메뉴가 존재하지 않으면 변경할 수 없다") {
             // given
             val menuId = UUID.randomUUID()
@@ -370,7 +370,7 @@ internal class MenuServiceTest : BaseUnitSpec({
             actual.exceptionOrNull() shouldBe NoSuchElementException()
         }
 
-        test("메뉴의 가격이 상품 가격의 합보다 클 경우에는 화면에 표시할 수 없다") {
+        test("메뉴의 가격이 상품 가격의 합보다 클 경우에는 화면에 노출할 수 없다") {
             // given
             val product = createProduct(price = BigDecimal("100"))
             val menuProduct = createMenuProduct(quantity = 1, product = product)
@@ -385,7 +385,7 @@ internal class MenuServiceTest : BaseUnitSpec({
             actual.exceptionOrNull() shouldBe IllegalStateException()
         }
 
-        test("표시하게 변경한다") {
+        test("노출되게 변경한다") {
             // given
             val product = createProduct(price = BigDecimal("100"))
             val menuProduct = createMenuProduct(quantity = 1, product = product)

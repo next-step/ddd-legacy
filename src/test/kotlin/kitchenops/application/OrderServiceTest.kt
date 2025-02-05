@@ -643,7 +643,7 @@ internal class OrderServiceTest : BaseUnitSpec({
             actual.status shouldBe OrderStatus.COMPLETED
         }
 
-        test("매장 내 식사 주문은 완료 상태가 아니었다면 주문 테이블을 정리한다") {
+        test("매장 내 식사 주문은 완료 상태가 아닐경우 주문 테이블을 정리한다") {
             // given
             val orderTable = createOrderTable(id = UUID.randomUUID(), occupied = true, numberOfGuests = 3)
             val order = createOrder(type = OrderType.EAT_IN, status = OrderStatus.SERVED, orderTable = orderTable)

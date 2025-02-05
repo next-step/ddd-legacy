@@ -151,7 +151,7 @@ internal class ProductServiceTest : BaseUnitSpec({
             actual.exceptionOrNull() shouldBe NoSuchElementException()
         }
 
-        test("상품을 사용하는 메뉴의 가격이 메뉴를 구성하는 상품 가격의 총 합보다 클 경우 메뉴를 숨긴다") {
+        test("상품을 사용하는 메뉴의 가격이 메뉴를 구성하는 상품 가격의 총 합보다 클 경우 가격을 변경한 후 메뉴를 숨긴다") {
             // given
             val request = createProduct(price = BigDecimal("500"))
             every { productRepository.findById(request.id) } returns Optional.of(request)
