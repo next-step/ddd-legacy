@@ -39,7 +39,7 @@ class OrderServiceTest {
         OrderLineItem orderLineItem = makeTestOrderLineItem(BigDecimal.valueOf(5000), menu, 1);
         OrderTable orderTable = makeTestOrderTable("1번 테이블", 0);
         orderTable.setOccupied(true);
-        
+
         Order eatInOrder = makeTestEatInOrder(OrderStatus.WAITING, orderLineItem, orderTable);
 
         when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
@@ -57,6 +57,34 @@ class OrderServiceTest {
         assertThat(resultOrder.getOrderDateTime()).isEqualTo(eatInOrder.getOrderDateTime());
         assertThat(resultOrder.getOrderLineItems()).isEqualTo(eatInOrder.getOrderLineItems());
         assertThat(resultOrder.getOrderTable()).isEqualTo(eatInOrder.getOrderTable());
+    }
+
+    @DisplayName("테이크 아웃 주문을 등록할 수 있다.")
+    @Test
+    void createTakeOutOrder() {
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
+
+        OrderLineItem orderLineItem = makeTestOrderLineItem(BigDecimal.valueOf(5000), menu, 1);
+
+        Order takeOutOrder = makeTestTakeOutOrder(OrderStatus.WAITING, orderLineItem);
+
+        when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+        when(orderRepository.save(any(Order.class))).thenReturn(takeOutOrder);
+
+        // when
+        Order resultOrder = orderService.create(takeOutOrder);
+
+        // then
+        assertThat(resultOrder.getId()).isNotNull();
+        assertThat(resultOrder.getType()).isEqualTo(takeOutOrder.getType());
+        assertThat(resultOrder.getStatus()).isEqualTo(takeOutOrder.getStatus());
+        assertThat(resultOrder.getOrderDateTime()).isEqualTo(takeOutOrder.getOrderDateTime());
+        assertThat(resultOrder.getOrderLineItems()).isEqualTo(takeOutOrder.getOrderLineItems());
     }
 
     @Test
