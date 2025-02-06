@@ -155,6 +155,22 @@ class MenuServiceTest {
         assertThat(resultMenu.getPrice()).isEqualTo(changeMenu.getPrice());
     }
 
+    @DisplayName("메뉴 상품들의 가격의 총합이 메뉴의 전체 가격보다 낮으면 에러를 발생시킨다.")
+    @Test
+    void compareMenuPrice() {
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
+        Menu changeMenu = makeTestMenu("중식", BigDecimal.valueOf(6000), menuGroup, menuProduct);
+
+        when(menuRepository.findById(any(UUID.class))).thenReturn(Optional.of(menu));
+
+        // when
+        assertThatThrownBy(() -> menuService.changePrice(menu.getId(), changeMenu)).isInstanceOf(IllegalArgumentException.class);
+    }
+
     @Test
     void display() {
     }
