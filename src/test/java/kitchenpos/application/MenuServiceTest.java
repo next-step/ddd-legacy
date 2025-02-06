@@ -93,8 +93,11 @@ class MenuServiceTest {
         MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
         Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
 
+        // when
+        when(menuGroupRepository.findById(any(UUID.class))).thenReturn(Optional.of(menuGroup));
+
         // then
-        assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(NoSuchElementException.class);
+        assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
