@@ -112,7 +112,7 @@ class MenuServiceTest {
         void 메뉴가격_허용범위_검사(final int price) {
             chickenMenu = MenuFixture.test(
                 null,
-                new BigDecimal(price),
+                BigDecimal.valueOf(price),
                 null,
                 true,
                 null
@@ -157,7 +157,7 @@ class MenuServiceTest {
             chicken = new ProductFixture(
                 null,
                 null,
-                new BigDecimal(price2)
+                BigDecimal.valueOf(price2)
             ).create();
 
             mockFindByMenuGroup();
@@ -217,14 +217,14 @@ class MenuServiceTest {
         void 변경가격_비교_검사(final int price1, final int price2) {
             chickenMenu = MenuFixture.test(
                 null,
-                new BigDecimal(price1),
+                BigDecimal.valueOf(price1),
                 null,
                 true,
                 List.of(new MenuProductFixture(
                     new ProductFixture(
                         null,
                         null,
-                        new BigDecimal(price2)
+                        BigDecimal.valueOf(price2)
                     ).create(),
                     100
                 ).create())
@@ -262,7 +262,7 @@ class MenuServiceTest {
         void 변경가격_허용범위_검사(final int price) {
             chickenMenu = MenuFixture.test(
                 null,
-                new BigDecimal(price),
+                BigDecimal.valueOf(price),
                 null,
                 true,
                 null
@@ -280,14 +280,14 @@ class MenuServiceTest {
         void 변경가격_비교_검사(final int price1, final int price2) {
             chickenMenu = MenuFixture.test(
                 null,
-                new BigDecimal(price1),
+                BigDecimal.valueOf(price1),
                 null,
                 true,
                 List.of(new MenuProductFixture(
                     new ProductFixture(
                         null,
                         null,
-                        new BigDecimal(price2)
+                        BigDecimal.valueOf(price2)
                     ).create(),
                     100
                 ).create())

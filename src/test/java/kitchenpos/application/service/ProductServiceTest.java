@@ -92,7 +92,7 @@ class ProductServiceTest {
         @ParameterizedTest
         @ValueSource(ints = {-10000, 0, 10000})
         void 상품가격_허용범위_검사(final int price) {
-            chicken = ProductFixture.test(null, new BigDecimal(price)).create();
+            chicken = ProductFixture.test(null, BigDecimal.valueOf(price)).create();
 
             if (price < 0) {
                 assertThatExceptionOfType(IllegalArgumentException.class)
@@ -110,7 +110,7 @@ class ProductServiceTest {
         @ParameterizedTest
         @ValueSource(ints = {-10000, 0, 10000})
         void 상품가격_허용범위_검사(final int price) {
-            chicken = ProductFixture.test(null, new BigDecimal(price)).create();
+            chicken = ProductFixture.test(null, BigDecimal.valueOf(price)).create();
 
             if (price < 0) {
                 assertThatExceptionOfType(IllegalArgumentException.class)
@@ -122,7 +122,7 @@ class ProductServiceTest {
         @ParameterizedTest
         @CsvSource({"100000, 100"})
         void 가격비교_숨김처리(final int price1, final int price2) {
-            chicken = ProductFixture.test(null, new BigDecimal(price1)).create();
+            chicken = ProductFixture.test(null, BigDecimal.valueOf(price1)).create();
 
             when(productRepository.findById(Mockito.any()))
                 .thenReturn(Optional.of(chicken));
@@ -136,7 +136,7 @@ class ProductServiceTest {
                     new ProductFixture(
                         null,
                         null,
-                        new BigDecimal(price2)
+                        BigDecimal.valueOf(price2)
                     ).create(),
                     100
                 ).create())

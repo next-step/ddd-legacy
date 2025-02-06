@@ -189,7 +189,7 @@ class OrderServiceTest {
         @Test
         @DisplayName("메뉴가격과 주문 아이템 가격이 다르면 안된다.")
         void 메뉴가격_주문아이템가격_비교() {
-            chickenMenu = MenuFixture.test(null, new BigDecimal("500000"), null, true, null)
+            chickenMenu = MenuFixture.test(null, BigDecimal.valueOf(500_000), null, true, null)
                 .create();
 
             mockFindAllByMenu(order);
