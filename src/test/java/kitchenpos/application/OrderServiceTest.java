@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.application.fixture.*;
 import kitchenpos.domain.*;
+import kitchenpos.infra.FakeKitchenridersClient;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

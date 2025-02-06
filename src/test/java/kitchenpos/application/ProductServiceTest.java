@@ -5,6 +5,7 @@ import kitchenpos.application.fixture.MenuGroupFixture;
 import kitchenpos.application.fixture.MenuProductFixture;
 import kitchenpos.application.fixture.ProductFixture;
 import kitchenpos.domain.*;
+import kitchenpos.infra.FakePurgomalumClient;
 import kitchenpos.infra.PurgomalumClient;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
