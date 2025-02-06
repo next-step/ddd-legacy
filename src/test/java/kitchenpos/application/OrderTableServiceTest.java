@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -54,7 +55,7 @@ class OrderTableServiceTest {
         assertThatThrownBy(() -> orderTableService.create(orderTable)).isInstanceOf(IllegalArgumentException.class);
     }
 
-
+    @DisplayName("매장 테이블은 매장 방문 고객이 착석이 가능하다.")
     @Test
     void sit() {
         // given
@@ -68,8 +69,20 @@ class OrderTableServiceTest {
         assertThat(resultOrderTable.isOccupied()).isTrue();
     }
 
+    @DisplayName("매장 테이블은 청소가 가능하다.")
     @Test
     void clear() {
+        // given
+        OrderTable orderTable = makeTestOrderTable("1번 테이블");
+        when(orderTableRepository.findById(any(UUID.class))).thenReturn(Optional.of(orderTable));
+        when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(false);
+
+        // when
+        OrderTable resultOrderTable = orderTableService.clear(orderTable.getId());
+
+        // then
+        assertThat(resultOrderTable.isOccupied()).isFalse();
+        assertThat(resultOrderTable.getNumberOfGuests()).isEqualTo(0);
     }
 
     @Test
