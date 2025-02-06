@@ -26,7 +26,7 @@ public class OrderTableService {
     @Transactional
     public OrderTable create(final OrderTable request) {
         final String name = request.getName();
-        if (Objects.isNull(name) || name.isEmpty()) {
+        if (Objects.isNull(name) || name.isBlank()) {
             throw new IllegalArgumentException();
         }
         final OrderTable orderTable = new OrderTable();
