@@ -15,7 +15,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
-import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -172,7 +171,7 @@ class ProductServiceTest {
             BigDecimal lowerPrice = new BigDecimal(10000);
             BigDecimal higherPrice = new BigDecimal(20000);
 
-            MenuGroup recommendedMenuGroup = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup recommendedMenuGroup = MenuGroupFixture.추천_메뉴그룹_Request();
             Product savedProduct = productRepository.save(ProductFixture.후라이드_치킨_상품_Request());
             Product requestProduct = ProductFixture.가격만_변경된_상품(savedProduct, lowerPrice);
 

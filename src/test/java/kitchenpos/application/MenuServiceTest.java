@@ -56,7 +56,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 생성 - 성공: 유효한 입력 값으로 메뉴가 생성된다.")
         void createMenuSuccess() {
             // given
-            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹_Request();
             Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
             Product 콜라_상품 = ProductFixture.콜라_상품_Request();
             Menu expected = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹, 후라이드_치킨_상품, 콜라_상품);
@@ -90,7 +90,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 생성 - 실패: 요청 메뉴 가격이 없으면 IllegalArgumentException 발생")
         void createMenuWithoutPriceThrowIllegalArgumentException() {
             // given
-            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹_Request();
             Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
             Product 콜라_상품 = ProductFixture.콜라_상품_Request();
 
@@ -106,7 +106,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 생성 - 실패: 요청 메뉴 가격이 0원 미만이면 IllegalArgumentException 발생")
         void createMenuWithNegativePriceThrowIllegalArgumentException() {
             // given
-            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹_Request();
             Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
             Product 콜라_상품 = ProductFixture.콜라_상품_Request();
 
@@ -135,7 +135,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 생성 - 실패: 요청 메뉴 구성 상품이 하나도 없으면 IllegalArgumentException 발생")
         void createMenuWithoutMenuProductsThrowIllegalArgumentException() {
             // given
-            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹_Request();
             // 구성 상품이 없는 메뉴 생성
             Menu 구성상품_없는_메뉴 = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹);
 
@@ -149,7 +149,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 생성 - 실패: 요청된 일부 메뉴 구성 상품 중, 실제 존재하지 않는 상품이 있으면 IllegalArgumentException 발생")
         void createMenuWithNonexistentMenuProductThrowIllegalArgumentException() {
             // given
-            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹_Request();
             Product 존재하는_상품 = ProductFixture.후라이드_치킨_상품_Request(); // 존재하는 상품
             Product 존재하지_않는_상품 = ProductFixture.콜라_상품_Request(); // 존재하지 않는 상품
 
@@ -170,7 +170,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 생성 - 실패: 메뉴 구성 상품의 수량이 음수이면 IllegalArgumentException 발생")
         void createMenuWithNegativeMenuProductQuantityThrowIllegalArgumentException() {
             // given
-            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹_Request();
             Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
             MenuProduct 음수_구성상품 = new MenuProduct();
             음수_구성상품.setProduct(후라이드_치킨_상품);
@@ -196,7 +196,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 생성 - 실패: 메뉴의 가격이 구성 상품 가격 총합보다 높으면 IllegalArgumentException 발생")
         void createMenuWithPriceHigherThanSumOfMenuProductPricesThrowIllegalArgumentException() {
             // given
-            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹_Request();
             Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request(); // 16,000원
             Product 콜라_상품 = ProductFixture.콜라_상품_Request(); // 1,000원
 
@@ -223,7 +223,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 생성 - 실패: 메뉴명이 없으면 IllegalArgumentException 발생")
         void createMenuWithoutNameThrowIllegalArgumentException() {
             // given
-            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹_Request();
             Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
 
             Menu 이름_없는_메뉴 = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹, 후라이드_치킨_상품);
@@ -245,7 +245,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 생성 - 실패: 메뉴에 비속어가 포함되면 IllegalArgumentException 발생")
         void createMenuWithEmptyOrProfanityNameThrowIllegalArgumentException() {
             // given
-            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹_Request();
             Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
 
             Menu 비속어_포함_메뉴 = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹, 후라이드_치킨_상품);
@@ -276,7 +276,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 가격 변경 - 성공: 기존 메뉴 가격이 변경된다.")
         void changeMenuPriceSuccess() {
             // given
-            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹_Request();
             Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
             Product 콜라_상품 = ProductFixture.콜라_상품_Request();
 
@@ -333,7 +333,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 가격 변경 - 실패: 변경할 메뉴 가격이 구성 상품 가격 총합보다 높으면 IllegalArgumentException 발생")
         void changeMenuPriceHigherThanMenuProductTotalThrowIllegalArgumentException() {
             // given
-            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹_Request();
             Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
             Product 콜라_상품 = ProductFixture.콜라_상품_Request();
 
@@ -358,7 +358,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 표시 - 성공: 메뉴 가격이 구성 상품 총합과 같으면 표시 가능")
         void displayMenuSuccess() {
             // given
-            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹_Request();
             Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
             Product 콜라_상품 = ProductFixture.콜라_상품_Request();
             Menu 구성_상품_가격_총합과_동일한_메뉴 = MenuFixture.구성_상품_가격_총합과_동일한_메뉴(추천_메뉴그룹, 후라이드_치킨_상품, 콜라_상품);
@@ -376,7 +376,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 표시 - 실패: 메뉴 가격이 구성 상품 가격 총합보다 크면 IllegalStateException 발생")
         void displayMenuFailWithHigherPrice() {
             // given
-            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
+            MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹_Request();
             Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
             Product 콜라_상품 = ProductFixture.콜라_상품_Request();
             Menu 구성_상품_가격_총합을_초과한_메뉴 = MenuFixture.구성_상품_가격_총합을_초과한_메뉴(추천_메뉴그룹, 후라이드_치킨_상품, 콜라_상품);
