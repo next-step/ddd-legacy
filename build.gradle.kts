@@ -20,6 +20,11 @@ repositories {
     mavenCentral()
 }
 
+object Versions {
+    const val KOTEST = "5.9.1"
+    const val MOCKK = "1.13.16"
+}
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
@@ -31,7 +36,14 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.mysql:mysql-connector-j")
+
+    // test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.kotest:kotest-runner-junit5:${Versions.KOTEST}")
+    testImplementation("io.kotest:kotest-assertions-core:${Versions.KOTEST}")
+    testImplementation("io.kotest:kotest-property:${Versions.KOTEST}")
+    testImplementation("io.kotest:kotest-framework-datatest:${Versions.KOTEST}")
+    testImplementation("io.mockk:mockk:${Versions.MOCKK}")
 }
 
 tasks.withType<KotlinCompile> {
