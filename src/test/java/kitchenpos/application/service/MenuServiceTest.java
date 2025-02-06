@@ -1,6 +1,7 @@
 package kitchenpos.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -70,7 +71,7 @@ class MenuServiceTest {
     class 메뉴_조회 {
 
         @Test
-        @DisplayName("특정 조건 없이 상품의 모든 목록을 조회할 수 있다.")
+        @DisplayName("성공 : 특정 조건 없이 상품의 모든 목록을 조회할 수 있다.")
         void 메뉴목록_조회() {
             when(menuRepository.findAll()).thenReturn(List.of(chickenMenu));
             List<Menu> result = menuService.findAll();
@@ -87,7 +88,7 @@ class MenuServiceTest {
     class 메뉴_등록 {
 
         @Test
-        @DisplayName("메뉴 등록 성공")
+        @DisplayName("성공")
         void 메뉴등록_성공() {
             mockCreateMenu(false);
 
@@ -211,6 +212,17 @@ class MenuServiceTest {
     @DisplayName("메뉴 노출")
     class 메뉴_노출 {
 
+        @Test
+        @DisplayName("성공")
+        void 메뉴_노출_성공() {
+            mockFindByMenu();
+
+            assertThatCode(() -> {
+                menuService.display(chickenMenu.getId());
+            }).doesNotThrowAnyException();
+
+        }
+
         @DisplayName("메뉴가격이 구성 상품 총 금액보다 크지 않아야 한다.")
         @ParameterizedTest
         @CsvSource({"100000, 100"})
@@ -242,7 +254,7 @@ class MenuServiceTest {
     class 메뉴_숨김 {
 
         @Test
-        @DisplayName("등록 메뉴를 숨긴다.")
+        @DisplayName("성공 : 등록 메뉴를 숨긴다.")
         void 메뉴_숨김_성공() {
             mockFindByMenu();
 
@@ -255,6 +267,25 @@ class MenuServiceTest {
     @Nested
     @DisplayName("메뉴 가격변경")
     class 메뉴_가격변경 {
+
+        @ParameterizedTest
+        @DisplayName("성공")
+        @ValueSource(ints = {0, 1000, 10000})
+        void 메뉴_가격변경_성공(final int price) {
+            chickenMenu = MenuFixture.test(
+                null,
+                BigDecimal.valueOf(price),
+                null,
+                true,
+                null
+            ).create();
+
+            mockFindByMenu();
+
+            assertThatCode(() -> {
+                menuService.changePrice(chickenMenu.getId(), chickenMenu);
+            }).doesNotThrowAnyException();
+        }
 
         @DisplayName("변경가격이 0원 보다 작으면 안된다.")
         @ParameterizedTest

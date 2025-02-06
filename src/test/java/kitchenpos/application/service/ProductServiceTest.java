@@ -1,6 +1,7 @@
 package kitchenpos.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,7 +64,7 @@ class ProductServiceTest {
     class 상품_등록 {
 
         @Test
-        @DisplayName("상품 등록 성공")
+        @DisplayName("성공")
         void 상품등록_성공() {
             when(productRepository.save(Mockito.any(Product.class))).thenReturn(chicken);
 
@@ -72,7 +73,10 @@ class ProductServiceTest {
             assertAll(
                 () -> assertNotNull(result),
                 () -> assertEquals(result.getName(), chicken.getName()),
-                () -> assertEquals(result.getPrice(), chicken.getPrice())
+                () -> assertEquals(result.getPrice(), chicken.getPrice()),
+                () -> assertThatCode(() -> {
+                    productService.create(chicken);
+                }).doesNotThrowAnyException()
             );
 
         }
@@ -106,6 +110,22 @@ class ProductServiceTest {
     @DisplayName("상품 수정")
     class 상품_수정 {
 
+        @ParameterizedTest
+        @DisplayName("성공")
+        @ValueSource(ints = {0, 1000, 10000})
+        void 상품수정_성공(final int price) {
+            chicken = ProductFixture.test(null, BigDecimal.valueOf(price)).create();
+
+            mockUpdateProduct();
+
+            var result = productService.changePrice(chicken.getId(), chicken);
+
+            assertAll(
+                () -> assertEquals(BigDecimal.valueOf(price), result.getPrice())
+            );
+
+        }
+
         @DisplayName("상품가격이 0원 이상이어야 한다.")
         @ParameterizedTest
         @ValueSource(ints = {-10000, 0, 10000})
@@ -124,8 +144,7 @@ class ProductServiceTest {
         void 가격비교_숨김처리(final int price1, final int price2) {
             chicken = ProductFixture.test(null, BigDecimal.valueOf(price1)).create();
 
-            when(productRepository.findById(Mockito.any()))
-                .thenReturn(Optional.of(chicken));
+            mockFindByProduct();
 
             chickenMenu = MenuFixture.test(
                 null,
@@ -156,7 +175,7 @@ class ProductServiceTest {
     class 상품_조회 {
 
         @Test
-        @DisplayName("특정 조건 없이 상품의 모든 목록을 조회할 수 있다.")
+        @DisplayName("성공 : 특정 조건 없이 상품의 모든 목록을 조회할 수 있다.")
         void 상품목록_조회() {
             when(productRepository.findAll()).thenReturn(List.of(chicken));
             List<Product> result = productService.findAll();
@@ -166,6 +185,16 @@ class ProductServiceTest {
                 () -> assertEquals(result.size(), 1)
             );
         }
+    }
+
+    private void mockUpdateProduct() {
+        mockFindByProduct();
+        mockFindByAllProducts(chickenMenu);
+    }
+
+    private void mockFindByProduct() {
+        when(productRepository.findById(Mockito.any()))
+            .thenReturn(Optional.of(chicken));
     }
 
     private void mockFindByAllProducts(Menu chickenMenu) {

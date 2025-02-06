@@ -1,6 +1,7 @@
 package kitchenpos.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -73,7 +74,7 @@ class OrderServiceTest {
     class 주문_조회 {
 
         @Test
-        @DisplayName("특정 조건 없이 상품의 모든 목록을 조회할 수 있다.")
+        @DisplayName("성공 : 특정 조건 없이 상품의 모든 목록을 조회할 수 있다.")
         void 주문목록_조회() {
             when(orderRepository.findAll()).thenReturn(List.of(order));
             List<Order> result = orderService.findAll();
@@ -90,7 +91,7 @@ class OrderServiceTest {
     class 주문_등록 {
 
         @Test
-        @DisplayName("주문 등록 성공")
+        @DisplayName("성공")
         void 주문등록_성공() {
             mockCreateOrder();
 
@@ -178,7 +179,7 @@ class OrderServiceTest {
         @DisplayName("메뉴가 노출된 상태여야 한다.")
         void 메뉴가_노출상태인지_검사() {
             chickenMenu.setDisplayed(false);
-            
+
             mockFindAllByMenu(order);
             mockFindByMenu(chickenMenu);
 
@@ -236,6 +237,16 @@ class OrderServiceTest {
     class 주문_수락 {
 
         @Test
+        @DisplayName("성공")
+        void 주문수락_성공() {
+            mockFindByOrder();
+
+            assertThatCode(() -> {
+                orderService.accept(order.getId());
+            }).doesNotThrowAnyException();
+        }
+
+        @Test
         @DisplayName("현 주문상태가 **대기**이어야 한다.")
         void 주문상태_대기인지_검사() {
             order = OrderFixture.test(
@@ -269,6 +280,18 @@ class OrderServiceTest {
     class 서빙_준비_완료 {
 
         @Test
+        @DisplayName("성공")
+        void 주문수락_성공() {
+            order.setStatus(OrderStatus.ACCEPTED);
+
+            mockFindByOrder();
+
+            assertThatCode(() -> {
+                orderService.serve(order.getId());
+            }).doesNotThrowAnyException();
+        }
+
+        @Test
         @DisplayName("현 주문상태가 **수락**이어야 한다.")
         void 주문상태_수락인지_검사() {
             mockFindByOrder();
@@ -281,6 +304,19 @@ class OrderServiceTest {
     @Nested
     @DisplayName("배달 시작")
     class 배달_시작 {
+
+        @Test
+        @DisplayName("성공")
+        void 배달시작_성공() {
+            order.setType(OrderType.DELIVERY);
+            order.setStatus(OrderStatus.SERVED);
+
+            mockFindByOrder();
+
+            assertThatCode(() -> {
+                orderService.startDelivery(order.getId());
+            }).doesNotThrowAnyException();
+        }
 
         @Test
         @DisplayName("주문 유형이 **배달**이어야 한다.")
@@ -312,17 +348,43 @@ class OrderServiceTest {
     class 배달_완료 {
 
         @Test
+        @DisplayName("성공")
+        void 배달완료_성공() {
+            order.setType(OrderType.DELIVERY);
+            order.setStatus(OrderStatus.DELIVERING);
+
+            mockFindByOrder();
+
+            assertThatCode(() -> {
+                orderService.completeDelivery(order.getId());
+            }).doesNotThrowAnyException();
+        }
+
+        @Test
         @DisplayName("현 주문상태가 **배달중**이어야 한다.")
         void 주문상태_배달중인지_검사() {
             mockFindByOrder();
             assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> orderService.serve(order.getId()));
+                .isThrownBy(() -> orderService.completeDelivery(order.getId()));
         }
     }
 
     @Nested
     @DisplayName("주문 완료")
     class 주문_완료 {
+
+        @Test
+        @DisplayName("성공")
+        void 주문완료_성공() {
+            order.setType(OrderType.DELIVERY);
+            order.setStatus(OrderStatus.DELIVERED);
+
+            mockFindByOrder();
+
+            assertThatCode(() -> {
+                orderService.complete(order.getId());
+            }).doesNotThrowAnyException();
+        }
 
         @Test
         @DisplayName("배달(주문유형)인데 배달완료(주문상태)가 아니면 안된다.")

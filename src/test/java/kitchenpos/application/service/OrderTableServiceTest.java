@@ -1,6 +1,7 @@
 package kitchenpos.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,6 +39,7 @@ class OrderTableServiceTest {
     private OrderRepository orderRepository;
 
     private OrderTable orderTable;
+
     @BeforeEach
     void setUp() {
         orderTable = OrderTableFixture.init().create();
@@ -48,7 +50,7 @@ class OrderTableServiceTest {
     class 주문_테이블_조회 {
 
         @Test
-        @DisplayName("특정 조건 없이 상품의 모든 목록을 조회할 수 있다.")
+        @DisplayName("성공 : 특정 조건 없이 상품의 모든 목록을 조회할 수 있다.")
         void 주문테이블_목록_조회() {
             when(orderTableRepository.findAll()).thenReturn(List.of(orderTable));
             List<OrderTable> result = orderTableRepository.findAll();
@@ -63,6 +65,18 @@ class OrderTableServiceTest {
     @Nested
     @DisplayName("주문 테이블 등록")
     class 주문_테이블_등록 {
+
+        @ParameterizedTest
+        @DisplayName("성공")
+        @ValueSource(strings = {"1번 테이블", "2번 테이블"})
+        void 주문_테이블_등록성공(final String name) {
+            orderTable = OrderTableFixture.test(name, 0, false).create();
+
+            assertThatCode(() -> {
+                orderTableService.create(orderTable);
+            }).doesNotThrowAnyException();
+
+        }
 
         @ParameterizedTest
         @DisplayName("테이블명은 공란일 수 없다.")
@@ -81,6 +95,17 @@ class OrderTableServiceTest {
     class 테이블_착석 {
 
         @Test
+        @DisplayName("성공")
+        void 주문_테이블_착석성공() {
+            mockFindByOrderTable();
+
+            assertThatCode(() -> {
+                orderTableService.sit(orderTable.getId());
+            }).doesNotThrowAnyException();
+
+        }
+
+        @Test
         @DisplayName("테이블 사용중 처리한다.")
         void 테이블_사용처리() {
             mockFindByOrderTable();
@@ -95,6 +120,20 @@ class OrderTableServiceTest {
     @Nested
     @DisplayName("테이블 정리")
     class 테이블_정리 {
+
+        @Test
+        @DisplayName("성공")
+        void 주문_테이블_정리성공() {
+
+            mockFindByOrderTable();
+
+            mockExistsByOrderTable(false);
+
+            assertThatCode(() -> {
+                orderTableService.clear(orderTable.getId());
+            }).doesNotThrowAnyException();
+
+        }
 
         @Test
         @DisplayName("주문 테이블이 있으면 주문상태가 **완료**이어야 한다.")
@@ -124,12 +163,26 @@ class OrderTableServiceTest {
     class 테이블_인원_변경 {
 
         @Test
+        @DisplayName("성공")
+        void 주문_테이블_인원변경_성공() {
+            orderTable = OrderTableFixture.test("1번 테이블", 3, true).create();
+
+            mockFindByOrderTable();
+
+            assertThatCode(() -> {
+                orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
+            }).doesNotThrowAnyException();
+
+        }
+
+        @Test
         @DisplayName("테이블 사용중인 상태여야 한다.")
         void 테이블_사용여부_검사() {
             mockFindByOrderTable();
 
             assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
+                .isThrownBy(
+                    () -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
         }
 
         @Test
@@ -137,7 +190,8 @@ class OrderTableServiceTest {
         void 테이블_인원수_허용범위_검사() {
             orderTable = OrderTableFixture.test("test", -1, false).create();
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
+                .isThrownBy(
+                    () -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
 
         }
     }

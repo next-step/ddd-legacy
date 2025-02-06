@@ -46,7 +46,7 @@ class MenuGroupServiceTest {
     class 메뉴_그룹_조회 {
 
         @Test
-        @DisplayName("특정 조건 없이 상품의 모든 목록을 조회할 수 있다.")
+        @DisplayName("성공 : 특정 조건 없이 상품의 모든 목록을 조회할 수 있다.")
         void 메뉴그룹목록_조회() {
             when(menuGroupRepository.findAll()).thenReturn(List.of(menuGroup));
             List<MenuGroup> result = menuGroupService.findAll();
@@ -63,7 +63,7 @@ class MenuGroupServiceTest {
     class 메뉴그룹_등록 {
 
         @Test
-        @DisplayName("메뉴 그룹 등록 성공")
+        @DisplayName("성공")
         void 메뉴그룹_등록_성공() {
             when(menuGroupRepository.save(Mockito.any(MenuGroup.class))).thenReturn(menuGroup);
 
@@ -79,7 +79,7 @@ class MenuGroupServiceTest {
         @ParameterizedTest
         @DisplayName("메뉴 그룹명을 반드시 가진다.")
         @NullAndEmptySource
-        @ValueSource(strings = {" ", "   ","\t", "\n"})
+        @ValueSource(strings = {" ", "   ", "\t", "\n"})
         void 메뉴그룹명_유효성_검사(final String name) {
             menuGroup = MenuGroupFixture.test(name).create();
 
