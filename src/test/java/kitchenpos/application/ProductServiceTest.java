@@ -3,7 +3,6 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -147,11 +146,5 @@ class ProductServiceTest {
 
         // then
         assertThat(menu.isDisplayed()).isFalse();
-    }
-
-    @DisplayName("모든 상품을 조회할 수 있다.")
-    @Test
-    void findAll() {
-
     }
 }
