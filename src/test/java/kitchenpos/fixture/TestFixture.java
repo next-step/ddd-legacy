@@ -44,10 +44,10 @@ public class TestFixture {
         return menuGroup;
     }
 
-    public static OrderTable makeTestOrderTable() {
+    public static OrderTable makeTestOrderTable(String name) {
         OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
-        orderTable.setName("1번 테이블");
+        orderTable.setName(name);
         orderTable.setNumberOfGuests(0);
         orderTable.setOccupied(false);
         return orderTable;
