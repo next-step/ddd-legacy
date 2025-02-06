@@ -1,9 +1,6 @@
 package kitchenpos.fixture;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.Product;
+import kitchenpos.domain.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -45,5 +42,14 @@ public class TestFixture {
         menuGroup.setId(UUID.randomUUID());
         menuGroup.setName(name);
         return menuGroup;
+    }
+
+    public static OrderTable makeTestOrderTable() {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(UUID.randomUUID());
+        orderTable.setName("1번 테이블");
+        orderTable.setNumberOfGuests(0);
+        orderTable.setOccupied(false);
+        return orderTable;
     }
 }
