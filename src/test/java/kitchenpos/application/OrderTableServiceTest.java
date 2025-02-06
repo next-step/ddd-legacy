@@ -98,33 +98,24 @@ class OrderTableServiceTest {
         @DisplayName("테이블의 주문 상태가 완료가 아니면 정리할 수 없다")
         @EnumSource(value = OrderStatus.class, names = "COMPLETED", mode = EnumSource.Mode.EXCLUDE)
         @ParameterizedTest
-        void validateOrderStatus(OrderStatus status) {
+        void validateOrderStatus(OrderStatus orderStatus) {
             //given
-            OrderTable orderTable = orderTableService.create(OrderTableFixture.createOrderTable("1번테이블"));
-            orderTableService.sit(orderTable.getId());
-            ReflectionTestUtils.setField(orderTable, "numberOfGuests", 4);
-            orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
-
-            Order order = createUnnamedOrder(orderTable.getId());
+            OrderTable occupiedOrderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(UUID.randomUUID(), "1번테이블", true, 4));
+            Order order = createUnnamedOrder(occupiedOrderTable.getId(), orderStatus);
             //when, then
-            ReflectionTestUtils.setField(order, "status", status);
             assertThatIllegalStateException()
-                    .isThrownBy(() -> orderTableService.clear(orderTable.getId()));
+                    .isThrownBy(() -> orderTableService.clear(occupiedOrderTable.getId()));
         }
 
         @DisplayName("테이블 정리하면 손님의 수 0명, 테이블 사용유무 안함으로 변경된다")
         @Test
         void clear() {
             //given
-            OrderTable orderTable = orderTableService.create(OrderTableFixture.createOrderTable("1번테이블"));
-            orderTableService.sit(orderTable.getId());
-            ReflectionTestUtils.setField(orderTable, "numberOfGuests", 4);
-            orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
-
-            Order order = createUnnamedOrder(orderTable.getId());
+            OrderTable occupiedOrderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(UUID.randomUUID(), "1번테이블", true, 4));
+            Order order = createUnnamedOrder(occupiedOrderTable.getId(), OrderStatus.COMPLETED);
             //when
             ReflectionTestUtils.setField(order, "status", OrderStatus.COMPLETED);
-            OrderTable clearOrder = orderTableService.clear(orderTable.getId());
+            OrderTable clearOrder = orderTableService.clear(occupiedOrderTable.getId());
             //then
             assertThat(clearOrder.getNumberOfGuests()).isZero();
             assertThat(clearOrder.isOccupied()).isFalse();
@@ -177,17 +168,17 @@ class OrderTableServiceTest {
     }
     //endregion
 
-    private Order createEatInOrder(List<OrderLineItem> orderLineItems, UUID orderTableId, LocalDateTime orderDateTime) {
-        return OrderFixture.createOrder(OrderType.EAT_IN, orderLineItems, null, orderTableId, orderDateTime);
+    private Order createEatInOrder(List<OrderLineItem> orderLineItems, UUID orderTableId, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+        return OrderFixture.createOrder(OrderType.EAT_IN, orderLineItems, null, orderTableId, orderStatus, orderDateTime);
     }
 
-    private Order createUnnamedOrder(UUID orderTableId) {
+    private Order createUnnamedOrder(UUID orderTableId, OrderStatus orderStatus) {
         Product unnamedProduct = productRepository.save(ProductFixture.createProduct(UUID.randomUUID(), "unnamed", BigDecimal.ZERO));
         MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.createMenuGroup(UUID.randomUUID(), "unnamed"));
         MenuProduct displayMenuProduct = MenuProductFixture.createMenuProduct(unnamedProduct, 1);
         Menu unknownMenu = menuRepository.save(MenuFixture.createMenu(UUID.randomUUID(), menuGroup, menuGroup.getId(), "unnamed", BigDecimal.ZERO, true, List.of(displayMenuProduct)));
 
         OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(unknownMenu.getId(), BigDecimal.ZERO, 1);
-        return orderService.create(createEatInOrder(List.of(orderLineItem), orderTableId, LocalDateTime.now()));
+        return orderService.create(createEatInOrder(List.of(orderLineItem), orderTableId, orderStatus, LocalDateTime.now()));
     }
 }
