@@ -14,6 +14,7 @@ import java.util.UUID;
 import static kitchenpos.fixture.OrderFixture.order;
 import static kitchenpos.fixture.OrderTableFixture.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Transactional
 @SpringBootTest
@@ -36,9 +37,11 @@ class OrderTableServiceTest {
             final OrderTable response = orderTableService.create(request);
 
             // then
-            assertThat(response.getName()).isEqualTo(DEFAULT_ORDER_TABLE_NAME);
-            assertThat(response.getNumberOfGuests()).isEqualTo(DEFAULT_NUMBER_OF_GUESTS);
-            assertThat(response.isOccupied()).isFalse();
+            assertAll(
+                    () -> assertThat(response.getName()).isEqualTo(DEFAULT_ORDER_TABLE_NAME),
+                    () -> assertThat(response.getNumberOfGuests()).isEqualTo(DEFAULT_NUMBER_OF_GUESTS),
+                    () -> assertThat(response.isOccupied()).isFalse()
+            );
         }
 
         @Test
@@ -105,8 +108,10 @@ class OrderTableServiceTest {
             final OrderTable response = orderTableService.clear(created.getId());
 
             // then
-            assertThat(response.getNumberOfGuests()).isEqualTo(DEFAULT_NUMBER_OF_GUESTS);
-            assertThat(response.isOccupied()).isFalse();
+            assertAll(
+                    () -> assertThat(response.getNumberOfGuests()).isEqualTo(DEFAULT_NUMBER_OF_GUESTS),
+                    () -> assertThat(response.isOccupied()).isFalse()
+            );
         }
 
         @Test
