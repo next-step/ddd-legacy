@@ -229,6 +229,28 @@ class OrderServiceTest {
         assertThat(resultOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
+    @DisplayName("배달 주문이 들어왔다면 메뉴를 준비한다.")
+    @Test
+    void serveDeliveryOrder() {
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
+
+        OrderLineItem orderLineItem = makeTestOrderLineItem(BigDecimal.valueOf(5000), menu, 1);
+
+        Order deliveryOrder = makeTestDeliveryOrder(OrderStatus.ACCEPTED, orderLineItem, "집");
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(deliveryOrder));
+
+        // when
+        Order resultOrder = orderService.serve(deliveryOrder.getId());
+
+        // then
+        assertThat(resultOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
+    }
+
     @Test
     void startDelivery() {
     }
