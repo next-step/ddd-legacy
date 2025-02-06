@@ -5,6 +5,7 @@ import kitchenpos.application.fixture.MenuGroupFixture;
 import kitchenpos.application.fixture.MenuProductFixture;
 import kitchenpos.application.fixture.ProductFixture;
 import kitchenpos.domain.*;
+import kitchenpos.infra.FakePurgomalumClient;
 import kitchenpos.infra.PurgomalumClient;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,25 +55,8 @@ class MenuServiceTest {
     @DisplayName("메뉴를 생성할 수 있다")
     @Nested
     class MenuCreator {
-        @DisplayName("단일 상품으로 메뉴를 등록할 수 있다")
-        @Test
-        void createMenuByProduct() {
-            MenuProduct chickenBurger = MenuProductFixture.createMenuProduct(BURGER_PRODUCT_ID, 1);
-            Menu menu = MenuFixture.createMenu(MENU_GROUP_ID, "치킨버거", new BigDecimal(7000), List.of(chickenBurger));
 
-            Menu resultMenu = menuService.create(menu);
-
-            assertAll(
-                    () -> assertThat(resultMenu.getName()).isEqualTo("치킨버거"),
-                    () -> assertThat(resultMenu.getPrice()).isEqualTo(new BigDecimal(7000)),
-                    () -> assertThat(resultMenu.isDisplayed()).isFalse(),
-                    () -> assertThat(resultMenu.getMenuProducts()).hasSize(1),
-                    () -> assertThat(resultMenu.getMenuGroup()).isNotNull(),
-                    () -> assertThat(resultMenu.getMenuGroup().getId()).isEqualTo(MENU_GROUP_ID)
-            );
-        }
-
-        @DisplayName("여러 상품으로 조합하여 하나의 메뉴를 등록할 수 있다")
+        @DisplayName("메뉴는 1가지 이상의 상품으로 등록 가능하다")
         @Test
         void createMenuByProducts() {
             //given
