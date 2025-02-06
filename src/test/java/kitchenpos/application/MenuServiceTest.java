@@ -5,15 +5,19 @@ import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
 import static kitchenpos.fixture.TestFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
@@ -52,6 +56,45 @@ class MenuServiceTest {
         assertThat(resultMenu.getMenuGroup()).isEqualTo(menu.getMenuGroup());
         assertThat(resultMenu.getMenuProducts()).isEqualTo(menu.getMenuProducts());
         assertThat(resultMenu.isDisplayed()).isEqualTo(menu.isDisplayed());
+    }
+
+    @DisplayName("메뉴 가격은 0원보다 작다면 에러를 발생시킨다.")
+    @Test
+    void minusPrice() {
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(-5000), menuGroup, menuProduct);
+
+        // then
+        assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴 모음이 하나 이상의 메뉴로 구성되어있지 않다면 에러를 발생시킨다.")
+    @Test
+    void noMenuInMenuGroup() {
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
+
+        // then
+        assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("메뉴가 하나 이상의 상품으로 구성되어있지 않다면 에러를 발생시킨다.")
+    @Test
+    void noProductInMenu() {
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
+
+        // then
+        assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
