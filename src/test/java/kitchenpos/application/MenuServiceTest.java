@@ -57,8 +57,8 @@ class MenuServiceTest {
         void createMenuSuccess() {
             // given
             MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
-            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품();
-            Product 콜라_상품 = ProductFixture.콜라_상품();
+            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
+            Product 콜라_상품 = ProductFixture.콜라_상품_Request();
             Menu expected = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹, 후라이드_치킨_상품, 콜라_상품);
 
             // 메뉴 그룹 및 상품 존재 검증
@@ -91,8 +91,8 @@ class MenuServiceTest {
         void createMenuWithoutPriceThrowIllegalArgumentException() {
             // given
             MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
-            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품();
-            Product 콜라_상품 = ProductFixture.콜라_상품();
+            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
+            Product 콜라_상품 = ProductFixture.콜라_상품_Request();
 
             // 가격이 음수인 메뉴 생성
             Menu 가격이_없는_메뉴 = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹, 후라이드_치킨_상품, 콜라_상품);
@@ -107,8 +107,8 @@ class MenuServiceTest {
         void createMenuWithNegativePriceThrowIllegalArgumentException() {
             // given
             MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
-            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품();
-            Product 콜라_상품 = ProductFixture.콜라_상품();
+            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
+            Product 콜라_상품 = ProductFixture.콜라_상품_Request();
 
             // 가격이 음수인 메뉴 생성
             Menu 음수_가격_메뉴 = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹, 후라이드_치킨_상품, 콜라_상품);
@@ -150,8 +150,8 @@ class MenuServiceTest {
         void createMenuWithNonexistentMenuProductThrowIllegalArgumentException() {
             // given
             MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
-            Product 존재하는_상품 = ProductFixture.후라이드_치킨_상품(); // 존재하는 상품
-            Product 존재하지_않는_상품 = ProductFixture.콜라_상품(); // 존재하지 않는 상품
+            Product 존재하는_상품 = ProductFixture.후라이드_치킨_상품_Request(); // 존재하는 상품
+            Product 존재하지_않는_상품 = ProductFixture.콜라_상품_Request(); // 존재하지 않는 상품
 
             Menu 존재하지_않는_상품_포함_메뉴 = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹, 존재하는_상품, 존재하지_않는_상품);
 
@@ -171,7 +171,7 @@ class MenuServiceTest {
         void createMenuWithNegativeMenuProductQuantityThrowIllegalArgumentException() {
             // given
             MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
-            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품();
+            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
             MenuProduct 음수_구성상품 = new MenuProduct();
             음수_구성상품.setProduct(후라이드_치킨_상품);
             음수_구성상품.setProductId(후라이드_치킨_상품.getId());
@@ -197,8 +197,8 @@ class MenuServiceTest {
         void createMenuWithPriceHigherThanSumOfMenuProductPricesThrowIllegalArgumentException() {
             // given
             MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
-            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품(); // 16,000원
-            Product 콜라_상품 = ProductFixture.콜라_상품(); // 1,000원
+            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request(); // 16,000원
+            Product 콜라_상품 = ProductFixture.콜라_상품_Request(); // 1,000원
 
             // 총 상품 가격: 16,000 + 1,000 = 17,000원
             // 메뉴 가격을 19,000원으로 설정하여 예외를 발생시킨다.
@@ -224,7 +224,7 @@ class MenuServiceTest {
         void createMenuWithoutNameThrowIllegalArgumentException() {
             // given
             MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
-            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품();
+            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
 
             Menu 이름_없는_메뉴 = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹, 후라이드_치킨_상품);
             이름_없는_메뉴.setName(null);
@@ -246,7 +246,7 @@ class MenuServiceTest {
         void createMenuWithEmptyOrProfanityNameThrowIllegalArgumentException() {
             // given
             MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
-            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품();
+            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
 
             Menu 비속어_포함_메뉴 = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹, 후라이드_치킨_상품);
             비속어_포함_메뉴.setName("비속어");
@@ -277,8 +277,8 @@ class MenuServiceTest {
         void changeMenuPriceSuccess() {
             // given
             MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
-            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품();
-            Product 콜라_상품 = ProductFixture.콜라_상품();
+            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
+            Product 콜라_상품 = ProductFixture.콜라_상품_Request();
 
             Menu 기존_메뉴 = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹, 후라이드_치킨_상품, 콜라_상품);
             UUID 기존_메뉴Id = 기존_메뉴.getId();
@@ -334,8 +334,8 @@ class MenuServiceTest {
         void changeMenuPriceHigherThanMenuProductTotalThrowIllegalArgumentException() {
             // given
             MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
-            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품();
-            Product 콜라_상품 = ProductFixture.콜라_상품();
+            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
+            Product 콜라_상품 = ProductFixture.콜라_상품_Request();
 
             Menu 기존_메뉴 = MenuFixture.후라이드_치킨_메뉴(추천_메뉴그룹, 후라이드_치킨_상품, 콜라_상품);
             UUID 기존_메뉴Id = 기존_메뉴.getId();
@@ -359,8 +359,8 @@ class MenuServiceTest {
         void displayMenuSuccess() {
             // given
             MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
-            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품();
-            Product 콜라_상품 = ProductFixture.콜라_상품();
+            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
+            Product 콜라_상품 = ProductFixture.콜라_상품_Request();
             Menu 구성_상품_가격_총합과_동일한_메뉴 = MenuFixture.구성_상품_가격_총합과_동일한_메뉴(추천_메뉴그룹, 후라이드_치킨_상품, 콜라_상품);
 
             given(menuRepository.findById(구성_상품_가격_총합과_동일한_메뉴.getId())).willReturn(Optional.of(구성_상품_가격_총합과_동일한_메뉴));
@@ -377,8 +377,8 @@ class MenuServiceTest {
         void displayMenuFailWithHigherPrice() {
             // given
             MenuGroup 추천_메뉴그룹 = MenuGroupFixture.추천_메뉴그룹();
-            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품();
-            Product 콜라_상품 = ProductFixture.콜라_상품();
+            Product 후라이드_치킨_상품 = ProductFixture.후라이드_치킨_상품_Request();
+            Product 콜라_상품 = ProductFixture.콜라_상품_Request();
             Menu 구성_상품_가격_총합을_초과한_메뉴 = MenuFixture.구성_상품_가격_총합을_초과한_메뉴(추천_메뉴그룹, 후라이드_치킨_상품, 콜라_상품);
 
             given(menuRepository.findById(구성_상품_가격_총합을_초과한_메뉴.getId())).willReturn(Optional.of(구성_상품_가격_총합을_초과한_메뉴));

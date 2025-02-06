@@ -1,8 +1,7 @@
 package kitchenpos;
 
-import helper.IdGenerator;
+import kitchenpos.infra.IdGenerator;
 import helper.PriceGenerator;
-import kitchenpos.domain.Menu;
 import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
@@ -13,33 +12,23 @@ public class ProductFixture {
     private static final IdGenerator productIdGenerator = UUID::randomUUID;
     private static final PriceGenerator priceGenerator = BigDecimal::new;
 
-    public static Product 양념_치킨_상품(){
-        Product product = new Product();
-        product.setId(productIdGenerator.ramdom());
-        product.setName("양념 치킨");
-        product.setPrice(priceGenerator.of(17000));
-        return product;
-    }
 
-    public static Product 후라이드_치킨_상품(){
+    public static Product 후라이드_치킨_상품_Request(){
         Product product = new Product();
-        product.setId(productIdGenerator.ramdom());
         product.setName("후라이드 치킨");
         product.setPrice(priceGenerator.of(16000));
         return product;
     }
 
-    public static Product 후라이드_치킨_상품(BigDecimal price){
+    public static Product 후라이드_치킨_상품_Request(BigDecimal price){
         Product product = new Product();
-        product.setId(productIdGenerator.ramdom());
         product.setName("후라이드 치킨");
         product.setPrice(price);
         return product;
     }
 
-    public static Product 콜라_상품() {
+    public static Product 콜라_상품_Request() {
         Product product = new Product();
-        product.setId(productIdGenerator.ramdom());
         product.setName("콜라");
         product.setPrice(priceGenerator.of(1000));
         return product;
@@ -47,7 +36,6 @@ public class ProductFixture {
 
     //각격변경
     public static Product 가격만_변경된_상품(Product origin, BigDecimal price) {
-        origin.setId(productIdGenerator.ramdom());
         origin.setName("콜라");
         origin.setPrice(price);
         return origin;

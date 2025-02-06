@@ -1,4 +1,4 @@
-package helper;
+package kitchenpos.infra;
 
 
 import java.util.UUID;

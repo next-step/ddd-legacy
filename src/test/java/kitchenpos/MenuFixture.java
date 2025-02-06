@@ -1,6 +1,6 @@
 package kitchenpos;
 
-import helper.IdGenerator;
+import kitchenpos.infra.IdGenerator;
 import helper.PriceGenerator;
 import helper.SequenceGenerator;
 import kitchenpos.domain.Menu;

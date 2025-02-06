@@ -22,9 +22,9 @@ public class ProductService {
     private final PurgomalumClient purgomalumClient;
 
     public ProductService(
-        final ProductRepository productRepository,
-        final MenuRepository menuRepository,
-        final PurgomalumClient purgomalumClient
+            final ProductRepository productRepository,
+            final MenuRepository menuRepository,
+            final PurgomalumClient purgomalumClient
     ) {
         this.productRepository = productRepository;
         this.menuRepository = menuRepository;
@@ -35,11 +35,11 @@ public class ProductService {
     public Product create(final Product request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new ProductPriceException();
         }
         final String name = request.getName();
         if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
-            throw new IllegalArgumentException();
+            throw new ProductNameException();
         }
         final Product product = new Product();
         product.setId(UUID.randomUUID());
@@ -52,19 +52,19 @@ public class ProductService {
     public Product changePrice(final UUID productId, final Product request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new ProductPriceException();
         }
         final Product product = productRepository.findById(productId)
-            .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(ProductNotFoundException::new);
         product.setPrice(price);
         final List<Menu> menus = menuRepository.findAllByProductId(productId);
         for (final Menu menu : menus) {
             BigDecimal sum = BigDecimal.ZERO;
             for (final MenuProduct menuProduct : menu.getMenuProducts()) {
                 sum = sum.add(
-                    menuProduct.getProduct()
-                        .getPrice()
-                        .multiply(BigDecimal.valueOf(menuProduct.getQuantity()))
+                        menuProduct.getProduct()
+                                .getPrice()
+                                .multiply(BigDecimal.valueOf(menuProduct.getQuantity()))
                 );
             }
             if (menu.getPrice().compareTo(sum) > 0) {
