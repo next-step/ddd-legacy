@@ -171,8 +171,22 @@ class MenuServiceTest {
         assertThatThrownBy(() -> menuService.changePrice(menu.getId(), changeMenu)).isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴를 노출할 수 있다.")
     @Test
     void display() {
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
+
+        when(menuRepository.findById(any(UUID.class))).thenReturn(Optional.of(menu));
+
+        // when
+        Menu resultMenu = menuService.display(menu.getId());
+
+        // then
+        assertThat(resultMenu.isDisplayed()).isTrue();
     }
 
     @Test
