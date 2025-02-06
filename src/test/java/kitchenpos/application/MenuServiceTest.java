@@ -117,6 +117,25 @@ class MenuServiceTest {
         assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(NoSuchElementException.class);
     }
 
+    @DisplayName("메뉴명에 비속어가 들어있다면 에러를 발생시킨다.")
+    @Test
+    void hasProfanity() {
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
+
+        // when
+        when(menuGroupRepository.findById(any(UUID.class))).thenReturn(Optional.of(menuGroup));
+        when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(product));
+        when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
+        when(purgomalumClient.containsProfanity(any(String.class))).thenReturn(true);
+
+        // then
+        assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
+    }
+
     @Test
     void changePrice() {
     }
