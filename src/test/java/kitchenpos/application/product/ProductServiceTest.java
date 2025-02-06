@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.NoSuchElementException;
@@ -21,7 +22,6 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-
 
 class ProductServiceTest {
     private ProductRepository productRepository;
@@ -45,9 +45,9 @@ class ProductServiceTest {
 
             Product created = productService.create(request);
             assertAll(
-                () -> assertThat(created.getId()).isNotNull(),
-                () -> assertThat(created.getName()).isEqualTo("후라이드"),
-                () -> assertThat(created.getPrice()).isEqualByComparingTo("16000")
+                    () -> assertThat(created.getId()).isNotNull(),
+                    () -> assertThat(created.getName()).isEqualTo("후라이드"),
+                    () -> assertThat(created.getPrice()).isEqualByComparingTo("16000")
             );
         }
 
@@ -79,7 +79,7 @@ class ProductServiceTest {
             Product product = ProductFixture.product("후라이드", 16000);
             productRepository.save(product);
             Product request = new Product();
-            request.setPrice(BigDecimal.valueOf(18000));
+            ReflectionTestUtils.setField(request, "price", BigDecimal.valueOf(18000));
 
             Product updated = productService.changePrice(product.getId(), request);
 
@@ -91,7 +91,7 @@ class ProductServiceTest {
         void failWithNonExistentProduct() {
             UUID nonExistentId = UUID.randomUUID();
             Product request = new Product();
-            request.setPrice(BigDecimal.valueOf(1000));
+            ReflectionTestUtils.setField(request, "price", BigDecimal.valueOf(1000));
 
             assertThatThrownBy(() -> productService.changePrice(nonExistentId, request))
                     .isInstanceOf(NoSuchElementException.class);
@@ -103,7 +103,7 @@ class ProductServiceTest {
             Product product = ProductFixture.product("후라이드", 16000);
             productRepository.save(product);
             Product request = new Product();
-            request.setPrice(BigDecimal.valueOf(-1000));
+            ReflectionTestUtils.setField(request, "price", BigDecimal.valueOf(-1000));
 
             assertThatThrownBy(() -> productService.changePrice(product.getId(), request))
                     .isInstanceOf(IllegalArgumentException.class);

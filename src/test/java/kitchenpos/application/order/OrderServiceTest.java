@@ -24,6 +24,7 @@ import kitchenpos.domain.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -59,8 +60,7 @@ class OrderServiceTest {
             MenuGroup menuGroup = MenuFixture.menuGroup("메인 메뉴");
             MenuProduct menuProduct = MenuFixture.menuProduct(product, 1);
             Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
-            menu.setId(UUID.randomUUID());
-
+            ReflectionTestUtils.setField(menu, "id", UUID.randomUUID());
             menuRepository.save(menu);
 
             OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
@@ -89,7 +89,7 @@ class OrderServiceTest {
             MenuGroup menuGroup = MenuFixture.menuGroup("메인 메뉴");
             MenuProduct menuProduct = MenuFixture.menuProduct(product, 1);
             Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
-            menu.setId(UUID.randomUUID());
+            ReflectionTestUtils.setField(menu, "id", UUID.randomUUID());
 
             menuRepository.save(menu);
 
@@ -112,7 +112,8 @@ class OrderServiceTest {
         @DisplayName("주문 유형이 없으면 실패")
         void failWithoutOrderType() {
             Order request = new Order();
-            request.setOrderLineItems(List.of(new OrderLineItem()));
+
+            ReflectionTestUtils.setField(request, "orderLineItems", List.of(new OrderLineItem()));
 
             assertThatThrownBy(() -> orderService.create(request))
                     .isInstanceOf(OrderTypeNotFoundException.class);
@@ -122,7 +123,7 @@ class OrderServiceTest {
         @DisplayName("주문 상품이 없으면 실패")
         void failWithoutOrderLineItems() {
             Order request = new Order();
-            request.setType(OrderType.TAKEOUT);
+            ReflectionTestUtils.setField(request, "type", OrderType.TAKEOUT);
 
             assertThatThrownBy(() -> orderService.create(request))
                     .isInstanceOf(OrderLineItemNotFoundException.class);
@@ -138,8 +139,9 @@ class OrderServiceTest {
             );
 
             Order request = new Order();
-            request.setType(OrderType.TAKEOUT);
-            request.setOrderLineItems(List.of(orderLineItem));
+            ReflectionTestUtils.setField(request, "type", OrderType.TAKEOUT);
+            ReflectionTestUtils.setField(request, "orderLineItems", List.of(orderLineItem));
+
 
             assertThatThrownBy(() -> orderService.create(request))
                     .isInstanceOf(OrderLineSizeNotMatched.class);
@@ -238,7 +240,7 @@ class OrderServiceTest {
 
             OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
             Order order = OrderFixture.order(OrderType.DELIVERY, OrderStatus.SERVED, List.of(orderLineItem));
-            order.setDeliveryAddress("서울시 강남구");
+            ReflectionTestUtils.setField(order, "deliveryAddress", "서울시 강남구");
             orderRepository.save(order);
 
             // when
@@ -259,7 +261,7 @@ class OrderServiceTest {
 
             OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
             Order order = OrderFixture.order(OrderType.DELIVERY, OrderStatus.DELIVERING, List.of(orderLineItem));
-            order.setDeliveryAddress("서울시 강남구");
+            ReflectionTestUtils.setField(order, "deliveryAddress", "서울시 강남구");
             orderRepository.save(order);
 
             // when

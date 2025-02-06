@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -200,8 +201,7 @@ class MenuServiceTest {
             menuRepository.save(menu);
 
             Menu request = new Menu();
-            request.setPrice(BigDecimal.valueOf(1000));
-
+            ReflectionTestUtils.setField(request, "price", BigDecimal.valueOf(1000));
             Menu updated = menuService.changePrice(menu.getId(), request);
 
             assertThat(updated.getPrice()).isEqualByComparingTo("1000");
@@ -220,7 +220,7 @@ class MenuServiceTest {
             menuRepository.save(menu);
 
             Menu request = new Menu();
-            request.setPrice(BigDecimal.valueOf(-1000));
+            ReflectionTestUtils.setField(request, "price", BigDecimal.valueOf(-1000));
 
             assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
                     .isInstanceOf(PriceInvalidException.class);
@@ -239,7 +239,7 @@ class MenuServiceTest {
             menuRepository.save(menu);
 
             Menu request = new Menu();
-            request.setPrice(BigDecimal.valueOf(2000));
+            ReflectionTestUtils.setField(request, "price", BigDecimal.valueOf(2000));
 
             assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
                     .isInstanceOf(MenuPriceInvalidException.class);
