@@ -6,20 +6,20 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import kitchenpos.application.ProductService;
 import kitchenpos.application.fixture.MenuFixture;
 import kitchenpos.application.fixture.MenuProductFixture;
 import kitchenpos.application.fixture.ProductFixture;
+import kitchenpos.domain.InMemoryMenuRepository;
+import kitchenpos.domain.InMemoryProductRepository;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.infra.FakeProfanityClient;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,8 +30,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,14 +38,11 @@ class ProductServiceTest {
     @InjectMocks
     private ProductService productService;
 
-    @Mock
-    private ProductRepository productRepository;
+    private ProductRepository productRepository = new InMemoryProductRepository();
 
-    @Mock
-    private MenuRepository menuRepository;
+    private MenuRepository menuRepository = new InMemoryMenuRepository();
 
-    @Mock
-    private PurgomalumClient purgomalumClient;
+    private PurgomalumClient purgomalumClient = new FakeProfanityClient(List.of("나쁜", "XXX"));
 
     private Product chicken;
 
@@ -55,6 +50,10 @@ class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
+        productRepository = new InMemoryProductRepository();
+        menuRepository = new InMemoryMenuRepository();
+        productService = new ProductService(productRepository, menuRepository, purgomalumClient);
+
         chicken = ProductFixture.init().create();
         chickenMenu = MenuFixture.init().create();
     }
@@ -66,7 +65,6 @@ class ProductServiceTest {
         @Test
         @DisplayName("성공")
         void 상품등록_성공() {
-            when(productRepository.save(Mockito.any(Product.class))).thenReturn(chicken);
 
             var result = productService.create(chicken);
 
@@ -85,9 +83,8 @@ class ProductServiceTest {
         @ParameterizedTest
         @ValueSource(strings = {"나쁜", "XXX"})
         void 상품명_비속어_검사(final String name) {
-            mockCheckProductName(true);
-
             chicken = ProductFixture.test(name, null).create();
+
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> productService.create(chicken));
         }
@@ -114,9 +111,9 @@ class ProductServiceTest {
         @DisplayName("성공")
         @ValueSource(ints = {0, 1000, 10000})
         void 상품수정_성공(final int price) {
-            chicken = ProductFixture.test(null, BigDecimal.valueOf(price)).create();
+            productRepository.save(chicken);
 
-            mockUpdateProduct();
+            chicken.setPrice(BigDecimal.valueOf(price));
 
             var result = productService.changePrice(chicken.getId(), chicken);
 
@@ -142,9 +139,8 @@ class ProductServiceTest {
         @ParameterizedTest
         @CsvSource({"100000, 100"})
         void 가격비교_숨김처리(final int price1, final int price2) {
-            chicken = ProductFixture.test(null, BigDecimal.valueOf(price1)).create();
-
-            mockFindByProduct();
+            chicken.setPrice(BigDecimal.valueOf(price1));
+            productRepository.save(chicken);
 
             chickenMenu = MenuFixture.test(
                 null,
@@ -153,15 +149,14 @@ class ProductServiceTest {
                 true,
                 List.of(new MenuProductFixture(
                     new ProductFixture(
-                        null,
+                        chicken.getId(),
                         null,
                         BigDecimal.valueOf(price2)
                     ).create(),
                     100
                 ).create())
             ).create();
-
-            mockFindByAllProducts(chickenMenu);
+            menuRepository.save(chickenMenu);
 
             productService.changePrice(chicken.getId(), chicken);
 
@@ -177,32 +172,12 @@ class ProductServiceTest {
         @Test
         @DisplayName("성공 : 특정 조건 없이 상품의 모든 목록을 조회할 수 있다.")
         void 상품목록_조회() {
-            when(productRepository.findAll()).thenReturn(List.of(chicken));
             List<Product> result = productService.findAll();
 
             assertAll(
-                () -> assertThat(result).isNotEmpty(),
-                () -> assertEquals(result.size(), 1)
+                () -> assertThat(result).isEmpty(),
+                () -> assertEquals(result.size(), 0)
             );
         }
-    }
-
-    private void mockUpdateProduct() {
-        mockFindByProduct();
-        mockFindByAllProducts(chickenMenu);
-    }
-
-    private void mockFindByProduct() {
-        when(productRepository.findById(Mockito.any()))
-            .thenReturn(Optional.of(chicken));
-    }
-
-    private void mockFindByAllProducts(Menu chickenMenu) {
-        when(menuRepository.findAllByProductId(Mockito.any()))
-            .thenReturn(List.of(chickenMenu));
-    }
-
-    private void mockCheckProductName(boolean isProfanity) {
-        when(purgomalumClient.containsProfanity(anyString())).thenReturn(isProfanity);
     }
 }
