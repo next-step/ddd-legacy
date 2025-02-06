@@ -100,6 +100,23 @@ class MenuServiceTest {
         assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴에 등록된 모든 상품이 등록되어있지 않다면 에러를 발생시킨다.")
+    @Test
+    void noMenuProduct() {
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
+
+        // when
+        when(menuGroupRepository.findById(any(UUID.class))).thenReturn(Optional.of(menuGroup));
+        when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(product));
+
+        // then
+        assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(NoSuchElementException.class);
+    }
+
     @Test
     void changePrice() {
     }
