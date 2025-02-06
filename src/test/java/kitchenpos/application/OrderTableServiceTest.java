@@ -90,14 +90,15 @@ class OrderTableServiceTest {
     void changeNumberOfGuests() {
         // given
         OrderTable orderTable = makeTestOrderTable("1번 테이블", 0);
-        when(orderTableRepository.findById(any(UUID.class))).thenReturn(Optional.of(orderTable));
-        when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(false);
+        OrderTable changeOrderTable = makeTestOrderTable("1번 테이블", 1);
+        changeOrderTable.setOccupied(true);
+
+        when(orderTableRepository.findById(any(UUID.class))).thenReturn(Optional.of(changeOrderTable));
 
         // when
-        OrderTable resultOrderTable = orderTableService.clear(orderTable.getId());
+        OrderTable resultOrderTable = orderTableService.changeNumberOfGuests(orderTable.getId(), changeOrderTable);
 
         // then
-        assertThat(resultOrderTable.isOccupied()).isFalse();
-        assertThat(resultOrderTable.getNumberOfGuests()).isEqualTo(0);
+        assertThat(resultOrderTable.getNumberOfGuests()).isEqualTo(changeOrderTable.getNumberOfGuests());
     }
 }
