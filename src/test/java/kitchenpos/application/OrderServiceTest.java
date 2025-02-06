@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static kitchenpos.fixture.TestFixture.*;
-import static kotlin.reflect.jvm.internal.impl.builtins.StandardNames.FqNames.any;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -337,10 +336,31 @@ class OrderServiceTest {
         Order eatInOrder = makeTestTakeOutOrder(OrderStatus.SERVED, orderLineItem);
 
         when(orderRepository.findById(any())).thenReturn(Optional.of(eatInOrder));
-        when(orderRepository.existsByOrderTableAndStatusNot(any(OrderTable.class), any(OrderStatus.class))).thenReturn(false);
 
         // when
         Order resultOrder = orderService.complete(eatInOrder.getId());
+
+        // then
+        assertThat(resultOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName("배달 주문을 완료된다.")
+    @Test
+    void completeDeliveryOrder() {
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
+
+        OrderLineItem orderLineItem = makeTestOrderLineItem(BigDecimal.valueOf(5000), menu, 1);
+
+        Order deliveryOrder = makeTestDeliveryOrder(OrderStatus.DELIVERED, orderLineItem, "집");
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(deliveryOrder));
+
+        // when
+        Order resultOrder = orderService.complete(deliveryOrder.getId());
 
         // then
         assertThat(resultOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
