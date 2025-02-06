@@ -3,7 +3,6 @@ package kitchenpos.application;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
-import kitchenpos.domain.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,10 +10,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
+import java.util.Optional;
+import java.util.UUID;
 
 import static kitchenpos.fixture.TestFixture.makeTestOrderTable;
-import static kitchenpos.fixture.TestFixture.makeTestProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,6 +57,15 @@ class OrderTableServiceTest {
 
     @Test
     void sit() {
+        // given
+        OrderTable orderTable = makeTestOrderTable("1번 테이블");
+        when(orderTableRepository.findById(any(UUID.class))).thenReturn(Optional.of(orderTable));
+
+        // when
+        OrderTable resultOrderTable = orderTableService.sit(orderTable.getId());
+
+        // then
+        assertThat(resultOrderTable.isOccupied()).isTrue();
     }
 
     @Test
