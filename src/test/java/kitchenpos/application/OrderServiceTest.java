@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static kitchenpos.fixture.TestFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -85,6 +84,35 @@ class OrderServiceTest {
         assertThat(resultOrder.getStatus()).isEqualTo(takeOutOrder.getStatus());
         assertThat(resultOrder.getOrderDateTime()).isEqualTo(takeOutOrder.getOrderDateTime());
         assertThat(resultOrder.getOrderLineItems()).isEqualTo(takeOutOrder.getOrderLineItems());
+    }
+
+    @DisplayName("배달 주문을 등록할 수 있다.")
+    @Test
+    void createDeliveryOrder() {
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
+
+        OrderLineItem orderLineItem = makeTestOrderLineItem(BigDecimal.valueOf(5000), menu, 1);
+
+        Order deliveryOrder = makeTestDeliveryOrder(OrderStatus.WAITING, orderLineItem, "집");
+
+        when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+        when(orderRepository.save(any(Order.class))).thenReturn(deliveryOrder);
+
+        // when
+        Order resultOrder = orderService.create(deliveryOrder);
+
+        // then
+        assertThat(resultOrder.getId()).isNotNull();
+        assertThat(resultOrder.getType()).isEqualTo(deliveryOrder.getType());
+        assertThat(resultOrder.getStatus()).isEqualTo(deliveryOrder.getStatus());
+        assertThat(resultOrder.getOrderDateTime()).isEqualTo(deliveryOrder.getOrderDateTime());
+        assertThat(resultOrder.getOrderLineItems()).isEqualTo(deliveryOrder.getOrderLineItems());
+        assertThat(resultOrder.getDeliveryAddress()).isEqualTo(deliveryOrder.getDeliveryAddress());
     }
 
     @Test
