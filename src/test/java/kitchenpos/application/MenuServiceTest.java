@@ -5,8 +5,6 @@ import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -189,11 +187,21 @@ class MenuServiceTest {
         assertThat(resultMenu.isDisplayed()).isTrue();
     }
 
+    @DisplayName("메뉴를 노출하지 않을 수 있다.")
     @Test
     void hide() {
-    }
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
 
-    @Test
-    void findAll() {
+        when(menuRepository.findById(any(UUID.class))).thenReturn(Optional.of(menu));
+
+        // when
+        Menu resultMenu = menuService.hide(menu.getId());
+
+        // then
+        assertThat(resultMenu.isDisplayed()).isFalse();
     }
 }
