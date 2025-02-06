@@ -31,7 +31,7 @@ class OrderTableServiceTest {
     @Test
     void create() {
         // given
-        OrderTable orderTable = makeTestOrderTable("1번 테이블");
+        OrderTable orderTable = makeTestOrderTable("1번 테이블", 0);
         when(orderTableRepository.save(any(OrderTable.class))).thenReturn(orderTable);
 
         // when
@@ -50,7 +50,7 @@ class OrderTableServiceTest {
     @NullAndEmptySource
     void nullName(String name) {
         // given
-        OrderTable orderTable = makeTestOrderTable(name);
+        OrderTable orderTable = makeTestOrderTable(name, 0);
         // then
         assertThatThrownBy(() -> orderTableService.create(orderTable)).isInstanceOf(IllegalArgumentException.class);
     }
@@ -59,7 +59,7 @@ class OrderTableServiceTest {
     @Test
     void sit() {
         // given
-        OrderTable orderTable = makeTestOrderTable("1번 테이블");
+        OrderTable orderTable = makeTestOrderTable("1번 테이블", 0);
         when(orderTableRepository.findById(any(UUID.class))).thenReturn(Optional.of(orderTable));
 
         // when
@@ -73,7 +73,7 @@ class OrderTableServiceTest {
     @Test
     void clear() {
         // given
-        OrderTable orderTable = makeTestOrderTable("1번 테이블");
+        OrderTable orderTable = makeTestOrderTable("1번 테이블", 0);
         when(orderTableRepository.findById(any(UUID.class))).thenReturn(Optional.of(orderTable));
         when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(false);
 
@@ -85,7 +85,19 @@ class OrderTableServiceTest {
         assertThat(resultOrderTable.getNumberOfGuests()).isEqualTo(0);
     }
 
+    @DisplayName("매장 테이블을 사용하는 인원은 늘어나거나 줄어들 수 있다.")
     @Test
     void changeNumberOfGuests() {
+        // given
+        OrderTable orderTable = makeTestOrderTable("1번 테이블", 0);
+        when(orderTableRepository.findById(any(UUID.class))).thenReturn(Optional.of(orderTable));
+        when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(false);
+
+        // when
+        OrderTable resultOrderTable = orderTableService.clear(orderTable.getId());
+
+        // then
+        assertThat(resultOrderTable.isOccupied()).isFalse();
+        assertThat(resultOrderTable.getNumberOfGuests()).isEqualTo(0);
     }
 }
