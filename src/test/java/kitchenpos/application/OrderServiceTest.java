@@ -322,4 +322,27 @@ class OrderServiceTest {
         assertThat(orderTable.getNumberOfGuests()).isEqualTo(0);
         assertThat(orderTable.isOccupied()).isFalse();
     }
+
+    @DisplayName("테이크 아웃 주문을 완료한다.")
+    @Test
+    void completeTakeOutOrder() {
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
+
+        OrderLineItem orderLineItem = makeTestOrderLineItem(BigDecimal.valueOf(5000), menu, 1);
+
+        Order eatInOrder = makeTestTakeOutOrder(OrderStatus.SERVED, orderLineItem);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(eatInOrder));
+        when(orderRepository.existsByOrderTableAndStatusNot(any(OrderTable.class), any(OrderStatus.class))).thenReturn(false);
+
+        // when
+        Order resultOrder = orderService.complete(eatInOrder.getId());
+
+        // then
+        assertThat(resultOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
 }
