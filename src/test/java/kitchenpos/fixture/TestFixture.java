@@ -85,4 +85,13 @@ public class TestFixture {
         order.setDeliveryAddress(address);
         return order;
     }
+
+    public static OrderLineItem makeTestOrderLineItem(BigDecimal price, Menu menu, int quantity) {
+        OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setSeq(1L);
+        orderLineItem.setPrice(price);
+        orderLineItem.setMenu(menu);
+        orderLineItem.setQuantity(quantity);
+        return orderLineItem;
+    }
 }
