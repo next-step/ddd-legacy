@@ -3,6 +3,7 @@ package kitchenpos.fixture;
 import kitchenpos.domain.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,5 +52,37 @@ public class TestFixture {
         orderTable.setNumberOfGuests(numberOfGuest);
         orderTable.setOccupied(false);
         return orderTable;
+    }
+
+    public static Order makeTestEatInOrder(OrderStatus orderStatus, OrderLineItem orderLineItem, OrderTable orderTable) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.EAT_IN);
+        order.setStatus(orderStatus);
+        order.setOrderDateTime(LocalDateTime.now());
+        order.setOrderLineItems(List.of(orderLineItem));
+        order.setOrderTable(orderTable);
+        return order;
+    }
+
+    public static Order makeTestTakeOutOrder(OrderStatus orderStatus, OrderLineItem orderLineItem) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.TAKEOUT);
+        order.setStatus(orderStatus);
+        order.setOrderDateTime(LocalDateTime.now());
+        order.setOrderLineItems(List.of(orderLineItem));
+        return order;
+    }
+
+    public static Order makeTestDeliveryOrder(OrderStatus orderStatus, OrderLineItem orderLineItem, String address) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(orderStatus);
+        order.setOrderDateTime(LocalDateTime.now());
+        order.setOrderLineItems(List.of(orderLineItem));
+        order.setDeliveryAddress(address);
+        return order;
     }
 }
