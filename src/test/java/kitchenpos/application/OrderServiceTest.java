@@ -183,8 +183,28 @@ class OrderServiceTest {
         assertThat(resultOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
+    @DisplayName("매장 주문이 들어왔다면 메뉴를 준비한다")
     @Test
-    void serve() {
+    void serveEatInOrder() {
+        // given
+        Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = makeTestMenuProduct(product);
+        MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
+
+        OrderLineItem orderLineItem = makeTestOrderLineItem(BigDecimal.valueOf(5000), menu, 1);
+        OrderTable orderTable = makeTestOrderTable("1번 테이블", 0);
+        orderTable.setOccupied(true);
+
+        Order eatInOrder = makeTestEatInOrder(OrderStatus.ACCEPTED, orderLineItem, orderTable);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(eatInOrder));
+
+        // when
+        Order resultOrder = orderService.serve(eatInOrder.getId());
+
+        // then
+        assertThat(resultOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
     @Test
