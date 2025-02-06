@@ -268,10 +268,8 @@ class OrderServiceTest {
         @ParameterizedTest
         void validateAcceptStatus(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
-            Order takeOutOrder = orderService.create(takeOutRequest);
+            Order takeOutOrder = orderRepository.save(createTakeOutOrder(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
 
-            ReflectionTestUtils.setField(takeOutOrder, "status", orderStatus);
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.accept(takeOutOrder.getId()));
         }
@@ -282,30 +280,27 @@ class OrderServiceTest {
     @Nested
     class OrderServer {
 
-        @DisplayName("주문 상태를 음식 제공됨(SERVED)로 변경한다")
-        @Test
-        void served() {
+        @DisplayName("주문의 상태가 주문 수락(ACCEPTED)일 때, 음식 제공됨(SERVED)로 변경한다")
+        @EnumSource(value = OrderStatus.class, names = "ACCEPTED", mode = EnumSource.Mode.INCLUDE)
+        @ParameterizedTest
+        void served(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
-            Order takeOutOrder = orderService.create(takeOutRequest);
-            Order acceptOrder = orderService.accept(takeOutOrder.getId());
+            Order acceptOrder = orderRepository.save(createTakeOutOrder(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
 
             Order servedOrder = orderService.serve(acceptOrder.getId());
 
             assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
         }
 
-        @DisplayName("주문의 상태가 주문 수락(ACCEPTED)일 때 음식 제공 가능하다")
+        @DisplayName("주문의 상태가 주문 수락(ACCEPTED)이 아니면 예외가 발생한다")
         @EnumSource(value = OrderStatus.class, names = "ACCEPTED", mode = EnumSource.Mode.EXCLUDE)
         @ParameterizedTest
         void validateServedStatus(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
-            Order takeOutOrder = orderService.create(takeOutRequest);
+            Order order = orderRepository.save(createTakeOutOrder(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
 
-            ReflectionTestUtils.setField(takeOutOrder, "status", orderStatus);
             assertThatIllegalStateException()
-                    .isThrownBy(() -> orderService.serve(takeOutOrder.getId()));
+                    .isThrownBy(() -> orderService.serve(order.getId()));
         }
 
     }
@@ -314,28 +309,25 @@ class OrderServiceTest {
     @Nested
     class DeliveryStarter {
 
-        @DisplayName("배달 주문의 경우 음식이 제공되면 주문 상태를 배달 중(DELIVERING)으로 변경한다")
-        @Test
-        void startDelivery() {
+        @DisplayName("주문 상태가 음식 제공됨(SERVED)인 경우, 주문 상태를 배달 중(DELIVERING)으로 변경한다")
+        @EnumSource(value = OrderStatus.class, names = "SERVED", mode = EnumSource.Mode.INCLUDE)
+        @ParameterizedTest
+        void startDelivery(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
-            Order order = orderService.create(deliveryOrderRequest);
+            Order order = orderRepository.save(createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
 
-            ReflectionTestUtils.setField(order, "status", OrderStatus.SERVED);
             Order deliveryStartorder = orderService.startDelivery(order.getId());
 
             assertThat(deliveryStartorder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
         }
 
-        @DisplayName("주문 상태가 음식 제공됨(SERVED)인 경우, 배달 시작이 가능하다")
+        @DisplayName("주문 상태가 음식 제공됨(SERVED)이 아니면 예외가 발생한다")
         @EnumSource(value = OrderStatus.class, names = "SERVED", mode = EnumSource.Mode.EXCLUDE)
         @ParameterizedTest
         void validateDeliveryStartStatus(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
-            Order order = orderService.create(deliveryOrderRequest);
+            Order order = orderRepository.save(createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
 
-            ReflectionTestUtils.setField(order, "status", orderStatus);
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.startDelivery(order.getId()));
         }
@@ -345,28 +337,26 @@ class OrderServiceTest {
     @Nested
     class DeliveryCompleter {
 
-        @DisplayName("배달 완료한 주문 상태를 배달완료(DELIVERED)로 변경한다")
-        @Test
-        void endDelivery() {
+        @DisplayName("주문 상태가 배달 중(DELIVERING)인 경우, 배달완료(DELIVERED)로 변경한다")
+        @ParameterizedTest
+        @EnumSource(value = OrderStatus.class, names = "DELIVERING", mode = EnumSource.Mode.INCLUDE)
+        void endDelivery(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
-            Order order = orderService.create(deliveryOrderRequest);
+            Order order = orderRepository.save(createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
 
-            ReflectionTestUtils.setField(order, "status", OrderStatus.DELIVERING);
             Order deliveryStartorder = orderService.completeDelivery(order.getId());
 
             assertThat(deliveryStartorder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
         }
 
-        @DisplayName("주문 상태가 배달 중(DELIVERING)인 경우, 배달완료(DELIVERED)로 변경 가능하다")
+        @DisplayName("주문 상태가 배달 중(DELIVERING)가 아니면 예외가 발생한다")
         @ParameterizedTest
         @EnumSource(value = OrderStatus.class, names = "DELIVERING", mode = EnumSource.Mode.EXCLUDE)
         void validateDeliveryEndStatus(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
-            Order order = orderService.create(deliveryOrderRequest);
 
-            ReflectionTestUtils.setField(order, "status", orderStatus);
+            Order order = orderService.create(createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
+
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.completeDelivery(order.getId()));
         }
@@ -376,52 +366,50 @@ class OrderServiceTest {
     @Nested
     class OrderCompleter {
 
-        @DisplayName("배달 주문의 상태를 주문 완료로 변경한다")
-        @Test
-        void complete() {
+        @DisplayName("배달 주문의 경우, 주문의 상태가 배달 완료(DELIVERED)인 경우만, 주문의 상태를 주문 완료로 변경한다")
+        @EnumSource(value = OrderStatus.class, names = "DELIVERED", mode = EnumSource.Mode.INCLUDE)
+        @ParameterizedTest
+        void complete(OrderStatus orderStatus) {
             //given
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
-            Order order = createDeliveredOrder(deliveryOrderRequest);
+            Order order = orderRepository.save(createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
             //when
             Order complete = orderService.complete(order.getId());
             //then
             assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
         }
 
-        @DisplayName("배달 주문의 경우, 주문의 상태가 배달 완료(DELIVERED)인 경우만 주문을 완료할 수 있다")
+        @DisplayName("배달 주문의 경우, 주문의 상태가 배달 완료(DELIVERED)아니면 예외가 발생한다")
         @EnumSource(value = OrderStatus.class, names = "DELIVERED", mode = EnumSource.Mode.EXCLUDE)
         @ParameterizedTest
         void completeOrderByDelivery(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", LocalDateTime.now());
-            Order order = orderService.create(deliveryOrderRequest);
+            Order order = orderRepository.save(createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
 
-            ReflectionTestUtils.setField(order, "status", orderStatus);
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.complete(order.getId()));
         }
 
-        @DisplayName("포장 주문의 상태를 주문 완료로 변경한다")
-        @Test
-        void completeByTakeOut() {
+        @DisplayName("포장 주문의 경우, 주문의 상태가(SERVED)인 경우만 상태를 주문 완료로 변경한다")
+        @EnumSource(value = OrderStatus.class, names = "SERVED", mode = EnumSource.Mode.INCLUDE)
+        @ParameterizedTest
+        void completeByTakeOut(OrderStatus orderStatus) {
             //given
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
-            Order servedOrder = createServedOrder(takeOutRequest);
+            Order servedOrder = orderRepository.save(createTakeOutOrder(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
             //when
             Order complete = orderService.complete(servedOrder.getId());
             //then
             assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
         }
 
-        @DisplayName("매장 내 취식 주문 상태를 주문 완료로 변경한다")
-        @Test
-        void completeByEatIn() {
+        @DisplayName("매장 내 취식의 경우, 주문의 상태가(SERVED)인 경우만 주문 상태를 주문 완료로 변경한다")
+        @EnumSource(value = OrderStatus.class, names = "SERVED", mode = EnumSource.Mode.INCLUDE)
+        @ParameterizedTest
+        void completeByEatIn(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
-            Order eatInRequest = createEatInOrder(List.of(orderLineItem), orderTable.getId(), LocalDateTime.now());
-            Order servedOrder = createServedOrder(eatInRequest);
+            Order servedOrder = orderRepository.save(createEatInOrder(List.of(orderLineItem), orderTable, orderStatus, LocalDateTime.now()));
             //when
             Order complete = orderService.complete(servedOrder.getId());
             //then
@@ -459,10 +447,10 @@ class OrderServiceTest {
             //given
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
-            Order eatInRequest = createEatInOrder(List.of(orderLineItem), orderTable.getId(), LocalDateTime.now());
+
             //주문 상태가 SERVED인 주문1,2 생성
-            Order servedOrder1 = createServedOrder(eatInRequest);
-            Order servedOrder2 = createServedOrder(eatInRequest);
+            Order servedOrder1 = orderRepository.save(createEatInOrder(List.of(orderLineItem), orderTable, OrderStatus.SERVED, LocalDateTime.now()));
+            Order servedOrder2 = orderRepository.save(createEatInOrder(List.of(orderLineItem), orderTable, OrderStatus.SERVED, LocalDateTime.now()));
 
             //when
             Order complete = orderService.complete(servedOrder1.getId());
@@ -481,10 +469,9 @@ class OrderServiceTest {
             //given
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
-            Order eatInRequest = createEatInOrder(List.of(orderLineItem), orderTable.getId(), LocalDateTime.now());
 
-            Order servedOrder1 = createServedOrder(eatInRequest);
-            Order servedOrder2 = createServedOrder(eatInRequest);
+            Order servedOrder1 = orderRepository.save(createEatInOrder(List.of(orderLineItem), orderTable, OrderStatus.SERVED, LocalDateTime.now()));
+            Order servedOrder2 = orderRepository.save(createEatInOrder(List.of(orderLineItem), orderTable, OrderStatus.SERVED, LocalDateTime.now()));
 
             //when
             Order complete1 = orderService.complete(servedOrder1.getId());
@@ -527,28 +514,30 @@ class OrderServiceTest {
 
 
     private Order createTakeOutOrder(List<OrderLineItem> orderLineItems, LocalDateTime orderDateTime) {
-        return OrderFixture.createOrder(OrderType.TAKEOUT, orderLineItems, null, null, orderDateTime);
+        return createTakeOutOrder(orderLineItems, null, orderDateTime);
     }
 
     private Order createDeliveryOrder(List<OrderLineItem> orderLineItems, String deliveryAddress, LocalDateTime orderDateTime) {
-        return OrderFixture.createOrder(OrderType.DELIVERY, orderLineItems, deliveryAddress, null, orderDateTime);
+        return createDeliveryOrder(orderLineItems, deliveryAddress, null, orderDateTime);
     }
 
     private Order createEatInOrder(List<OrderLineItem> orderLineItems, UUID orderTableId, LocalDateTime orderDateTime) {
-        return OrderFixture.createOrder(OrderType.EAT_IN, orderLineItems, null, orderTableId, orderDateTime);
+        return createEatInOrder(orderLineItems, orderTableId, null, orderDateTime);
     }
 
-    private Order createDeliveredOrder(Order deliveryOrder) {
-        Order order = orderService.create(deliveryOrder);
-        Order accept = orderService.accept(order.getId());
-        Order serve = orderService.serve(accept.getId());
-        Order startDelivery = orderService.startDelivery(serve.getId());
-        return orderService.completeDelivery(startDelivery.getId());
+    private Order createTakeOutOrder(List<OrderLineItem> orderLineItems, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+        return OrderFixture.createOrder(OrderType.TAKEOUT, orderLineItems, null, null, orderStatus, orderDateTime);
     }
 
-    private Order createServedOrder(Order orderRequest) {
-        Order takeOutOrder = orderService.create(orderRequest);
-        Order accept = orderService.accept(takeOutOrder.getId());
-        return orderService.serve(accept.getId());
+    private Order createDeliveryOrder(List<OrderLineItem> orderLineItems, String deliveryAddress, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+        return OrderFixture.createOrder(OrderType.DELIVERY, orderLineItems, deliveryAddress, null, orderStatus, orderDateTime);
+    }
+
+    private Order createEatInOrder(List<OrderLineItem> orderLineItems, OrderTable orderTable, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+        return OrderFixture.createOrder(OrderType.EAT_IN, orderLineItems, orderTable, orderStatus, orderDateTime);
+    }
+
+    private Order createEatInOrder(List<OrderLineItem> orderLineItems, UUID orderTableId, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+        return OrderFixture.createOrder(OrderType.EAT_IN, orderLineItems, orderTableId, orderStatus, orderDateTime);
     }
 }

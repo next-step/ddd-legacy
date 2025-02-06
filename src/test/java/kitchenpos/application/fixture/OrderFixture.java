@@ -1,9 +1,6 @@
 package kitchenpos.application.fixture;
 
-import kitchenpos.domain.Order;
-import kitchenpos.domain.OrderLineItem;
-import kitchenpos.domain.OrderStatus;
-import kitchenpos.domain.OrderType;
+import kitchenpos.domain.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,7 +14,34 @@ public class OrderFixture {
     }
 
     public static Order createOrder(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress, UUID orderTableId, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+        return createOrder(UUID.randomUUID(), orderType, orderLineItems, deliveryAddress, orderTableId, orderStatus, orderDateTime);
+    }
+
+    public static Order createOrder(OrderType orderType, List<OrderLineItem> orderLineItems, OrderTable orderTable, OrderStatus orderStatus, LocalDateTime orderDateTime) {
         Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        order.setOrderLineItems(orderLineItems);
+        order.setOrderTable(orderTable);
+        order.setStatus(orderStatus);
+        order.setOrderDateTime(orderDateTime);
+        return order;
+    }
+
+    public static Order createOrder(OrderType orderType, List<OrderLineItem> orderLineItems, UUID orderTableId, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        order.setOrderLineItems(orderLineItems);
+        order.setOrderTableId(orderTableId);
+        order.setStatus(orderStatus);
+        order.setOrderDateTime(orderDateTime);
+        return order;
+    }
+
+    public static Order createOrder(UUID id, OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress, UUID orderTableId, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+        Order order = new Order();
+        order.setId(id);
         order.setType(orderType);
         order.setOrderLineItems(orderLineItems);
         order.setDeliveryAddress(deliveryAddress);
