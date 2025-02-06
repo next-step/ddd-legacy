@@ -17,6 +17,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 
 class MenuGroupServiceTest {
@@ -36,8 +37,10 @@ class MenuGroupServiceTest {
 
         MenuGroup created = menuGroupService.create(request);
 
-        assertThat(created.getId()).isNotNull();
-        assertThat(created.getName()).isEqualTo("나의 메뉴 그룹");
+        assertAll(
+            () -> assertThat(created.getId()).isNotNull(),
+            () -> assertThat(created.getName()).isEqualTo("나의 메뉴 그룹")
+        );
     }
 
     @Test

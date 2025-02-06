@@ -31,6 +31,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class OrderServiceTest {
     private OrderService orderService;
@@ -69,10 +70,12 @@ class OrderServiceTest {
             Order created = orderService.create(request);
 
             // then
-            assertThat(created.getId()).isNotNull();
-            assertThat(created.getType()).isEqualTo(OrderType.DELIVERY);
-            assertThat(created.getStatus()).isEqualTo(OrderStatus.WAITING);
-            assertThat(created.getDeliveryAddress()).isEqualTo("서울시 강남구");
+            assertAll(
+                () -> assertThat(created.getId()).isNotNull(),
+                () -> assertThat(created.getType()).isEqualTo(OrderType.DELIVERY),
+                () -> assertThat(created.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(created.getDeliveryAddress()).isEqualTo("서울시 강남구")
+            );
         }
 
         @Test
@@ -97,10 +100,12 @@ class OrderServiceTest {
             Order created = orderService.create(request);
 
             // then
-            assertThat(created.getId()).isNotNull();
-            assertThat(created.getType()).isEqualTo(OrderType.EAT_IN);
-            assertThat(created.getStatus()).isEqualTo(OrderStatus.WAITING);
-            assertThat(created.getOrderTable().getId()).isEqualTo(orderTable.getId());
+            assertAll(
+                () -> assertThat(created.getId()).isNotNull(),
+                () -> assertThat(created.getType()).isEqualTo(OrderType.EAT_IN),
+                () -> assertThat(created.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(created.getOrderTable().getId()).isEqualTo(orderTable.getId())
+            );
         }
 
         @Test

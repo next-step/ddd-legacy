@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class OrderTableServiceTest {
     private OrderTableService orderTableService;
@@ -46,10 +47,12 @@ class OrderTableServiceTest {
             OrderTable created = orderTableService.create(request);
 
             // then
-            assertThat(created.getId()).isNotNull();
-            assertThat(created.getName()).isEqualTo("테이블");
-            assertThat(created.getNumberOfGuests()).isEqualTo(0);
-            assertThat(created.isOccupied()).isFalse();
+            assertAll(
+                () -> assertThat(created.getId()).isNotNull(),
+                () -> assertThat(created.getName()).isEqualTo("테이블"),
+                () -> assertThat(created.getNumberOfGuests()).isEqualTo(0),
+                () -> assertThat(created.isOccupied()).isFalse()
+            );
         }
 
         @Test
@@ -100,8 +103,11 @@ class OrderTableServiceTest {
             OrderTable clearOrderTable = orderTableService.clear(orderTable.getId());
 
             // then
-            assertThat(clearOrderTable.getNumberOfGuests()).isEqualTo(0);
-            assertThat(clearOrderTable.isOccupied()).isFalse();
+            assertAll(
+                    () -> assertThat(clearOrderTable.getNumberOfGuests()).isEqualTo(0),
+                    () -> assertThat(clearOrderTable.isOccupied()).isFalse()
+            );
+
         }
 
         @Test

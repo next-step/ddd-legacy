@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 
 class ProductServiceTest {
@@ -43,10 +44,11 @@ class ProductServiceTest {
             Product request = ProductFixture.product("후라이드", 16000);
 
             Product created = productService.create(request);
-
-            assertThat(created.getId()).isNotNull();
-            assertThat(created.getName()).isEqualTo("후라이드");
-            assertThat(created.getPrice()).isEqualByComparingTo("16000");
+            assertAll(
+                () -> assertThat(created.getId()).isNotNull(),
+                () -> assertThat(created.getName()).isEqualTo("후라이드"),
+                () -> assertThat(created.getPrice()).isEqualByComparingTo("16000")
+            );
         }
 
         @Test
