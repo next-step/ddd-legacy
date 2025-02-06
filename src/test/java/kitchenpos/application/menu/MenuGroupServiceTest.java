@@ -9,6 +9,7 @@ import kitchenpos.fake.repository.InMemoryMenuGroupRepository;
 import kitchenpos.fixture.MenuFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -30,17 +31,30 @@ class MenuGroupServiceTest {
         menuGroupService = new MenuGroupService(menuGroupRepository);
     }
 
-    @Test
-    @DisplayName("메뉴 그룹을 생성한다")
-    void createMenuGroup() {
-        MenuGroup request = MenuFixture.menuGroup("나의 메뉴 그룹");
+    @Nested
+    class CreateMenuGroup {
+        @Test
+        @DisplayName("메뉴 그룹을 생성한다")
+        void createMenuGroup() {
+            MenuGroup request = MenuFixture.menuGroup("나의 메뉴 그룹");
 
-        MenuGroup created = menuGroupService.create(request);
+            MenuGroup created = menuGroupService.create(request);
 
-        assertAll(
-            () -> assertThat(created.getId()).isNotNull(),
-            () -> assertThat(created.getName()).isEqualTo("나의 메뉴 그룹")
-        );
+            assertAll(
+                    () -> assertThat(created.getId()).isNotNull(),
+                    () -> assertThat(created.getName()).isEqualTo("나의 메뉴 그룹")
+            );
+        }
+
+        @DisplayName("이름이 없는 메뉴 그룹은 생성할 수 없다")
+        @NullAndEmptySource
+        @ParameterizedTest
+        void cannotMenuGroupWithoutName(String name) {
+            MenuGroup request = MenuFixture.menuGroup(name);
+
+            assertThatThrownBy(() -> menuGroupService.create(request))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     @Test
@@ -56,15 +70,5 @@ class MenuGroupServiceTest {
         assertThat(result).hasSize(2)
                 .extracting("name")
                 .contains("메뉴 1", "메뉴 2");
-    }
-
-    @DisplayName("이름이 없는 메뉴 그룹은 생성할 수 없다")
-    @NullAndEmptySource
-    @ParameterizedTest
-    void cannotMenuGroupWithoutName(String name) {
-        MenuGroup request = MenuFixture.menuGroup(name);
-
-        assertThatThrownBy(() -> menuGroupService.create(request))
-                .isInstanceOf(IllegalArgumentException.class);
     }
 }
