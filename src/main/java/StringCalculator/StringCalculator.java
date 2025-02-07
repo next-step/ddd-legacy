@@ -1,8 +1,10 @@
 package StringCalculator;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class StringCalculator {
     private static final String DEFAULT_DELIMITER = "[,:]";
@@ -22,9 +24,10 @@ public class StringCalculator {
             numbersStr = matcher.group(2);
         }
 
-        return Arrays.stream(numbersStr.split(delimiter))
+        List<Number> numberList = Arrays.stream(numbersStr.split(delimiter))
                 .map(Number::new)
-                .mapToInt(Number::getValue)
-                .sum();
+                .collect(Collectors.toList());
+
+        return new Numbers(numberList).sum();
     }
 }
