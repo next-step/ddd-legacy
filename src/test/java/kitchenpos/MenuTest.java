@@ -65,6 +65,7 @@ public class MenuTest {
         void createMenuTest() {
             Mockito.clearInvocations(menuRepository, productRepository);
             Product product = createProduct();
+            productRepository.save(product);
             MenuGroup menuGroup = createMenuGroup();
             menuGroupRepository.save(menuGroup);
             MenuProduct menuProduct = createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID);
@@ -235,17 +236,6 @@ public class MenuTest {
         }
     }
 
-    private static Menu createMenu(MenuProduct menuProducts) {
-        Menu menu = new Menu();
-        menu.setId(후라이드치킨_MENU_UUID);
-        menu.setName(후라이드치킨_MENU_NAME);
-        menu.setPrice(후라이드치킨_DEFAULT_PRICE);
-        menu.setMenuGroup(createMenuGroup());
-        menu.setDisplayed(true);
-        menu.setMenuProducts(List.of(menuProducts));
-        menu.setMenuGroupId(후라이드치킨_MENU_GROUP_UUID);
-        return menu;
-    }
     private static Menu createMenu() {
         Menu menu = new Menu();
         menu.setId(후라이드치킨_MENU_UUID);
