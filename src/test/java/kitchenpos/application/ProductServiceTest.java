@@ -45,15 +45,16 @@ class ProductServiceTest {
     @Test
     @DisplayName("상품을 생성한다.")
     void createProduct() {
+        //given
         Product product = ProductFixture.setProduct("새상품", "10000");
-
+        //when
         when(purgomalumClient.containsProfanity(any()))
                 .thenReturn(false);
         when(productRepository.save(any()))
                 .thenReturn(product);
 
         Product newProduct = productService.create(product);
-
+        //then
         assertAll(
                 () -> assertThat(newProduct.getId()).isInstanceOf(UUID.class),
                 () -> assertThat(newProduct.getName()).isEqualTo(product.getName()),
@@ -64,15 +65,15 @@ class ProductServiceTest {
     @Test
     @DisplayName("조회시 모든 상품을 나타낸다.")
     void showAllProducts() {
+        //given
         Product product1 = ProductFixture.setProduct("새상품", "10000");
         Product product2 = ProductFixture.setProduct("새상품2", "10000");
         List<Product> productList = List.of(product1, product2);
-
+        //when
         when(productRepository.findAll())
                 .thenReturn(productList);
-
         List<Product> productListResult = productService.findAll();
-
+        //then
         assertAll(
                 () -> assertThat(productListResult.size()).isEqualTo(productList.size()),
                 () -> assertThat(productListResult).containsExactly(product1, product2)
@@ -84,7 +85,10 @@ class ProductServiceTest {
     @ParameterizedTest
     @NullSource
     void throwExceptionWhenPriceIsNull(String price){
+        //given
         Product product = ProductFixture.setProduct("새상품2", price);
+        //when
+        //then
         assertThatThrownBy(() -> productService.create(product)).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -92,7 +96,10 @@ class ProductServiceTest {
     @ParameterizedTest
     @ValueSource(strings = {"-1000","-2000"})
     void throwExceptionWhenPriceIsNegative(String price){
+        //given
         Product product = ProductFixture.setProduct("새상품2", price);
+        //when
+        //then
         assertThatThrownBy(() -> productService.create(product)).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -100,7 +107,10 @@ class ProductServiceTest {
     @ParameterizedTest
     @NullSource
     void throwExceptionWhenChangePriceIsNull(String price){
+        //give
         Product product = ProductFixture.setProduct("새상품2", price);
+        //when
+        //then
         assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), product))
                 .isInstanceOf(IllegalArgumentException.class);
     }
@@ -109,7 +119,10 @@ class ProductServiceTest {
     @ParameterizedTest
     @ValueSource(strings = {"-1000","-2000"})
     void throwExceptionWhenChangePriceIsNegative(String price){
+        //given
         Product product = ProductFixture.setProduct("새상품2", price);
+        //when
+        //then
         assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), product))
                 .isInstanceOf(IllegalArgumentException.class);
     }
@@ -118,21 +131,21 @@ class ProductServiceTest {
     @ParameterizedTest
     @ValueSource(strings = {"10000","20000"})
     void hideMenuWhenMenuProductTotalPriceBiggerThanMenuPrice(String priceStr){
+        //given
         Product product = ProductFixture.setProduct("제품", "30000");
         MenuProduct menuProduct = MenuProductFixture.setMenuProduct(product, 1, 1);
         Menu menu = MenuFixture.setMenu(
                 MenuGroupFixture.setMenuGroup("메인디쉬"),
                 "메인디쉬", "30000",      List.of(menuProduct)
         );
-
-
         given(productRepository.findById(any())).willReturn(Optional.of(product));
         given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
 
+        //when
         BigDecimal price = BigDecimal.valueOf(Double.parseDouble(priceStr));
         product.setPrice(price);
         Product productResult = productService.changePrice(UUID.randomUUID(), product);
-
+        //then
         assertAll(
                 () -> assertThat(productResult.getPrice()).isEqualTo(price),
                 () -> assertThat(menu.isDisplayed()).isFalse()

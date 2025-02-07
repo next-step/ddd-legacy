@@ -36,12 +36,14 @@ class MenuGroupServiceTest {
     @ValueSource(strings = {"메인 메뉴"})
     void createMenuGroup(String name) {
 
+        //given
         MenuGroup menuGroup = MenuGroupFixture.setMenuGroup(name);
-
         given(repository.save(any())).willReturn(menuGroup);
 
+        //when
         MenuGroup resultMenuGroup = menuGroupService.create(menuGroup);
 
+        //then
         assertAll(
                 () -> assertThat(resultMenuGroup.getId()).isInstanceOf(UUID.class),
                 () -> assertThat(resultMenuGroup.getName()).isEqualTo(name)
@@ -51,14 +53,16 @@ class MenuGroupServiceTest {
     @Test
     @DisplayName("메뉴 그룹을 조회할 수 있다.")
     void selectAllMenuGroup() {
-
+        //given
         MenuGroup menuGroup1 = MenuGroupFixture.setMenuGroup("메인메뉴1");
         MenuGroup menuGroup2 = MenuGroupFixture.setMenuGroup("메인메뉴2");
 
         given(repository.findAll()).willReturn(List.of(menuGroup1, menuGroup2));
 
+        //when
         List<MenuGroup> menuGroupList = menuGroupService.findAll();
 
+        //then
         assertAll(
                 () -> assertThat(menuGroupList.size()).isEqualTo(2),
                 () -> assertThat(menuGroupList).containsExactly(menuGroup1, menuGroup2)
@@ -70,7 +74,10 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     void nameCannotBeNullOrBlink(String name) {
+        //given
         MenuGroup menuGroup = MenuGroupFixture.setMenuGroup(name);
+        //when
+        //then
         assertThatThrownBy(() -> menuGroupService.create(menuGroup))
             .isInstanceOf(IllegalArgumentException.class);
 

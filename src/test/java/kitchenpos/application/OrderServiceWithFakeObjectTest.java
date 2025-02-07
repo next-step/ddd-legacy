@@ -41,8 +41,10 @@ class OrderServiceWithFakeObjectTest {
 
     @Test@DisplayName("주문타입은 필수이다.")
     void throwExceptionWithOutType(){
+        //given
         Order order = new Order();
-
+        //when
+        //then
         assertThatThrownBy(() -> orderService.create(order)).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -50,14 +52,13 @@ class OrderServiceWithFakeObjectTest {
     @Test
     @DisplayName("주문 생성시 상태는 WAITTING 으로 생성된다.")
     void createOrder() {
-
-
-        Order order = OrderFixture.makeOrder(OrderType.EAT_IN, OrderLineItemFixture.DEFAULT_ORDER_LINE_ITEM,OrderFixture.DEFAULT_ORDER_TABLE);
         //given
+        Order order = OrderFixture.makeOrder(OrderType.EAT_IN, OrderLineItemFixture.DEFAULT_ORDER_LINE_ITEM,OrderFixture.DEFAULT_ORDER_TABLE);
         menuRepository.save(MenuFixture.DEFAULT_MENU);
         orderTableRepository.save(OrderFixture.DEFAULT_ORDER_TABLE);
-
+        //when
         Order createdOrder = orderService.create(order);
+        //then
         assertAll(
                 () -> assertThat(createdOrder).isNotNull(),
                 () -> assertThat(createdOrder.getId()).isInstanceOf(UUID.class),
@@ -70,17 +71,20 @@ class OrderServiceWithFakeObjectTest {
     @DisplayName("주문 생성시에는 주문 메뉴리스트는 필수로 가져야 한다.")
     @NullAndEmptySource
     void throwExceptionWhenOrderLineIsEmpty(List<OrderLineItem> orderMenuList) {
+        //given
         Order order = OrderFixture.makeOrder(OrderType.EAT_IN, orderMenuList,OrderFixture.DEFAULT_ORDER_TABLE);
+        //when
+        //then
         assertThatThrownBy(() -> orderService.create(order)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("주문시 주문메뉴리스트의 모든 메뉴는 실제 메뉴에 등록이 되어있어야 한다.")
     void throwExceptionWhenMenuAndOrderLineItemDiff() {
+        //given
         Menu menu1 = MenuFixture.create("menu1", "10000");
         Menu menu2 = MenuFixture.create("menu2", "10000");
 
-        //given
         List<OrderLineItem> orderLineItems = OrderLineItemFixture.moreMenuLine(1, menu1, menu2);
         menuRepository.save(menu1);
         menuRepository.save(menu2);
@@ -110,7 +114,8 @@ class OrderServiceWithFakeObjectTest {
     @Test
     @DisplayName("준비상태의 주문은 수락할수 있다.")
     void canAcceptWaitingOrder(){
-
+        //given
+        //when
         Order acceptedOrder = getAcceptedOrder(OrderType.EAT_IN);
 
         //then
@@ -200,16 +205,16 @@ class OrderServiceWithFakeObjectTest {
     private Order getAcceptedOrder(OrderType type) {
         //given
         Order createdOrder = createOrder(type);
-
         //when
         return orderService.accept(createdOrder.getId());
     }
 
     private Order deliveringOrder(OrderType type, String address) {
+        //given
         Order createdOrder = createOrder(type, address);
-        //when
         Order acceptedOrder = orderService.accept(createdOrder.getId());
         Order servedOrder = orderService.serve(acceptedOrder.getId());
+        //when
         return orderService.startDelivery(servedOrder.getId());
     }
 
@@ -220,6 +225,7 @@ class OrderServiceWithFakeObjectTest {
     }
 
     private Order readyToOrder(OrderType type, int quantity){
+        //given
         Order order = OrderFixture.makeOrder(type, OrderLineItemFixture.createOrderLineItems(quantity), OrderFixture.DEFAULT_ORDER_TABLE);
         menuRepository.save(MenuFixture.DEFAULT_MENU);
         orderTableRepository.save(OrderFixture.DEFAULT_ORDER_TABLE);
@@ -227,11 +233,14 @@ class OrderServiceWithFakeObjectTest {
     }
 
     private Order createOrder(OrderType type){
+        //given
         Order order = readyToOrder(type);
+        //when
         return orderService.create(order);
     }
 
     private Order createOrder(OrderType type, String deliveryAddress){
+        //given
         Order order = readyToOrder(type);
         order.setDeliveryAddress(deliveryAddress);
         return orderService.create(order);

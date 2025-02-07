@@ -65,14 +65,18 @@ class OrderTableServiceTest {
         //when
         OrderTable sitedTable = orderTableService.sit(orderTable.getId());
 
+        //then
         assertThat(sitedTable.isOccupied()).isTrue();
     }
 
     @Test
     @DisplayName("테이블의 인원은 변경시 변경인원은 0이상이어야 한다.")
     void canChangeOrderTableWhenGuestCntIsUnderZero(){
+        //given
         OrderTable request = createRequestOrderTable("테이블");
         request.setNumberOfGuests(-1);
+        //when
+        //then
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(request.getId(), request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
