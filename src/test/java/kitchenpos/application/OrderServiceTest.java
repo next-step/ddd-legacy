@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fake.*;
 import kitchenpos.application.fixture.*;
 import kitchenpos.domain.*;
 import kitchenpos.infra.FakeKitchenridersClient;

@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fake.InMemoryMenuGroupRepository;
 import kitchenpos.application.fixture.MenuGroupFixture;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
