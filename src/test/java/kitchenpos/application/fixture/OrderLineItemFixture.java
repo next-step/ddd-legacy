@@ -32,6 +32,14 @@ public class OrderLineItemFixture {
         return orderLineItem;
     }
 
+    public static List<OrderLineItem> createMenuLine(int quantity, Menu... menus) {
+        List<OrderLineItem> result = new ArrayList<>();
+        if(menus == null || menus.length == 0) return result;
+
+        Arrays.stream(menus).forEach(menu -> result.add(createOrderLineItem(menu, quantity)));
+        return result;
+    }
+
     public static List<OrderLineItem> moreMenuLine(int quantity, Menu... menus) {
         List<OrderLineItem> result = new ArrayList<>();
         result.add(OrderLineItemFixture.createOrderLineItem(MenuFixture.DEFAULT_MENU, quantity));

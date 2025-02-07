@@ -13,6 +13,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,11 +25,11 @@ import static org.mockito.BDDMockito.given;
 
 class OrderServiceWithFakeObjectTest {
 
-    OrderService orderService;
-    OrderRepository orderRepository;
-    MenuRepository menuRepository;
-    OrderTableRepository orderTableRepository;
-    KitchenridersClient kitchenridersClient;
+    private OrderService orderService;
+    private OrderRepository orderRepository;
+    private MenuRepository menuRepository;
+    private OrderTableRepository orderTableRepository;
+    private KitchenridersClient kitchenridersClient;
 
     @BeforeEach
     public void setup() {
@@ -93,6 +94,38 @@ class OrderServiceWithFakeObjectTest {
         Order order = OrderFixture.makeOrder(OrderType.EAT_IN, orderLineItems,OrderFixture.DEFAULT_ORDER_TABLE);
 
         // then
+        assertThatThrownBy(() -> orderService.create(order)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    //'주문 내역 중 화면에 표시 되지 않은 메뉴는 포함될수 없다.'
+    //'주문내역 가격과 메뉴의 가격이 다르면 주문할 수 없다'
+    @Test
+    @DisplayName("주문 내역 중 화면에 표시 되지 않은 메뉴는 포함될수 없다.")
+    void throwExceptionWhenOrderUnDisplayedMenu(){
+        //given
+        Menu menu1 = MenuFixture.create("menu1", "10000");
+        menu1.setDisplayed(false);
+        menuRepository.save(menu1);
+
+        List<OrderLineItem> orderLineItems = OrderLineItemFixture.createMenuLine(1, menu1);
+        //when
+        Order order = OrderFixture.makeOrder(OrderType.EAT_IN, orderLineItems,OrderFixture.DEFAULT_ORDER_TABLE);
+        //then
+        assertThatThrownBy(() -> orderService.create(order)).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("주문내역 가격과 메뉴의 가격이 다르면 주문할 수 없다.")
+    void throwExceptionWhenMenuPriceIsNotSameAsOrderPrice(){
+        //given
+        Menu menu1 = MenuFixture.create("menu1", "10000");
+        menuRepository.save(menu1);
+
+        List<OrderLineItem> orderLineItems = OrderLineItemFixture.createMenuLine(1, menu1);
+        orderLineItems.forEach(orderLineItem -> orderLineItem.setPrice(BigDecimal.valueOf(20000)));
+        //when
+        Order order = OrderFixture.makeOrder(OrderType.EAT_IN, orderLineItems,OrderFixture.DEFAULT_ORDER_TABLE);
+        //then
         assertThatThrownBy(() -> orderService.create(order)).isInstanceOf(IllegalArgumentException.class);
     }
 
