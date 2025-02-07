@@ -1,6 +1,7 @@
 package kitchenpos.application.fixture;
 
 import kitchenpos.domain.OrderTable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.UUID;
 
@@ -16,10 +17,10 @@ public class OrderTableFixture {
 
     public static OrderTable createOrderTable(UUID id, String name, boolean occupied, int numberOfGuests) {
         OrderTable orderTable = new OrderTable();
-        orderTable.setId(id);
-        orderTable.setName(name);
-        orderTable.setOccupied(occupied);
-        orderTable.setNumberOfGuests(numberOfGuests);
+        ReflectionTestUtils.setField(orderTable, "id", id);
+        ReflectionTestUtils.setField(orderTable, "name", name);
+        ReflectionTestUtils.setField(orderTable, "occupied", occupied);
+        ReflectionTestUtils.setField(orderTable, "numberOfGuests", numberOfGuests);
         return orderTable;
     }
 
