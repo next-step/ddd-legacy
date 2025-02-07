@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.jdbc.Sql;
@@ -14,7 +16,6 @@ import org.springframework.test.context.jdbc.Sql;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 import static kitchenpos.domain.OrderStatus.*;
@@ -45,6 +46,7 @@ public class OrderTest {
      private static final OrderStatus ORDER_STATUS_배달중 = DELIVERING;
     private static final OrderStatus ORDER_STATUS_배달완료 = DELIVERED;
     private static final OrderStatus ORDER_STATUS_제공완료 = SERVED;
+    private static final OrderStatus ORDER_STATUS_주문완료 = COMPLETED;
     private static final OrderType ORDER_TYPE_배달주문 = DELIVERY;
     private static final OrderType ORDER_TYPE_포장주문 = TAKEOUT;
     private static final OrderType ORDER_TYPE_매장내식사주문 = EAT_IN;
@@ -261,6 +263,97 @@ public class OrderTest {
         }
     }
 
+    @DisplayName(value = "배달 완료 기능.")
+    @Nested
+    class OrderCompleteDeliveryTest {
+        @DisplayName(value = "요청된 주문의 상태는 배달중(DELIVERING)이어야 합니다.")
+        @Test
+        void validateOrderStatusDelivering() {
+            var menu = createMenu(후라이드치킨_DEFAULT_PRICE, true, createMenuProduct());
+            menuRepository.save(menu);
+            Order orderRequest = createOrder(createOrderLineItem(menu), ORDER_TYPE_매장내식사주문, ORDER_STATUS_주문대기);
+            orderRepository.save(orderRequest);
+            assertThatIllegalStateException().isThrownBy(() -> orderService.completeDelivery(orderRequest.getId()));
+        }
+
+        @DisplayName(value = "배달이 완료되면 상태를 배달 완료(DELIVERED)으로 변경합니다.")
+        @Test
+        void validateStateDelivered() {
+            var menu = createMenu(후라이드치킨_DEFAULT_PRICE, true, createMenuProduct());
+            menuRepository.save(menu);
+            Order orderRequest = createOrder(createOrderLineItem(menu), ORDER_TYPE_배달주문, ORDER_STATUS_배달중);
+            orderRepository.save(orderRequest);
+            var serveResponse = orderService.completeDelivery(orderRequest.getId());
+            assertThat(serveResponse.getStatus()).isEqualTo(ORDER_STATUS_배달완료);
+        }
+    }
+
+    @DisplayName(value = "주문 완료 기능.")
+    @Nested
+    class OrdercompleteTest {
+        @DisplayName(value = "배달인 주문일 경우 현재 상태가 배달 완료(DELIVERED)여야 합니다.")
+        @Test
+        void valideOrderDelivered() {
+            var menu = createMenu(후라이드치킨_DEFAULT_PRICE, true, createMenuProduct());
+            menuRepository.save(menu);
+            Order orderRequest = createOrder(createOrderLineItem(menu), ORDER_TYPE_배달주문, ORDER_STATUS_주문대기);
+            orderRepository.save(orderRequest);
+            assertThatIllegalStateException().isThrownBy(() -> orderService.complete(orderRequest.getId()));
+        }
+
+        @DisplayName(value = "포장이나 매장내 식사 주문일 경우 현재 상태가 제공완료(SERVED)이어야 합니다.")
+        @ParameterizedTest
+        @CsvSource(value = {"DELIVERY","TAKEOUT"})
+        void validateNotServedTypeState(String orderType) {
+            var menu = createMenu(후라이드치킨_DEFAULT_PRICE, true, createMenuProduct());
+            menuRepository.save(menu);
+            Order orderRequest = createOrder(createOrderLineItem(menu), OrderType.valueOf(orderType), ORDER_STATUS_배달중);
+            orderRepository.save(orderRequest);
+            assertThatIllegalStateException().isThrownBy(() -> orderService.complete(orderRequest.getId()));
+        }
+
+        @DisplayName(value = "매장내 식사 주문일 경우 제공된 주문 테이블이 제공완료 상태이면 테이블을 정리합니다.")
+        @Test
+        void eatInStateClearTable() {
+            var menu = createMenu(후라이드치킨_DEFAULT_PRICE, true, createMenuProduct());
+            menuRepository.save(menu);
+            var orderTable = createOrderTable();
+            orderTableRepository.save(orderTable);
+            Order orderRequest = createOrder(createOrderLineItem(menu), ORDER_TYPE_매장내식사주문, ORDER_STATUS_제공완료, orderTable);
+            orderRepository.save(orderRequest);
+            var complete = orderService.complete(orderRequest.getId());
+            assertAll(
+                    () -> assertThat(complete.getOrderTable().isOccupied()).isFalse(),
+                    () -> assertThat(complete.getOrderTable().getNumberOfGuests()).isZero(),
+                    () -> assertThat(complete.getStatus()).isEqualTo(ORDER_STATUS_주문완료)
+            );
+        }
+    }
+
+
+    @DisplayName(value = "모든 주문 조회 기능.")
+    @Nested
+    class OrderFindAllTest {
+
+        @DisplayName(value = "모든 주문을 조회할 수 있다.")
+        @Test
+        void findAllTest() {
+            Order orderRequest = createOrder();
+            orderRepository.save(orderRequest);
+            var orders = orderService.findAll();
+
+            assertThat(orders.size()).isOne();
+        }
+    }
+
+    private OrderTable createOrderTable() {
+        var orderTable = new OrderTable();
+        orderTable.setId(UUID.randomUUID());
+        orderTable.setName("1번");
+        orderTable.setNumberOfGuests(1);
+        orderTable.setOccupied(true);
+        return orderTable;
+    }
 
     private MenuProduct createMenuProduct(final Product product, final int quantity, final UUID productId) {
         MenuProduct menuProduct = new MenuProduct();
@@ -365,6 +458,18 @@ public class OrderTest {
         order.setStatus(orderStatus);
         order.setOrderLineItems(Arrays.asList(orderLineItem));
         order.setDeliveryAddress("강남구");
+        return order;
+    }
+
+    private Order createOrder(OrderLineItem orderLineItem, OrderType orderType , OrderStatus orderStatus, OrderTable orderTable) {
+        Order order = new Order();
+        order.setId(ORDER_UUID);
+        order.setType(orderType);
+        order.setStatus(orderStatus);
+        order.setOrderLineItems(Arrays.asList(orderLineItem));
+        order.setDeliveryAddress("강남구");
+        order.setOrderTable(orderTable);
+        order.setOrderTableId(orderTable.getId());
         return order;
     }
 
