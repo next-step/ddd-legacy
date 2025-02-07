@@ -14,10 +14,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class OrderTableServiceTest {
 
-    OrderTableRepository orderTableRepository;
-    OrderRepository orderRepository;
+    private OrderTableRepository orderTableRepository;
+    private OrderRepository orderRepository;
 
-    OrderTableService orderTableService;
+    private OrderTableService orderTableService;
 
     @BeforeEach
     void setUp() {

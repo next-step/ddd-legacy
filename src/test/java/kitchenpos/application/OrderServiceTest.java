@@ -28,15 +28,15 @@ import static org.mockito.BDDMockito.given;
 class OrderServiceTest {
 
     @InjectMocks
-    OrderService orderService;
+    private OrderService orderService;
     @Mock
-    OrderRepository orderRepository;
+    private OrderRepository orderRepository;
     @Mock
-    MenuRepository menuRepository;
+    private MenuRepository menuRepository;
     @Mock
-    OrderTableRepository orderTableRepository;
+    private OrderTableRepository orderTableRepository;
     @Mock
-    KitchenridersClient kitchenridersClient;
+    private KitchenridersClient kitchenridersClient;
 
     @Test@DisplayName("주문타입은 필수이다.")
     void throwExceptionWithOutType(){
