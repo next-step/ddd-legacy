@@ -30,7 +30,6 @@ import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @DisplayName(value = "ProductService 테스트")
-@Import(PurgomalumConfiguration.class)
 @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class ProductTest {
 
@@ -43,15 +42,12 @@ public class ProductTest {
     public static final UUID 후라이드치킨_MENU_GROUP_UUID = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
     private static final String 한마리메뉴_MENU_GROUP_NAME = "한마리메뉴";
 
-    @Autowired
+
     private ProductService productService;
     @SpyBean
     private ProductRepository productRepository;
-    @Autowired
-    private PurgomalumClient mockPurgomalumClient;
-    @Autowired
+    private PurgomalumClient purgomalumClient;
     private MenuRepository menuRepository;
-    @Autowired
     private MenuGroupRepository menuGroupRepository;
 
     @DisplayName(value = "상품 등록 기능")
@@ -74,7 +70,7 @@ public class ProductTest {
         void productInvalidName(final String productName) {
             //상품명에 빈값이나 비속어가 들어간 경우
             Product product = ProductTest.createProduct(후라이드치킨_PRODUCT_UUID, productName, BigDecimal.ONE);
-            Mockito.when(mockPurgomalumClient.containsProfanity(productName)).thenReturn(true);
+            Mockito.when(purgomalumClient.containsProfanity(productName)).thenReturn(true);
 
             //에러처리
             ThrowingCallable throwingCallable = () -> productService.create(product);

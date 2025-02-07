@@ -1,7 +1,8 @@
 package kitchenpos;
 
-import kitchenpos.application.MenuService;
+import kitchenpos.application.*;
 import kitchenpos.domain.*;
+import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -17,15 +18,15 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
 @DisplayName(value = " Menu 테스트")
 @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class MenuTest {
 
     private static final String TEST_PRODUCT_NAME = "TEST치킨";
+    private static final String PRODUCT_NAME_비속어 = "fucking 치킨";
+
     private static final UUID 후라이드치킨_PRODUCT_UUID = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
     private static final BigDecimal 후라이드치킨_DEFAULT_PRICE = new BigDecimal(20000);
     private static final BigDecimal 후라이드치킨_OVER_PRICE = new BigDecimal(21000);
@@ -35,14 +36,20 @@ public class MenuTest {
     private static final String 한마리메뉴_MENU_GROUP_NAME = "한마리메뉴";
 
 
-    @SpyBean
     private ProductRepository productRepository;
-    @Autowired
     private MenuService menuService;
-    @SpyBean
     private MenuRepository menuRepository;
-    @SpyBean
     private MenuGroupRepository menuGroupRepository;
+    private PurgomalumClient purgomalumClient;
+
+    @BeforeEach
+    void initialize() {
+        productRepository = spy(new InMemoryProductRepository());
+        menuGroupRepository = spy(new InMemoryMenuGroupRepository());
+        menuRepository = spy(new InMemoryMenuRepository());
+        purgomalumClient = new FakeDefaultPurgomalumClient();
+        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+    }
 
     @DisplayName(value = "메뉴 등록 기능")
     @Nested
@@ -51,29 +58,18 @@ public class MenuTest {
         private static final String 후라이드치킨_PROFANITY_MENU_NAME = "fucking 치킨메뉴";
         private static final int MINUS_QUANTITY = -1;
 
-        @BeforeEach
-        void initialize() {
-            Product product = createProduct(후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
-            productRepository.save(product);
-            MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
-            menuGroupRepository.save(menuGroup);
-            List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
-            Menu menu = MenuTest.createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
-            menuRepository.save(menu);
-        }
+
 
         @DisplayName(value = "메뉴를 등록할 수 있다.")
         @Test
-        void createMenu() {
+        void createMenuTest() {
             Mockito.clearInvocations(menuRepository, productRepository);
-            Product product = createProduct(MenuTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
-            MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
-
-            List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
-            Menu menuRequest = MenuTest.createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
-
+            Product product = createProduct();
+            MenuGroup menuGroup = createMenuGroup();
+            menuGroupRepository.save(menuGroup);
+            MenuProduct menuProduct = createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID);
+            Menu menuRequest = createMenu();
             Menu menu = menuService.create(menuRequest);
-
             //행위검증
             verify(menuRepository, times(1)).save(ArgumentCaptor.forClass(Menu.class).capture());
             verify(productRepository, times(1)).findAllByIdIn(Mockito.anyList());
@@ -95,11 +91,8 @@ public class MenuTest {
         @DisplayName(value = "메뉴의 가격은 0원 이상이어야 한다.")
         @Test
         void invalidMenuAmount() {
-            Product product = createProduct(MenuTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
-            MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_UUID);
             //상품명이나 가격이 없을때 에러처리
-            List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
-            Menu menu = MenuTest.createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_MINUS_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
+            Menu menu = MenuTest.createMenu(후라이드치킨_MINUS_PRICE);
             ThrowingCallable throwingCallable = () -> menuService.create(menu);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
         }
@@ -107,11 +100,9 @@ public class MenuTest {
         @DisplayName(value = "메뉴의 주문 상품이 1개 이상 존재해야 합니다")
         @Test
         void invalidMenuProduct() {
-            Product product = createProduct(MenuTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
             MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
-
-            List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
-            Menu menu = MenuTest.createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_MINUS_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
+            menuGroupRepository.save(menuGroup);
+            Menu menu = MenuTest.createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, 후라이드치킨_MENU_GROUP_UUID);
             ThrowingCallable throwingCallable = () -> menuService.create(menu);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
         }
@@ -119,10 +110,11 @@ public class MenuTest {
         @DisplayName(value = "메뉴 내부 상품의 수량은 0개 이상이어야 합니다.")
         @Test
         void menuProductNotEqualsProductSize() {
-            Product product = createProduct(MenuTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
-            MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
-            List<MenuProduct> menuProducts = List.of(createMenuProduct(product, MINUS_QUANTITY, 후라이드치킨_PRODUCT_UUID));
-            Menu menu = MenuTest.createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
+            Product product = createProduct();
+            MenuGroup menuGroup = createMenuGroup();
+            menuGroupRepository.save(menuGroup);
+            var menuProducts = createMenuProduct(product, MINUS_QUANTITY, 후라이드치킨_PRODUCT_UUID);
+            Menu menu = MenuTest.createMenu(menuGroup, menuProducts);
             ThrowingCallable throwingCallable = () -> menuService.create(menu);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
         }
@@ -130,11 +122,8 @@ public class MenuTest {
         @DisplayName(value = "등록하려는 메뉴의 가격이 메뉴에 포함된 상품의 총 가격보다 높으면 안됩니다.")
         @Test
         void invalidTotalMenuAmount() {
-            Product product = createProduct(MenuTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
-            MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
-
-            List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
-            Menu menu = MenuTest.createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_OVER_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
+            menuGroupRepository.save(createMenuGroup());
+            Menu menu = MenuTest.createMenu(후라이드치킨_OVER_PRICE);
 
             ThrowingCallable throwingCallable = () -> menuService.create(menu);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
@@ -143,8 +132,9 @@ public class MenuTest {
         @DisplayName(value = "메뉴의 이름이 없거나 비속어가 들어가 있으면 안됩니다.")
         @Test
         void invalidMenuName() {
-            Product product = createProduct(MenuTest.후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
+            Product product = createProduct(MenuTest.후라이드치킨_PRODUCT_UUID, PRODUCT_NAME_비속어, 후라이드치킨_DEFAULT_PRICE);
             MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
+            menuGroupRepository.save(menuGroup);
             List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
             Menu menu = MenuTest.createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_PROFANITY_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
 
@@ -153,29 +143,19 @@ public class MenuTest {
         }
     }
 
+
+
     @DisplayName(value = "메뉴 가격 수정 기능")
     @Nested
     class MenuChangePriceTest {
         private static final BigDecimal 후라이드치킨_MINUS_PRICE = new BigDecimal(-10);
         private static final BigDecimal 후라이드치킨_CHANGE_PRICE = new BigDecimal(19000);
 
-        @BeforeEach
-        void initialize() {
-            Product product = createProduct(후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
-            productRepository.save(product);
-            MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_GROUP_UUID);
-            menuGroupRepository.save(menuGroup);
-            List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
-            Menu menu = MenuTest.createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
-            menuRepository.save(menu);
-        }
-
         @DisplayName(value = "메뉴가격을 수정할 수 있다.")
         @Test
-        void createMenu() {
-            Mockito.clearInvocations(menuRepository,productRepository);
-            Menu menuRequest = new Menu();
-            menuRequest.setPrice(후라이드치킨_CHANGE_PRICE);
+        void changeMenu() {
+            menuRepository.save( createMenu());
+            Menu menuRequest = createMenu(후라이드치킨_CHANGE_PRICE);
             Menu menu = menuService.changePrice(후라이드치킨_MENU_UUID, menuRequest);
             //행위검증
             verify(menuRepository,times(1)).findById(Mockito.any());
@@ -185,8 +165,7 @@ public class MenuTest {
         @DisplayName(value = "메뉴의 가격은 0원 이상이어야 한다.")
         @Test
         void invalidMenuAmount() {
-           Menu menuRequest = new Menu();
-            menuRequest.setPrice(후라이드치킨_MINUS_PRICE);
+           Menu menuRequest = createMenu(후라이드치킨_MINUS_PRICE);
 
             ThrowingCallable throwingCallable = () -> menuService.changePrice(후라이드치킨_MENU_UUID, menuRequest);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
@@ -195,38 +174,24 @@ public class MenuTest {
         @DisplayName(value = "메뉴의 변경 금액은 메뉴에 포함된 상품들의 가격 합보다 크면 안됩니다.")
         @Test
         void invalidTotalMenuAmount() {
-          Menu menuRequest = new Menu();
-            menuRequest.setPrice(후라이드치킨_OVER_PRICE);
-
+            Menu menu = createMenu();
+            menuRepository.save(menu);
+            Menu menuRequest = createMenu(후라이드치킨_OVER_PRICE);
             ThrowingCallable throwingCallable = () -> menuService.changePrice(후라이드치킨_MENU_UUID, menuRequest);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
         }
 
     }
 
+
     @DisplayName(value = "메뉴 노출 기능")
     @Nested
     class MenuDisplayTest {
-
-        private Product product;
-        private MenuGroup menuGroup;
-        private List<MenuProduct> menuProducts;
-        @BeforeEach
-        void initialize() {
-            product = createProduct(후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
-            productRepository.save(product);
-            menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_GROUP_UUID);
-            menuGroupRepository.save(menuGroup);
-            menuProducts = List.of(createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
-
-        }
-
         @DisplayName(value = "메뉴내에 포함된 금액의 합이 메뉴 금액보다 크면 안됩니다.")
         @Test
         void invalidMenuAmount() {
-            Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_OVER_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
+            Menu menu = createMenu(후라이드치킨_OVER_PRICE);
             menuRepository.save(menu);
-
             ThrowingCallable throwingCallable = () -> menuService.display(후라이드치킨_MENU_UUID);
             assertThatIllegalStateException().isThrownBy(throwingCallable);
         }
@@ -235,9 +200,8 @@ public class MenuTest {
         @DisplayName(value = "메뉴를 노출시킵니다.")
         @Test
         void displayMenu() {
-            Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE , menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
+            Menu menu = createMenu();
             menuRepository.save(menu);
-
             Menu ResponseMenu = menuService.display(후라이드치킨_MENU_UUID);
             assertThat(ResponseMenu.isDisplayed()).isTrue();
         }
@@ -246,24 +210,11 @@ public class MenuTest {
     @DisplayName(value = "메뉴 비노출 기능")
     @Nested
     class MenuHideTest {
-        private Product product;
-        private MenuGroup menuGroup;
-        private List<MenuProduct> menuProducts;
-        @BeforeEach
-        void initialize() {
-            product = createProduct(후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
-            productRepository.save(product);
-            menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_GROUP_UUID);
-            menuGroupRepository.save(menuGroup);
-            menuProducts = List.of(createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
-        }
-
         @DisplayName(value = "메뉴를 비노출시킵니다.")
         @Test
         void displayMenu() {
-            Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE , menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
+            Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE);
             menuRepository.save(menu);
-
             Menu ResponseMenu = menuService.hide(후라이드치킨_MENU_UUID);
             assertThat(ResponseMenu.isDisplayed()).isFalse();
         }
@@ -272,55 +223,51 @@ public class MenuTest {
     @DisplayName(value = "모든 메뉴 조회 기능")
     @Nested
     class findAllMenuTest {
-        private Product product;
-        private MenuGroup menuGroup;
-        private List<MenuProduct> menuProducts;
-        @BeforeEach
-        void initialize() {
-            product = createProduct(후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
-            productRepository.save(product);
-            menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME,후라이드치킨_MENU_GROUP_UUID);
-            menuGroupRepository.save(menuGroup);
-            menuProducts = List.of(createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
-        }
-
         @DisplayName(value = "모든 메뉴를 조회합니다.")
         @Test
         void displayMenu() {
-            Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE , menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
+            Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE);
             menuRepository.save(menu);
-
             List<Menu> ResponseMenu = menuService.findAll();
-
             verify(menuRepository, times(1)).findAll();
             assertThat(ResponseMenu.size()).isEqualTo(1);
 
         }
     }
 
-
-    private MenuProduct createMenuProduct(final Product product, final int quantity, final UUID productId) {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setQuantity(quantity);
-        menuProduct.setProductId(productId);
-        return menuProduct;
+    private static Menu createMenu(MenuProduct menuProducts) {
+        Menu menu = new Menu();
+        menu.setId(후라이드치킨_MENU_UUID);
+        menu.setName(후라이드치킨_MENU_NAME);
+        menu.setPrice(후라이드치킨_DEFAULT_PRICE);
+        menu.setMenuGroup(createMenuGroup());
+        menu.setDisplayed(true);
+        menu.setMenuProducts(List.of(menuProducts));
+        menu.setMenuGroupId(후라이드치킨_MENU_GROUP_UUID);
+        return menu;
+    }
+    private static Menu createMenu() {
+        Menu menu = new Menu();
+        menu.setId(후라이드치킨_MENU_UUID);
+        menu.setName(후라이드치킨_MENU_NAME);
+        menu.setPrice(후라이드치킨_DEFAULT_PRICE);
+        menu.setMenuGroup(createMenuGroup());
+        menu.setDisplayed(true);
+        menu.setMenuProducts(List.of(createMenuProduct()));
+        menu.setMenuGroupId(후라이드치킨_MENU_GROUP_UUID);
+        return menu;
     }
 
-
-    private static Product createProduct(final UUID uuid, final String name, final BigDecimal price) {
-        Product product = new Product();
-        product.setId(uuid);
-        product.setName(name);
-        product.setPrice(price);
-        return product;
-    }
-
-    private static MenuGroup createMenuGroup(final String name, final UUID id) {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName(name);
-        menuGroup.setId(id);
-        return menuGroup;
+    private static Menu createMenu(BigDecimal price) {
+        Menu menu = new Menu();
+        menu.setId(후라이드치킨_MENU_UUID);
+        menu.setName(후라이드치킨_MENU_NAME);
+        menu.setPrice(price);
+        menu.setMenuGroup(createMenuGroup());
+        menu.setDisplayed(true);
+        menu.setMenuProducts(List.of(createMenuProduct()));
+        menu.setMenuGroupId(후라이드치킨_MENU_GROUP_UUID);
+        return menu;
     }
 
     private static Menu createMenu(final UUID id, final String name, final BigDecimal price, final MenuGroup menuGroup, final List<MenuProduct> menuProducts, final UUID menugroupId) {
@@ -334,4 +281,87 @@ public class MenuTest {
         menu.setMenuGroupId(menugroupId);
         return menu;
     }
+
+    private static Menu createMenu(final UUID id, final String name, final BigDecimal price, final MenuGroup menuGroup, final UUID menugroupId) {
+        Menu menu = new Menu();
+        menu.setId(id);
+        menu.setName(name);
+        menu.setPrice(price);
+        menu.setMenuGroup(menuGroup);
+        menu.setDisplayed(true);
+        menu.setMenuGroupId(menugroupId);
+        return menu;
+    }
+
+    private static Menu createMenu(MenuGroup menuGroup, MenuProduct menuProducts) {
+        Menu menu = new Menu();
+        menu.setId(후라이드치킨_MENU_UUID);
+        menu.setName(후라이드치킨_MENU_NAME);
+        menu.setPrice(후라이드치킨_DEFAULT_PRICE);
+        menu.setMenuGroup(menuGroup);
+        menu.setDisplayed(true);
+        menu.setMenuProducts(List.of(menuProducts));
+        menu.setMenuGroupId(후라이드치킨_MENU_GROUP_UUID);
+        return menu;
+    }
+
+    private Menu createMenu(UUID id, String name, BigDecimal price) {
+        Menu menu = new Menu();
+        menu.setId(id);
+        menu.setName(name);
+        menu.setPrice(price);
+        return menu;
+    }
+
+
+    private static MenuProduct createMenuProduct() {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProduct(createProduct());
+        menuProduct.setQuantity(1);
+        menuProduct.setProductId(후라이드치킨_PRODUCT_UUID);
+        return menuProduct;
+    }
+
+    private static MenuProduct createMenuProduct(final Product product, final int quantity, final UUID productId) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProduct(product);
+        menuProduct.setQuantity(quantity);
+        menuProduct.setProductId(productId);
+        return menuProduct;
+    }
+
+    private static Product createProduct(final UUID uuid, final String name, final BigDecimal price) {
+        Product product = new Product();
+        product.setId(uuid);
+        product.setName(name);
+        product.setPrice(price);
+        return product;
+    }
+
+    private static Product createProduct() {
+        Product product = new Product();
+        product.setId(후라이드치킨_PRODUCT_UUID);
+        product.setName(TEST_PRODUCT_NAME);
+        product.setPrice(후라이드치킨_DEFAULT_PRICE);
+        return product;
+    }
+
+
+
+    private static MenuGroup createMenuGroup(final String name, final UUID id) {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setName(name);
+        menuGroup.setId(id);
+        return menuGroup;
+    }
+
+    private static MenuGroup createMenuGroup() {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setName(한마리메뉴_MENU_GROUP_NAME);
+        menuGroup.setId(후라이드치킨_MENU_GROUP_UUID);
+        return menuGroup;
+    }
+
+
+
 }
