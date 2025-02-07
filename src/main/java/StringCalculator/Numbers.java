@@ -14,4 +14,4 @@ public class Numbers {
                 .mapToInt(Number::getValue)
                 .sum();
     }
-} 
+}
