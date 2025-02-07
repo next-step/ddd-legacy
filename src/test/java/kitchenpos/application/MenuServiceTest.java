@@ -16,6 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -83,6 +84,22 @@ class MenuServiceTest {
                     () -> assertThat(resultMenu.getMenuGroup()).isNotNull(),
                     () -> assertThat(resultMenu.getMenuGroup().getId()).isEqualTo(MENU_GROUP_ID)
             );
+        }
+
+        @DisplayName("메뉴를 빈 상품 또는 상품 없이 등록하면 예외가 발생한다")
+        @NullAndEmptySource
+        @ParameterizedTest
+        void emptyOrNullProduct(List<MenuProduct> menuProducts) {
+            //given
+            Menu menu = MenuFixture.createMenu(
+                    MENU_GROUP_ID,
+                    "치킨버거세트",
+                    new BigDecimal(10000),
+                    menuProducts
+            );
+            //when, then
+            assertThatIllegalArgumentException()
+                    .isThrownBy(() -> menuService.create(menu));
         }
 
         @DisplayName("각 메뉴를 구성하는 상품의 수량은 0이상이어야 한다")
