@@ -134,7 +134,7 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴의 이름(name)은 필수로 입력되어야 한다.")
+    @DisplayName("메뉴의 이름(name)은 비속어가 포함되면 안된다.")
     @ParameterizedTest
     @ValueSource(strings = {"비속어"})
     void throwExceptionWhenNameIsProfanity(String name){
