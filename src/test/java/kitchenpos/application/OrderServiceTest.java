@@ -160,6 +160,7 @@ class OrderServiceTest {
         assertThat(savedOrder.getOrderLineItems().size()).isEqualTo(
             order.getOrderLineItems().size());
         assertThat(savedOrder.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress());
+        assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.WAITING);
     }
 
     @DisplayName("배달 주소 없이 배달 주문 시, 예외가 발생한다.")
