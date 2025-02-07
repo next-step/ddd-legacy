@@ -18,6 +18,22 @@ public class OrderFixture {
         return order;
     }
 
+    public static Order acceptedTakeoutOrder(List<OrderLineItem> orderLineItems) {
+        return order(OrderType.TAKEOUT, OrderStatus.ACCEPTED, orderLineItems);
+    }
+
+    public static Order waitingTakeoutOrder(List<OrderLineItem> orderLineItems) {
+        return order(OrderType.TAKEOUT, OrderStatus.WAITING, orderLineItems);
+    }
+
+    public static Order servedDeliveryOrder(List<OrderLineItem> orderLineItems) {
+        return order(OrderType.DELIVERY, OrderStatus.SERVED, orderLineItems);
+    }
+
+    public static Order deliveringDeliveryOrder(List<OrderLineItem> orderLineItems) {
+        return order(OrderType.DELIVERY, OrderStatus.DELIVERING, orderLineItems);
+    }
+
     public static Order deliveryOrder(String address, List<OrderLineItem> orderLineItems) {
         Order order = order(OrderType.DELIVERY, OrderStatus.WAITING, orderLineItems);
         order.setDeliveryAddress(address);

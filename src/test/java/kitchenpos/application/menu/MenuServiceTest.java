@@ -21,12 +21,12 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+
 
 class MenuServiceTest {
     private MenuRepository menuRepository;
@@ -61,13 +61,7 @@ class MenuServiceTest {
 
             Menu created = menuService.create(request);
             // then
-            assertAll(
-                    () -> assertThat(created.getId()).isNotNull(),
-                    () -> assertThat(created.getName()).isEqualTo("콜라 세트"),
-                    () -> assertThat(created.getPrice()).isEqualByComparingTo(BigDecimal.valueOf(1000)),
-                    () -> assertThat(created.isDisplayed()).isEqualTo(true),
-                    () -> assertThat(created.getMenuProducts()).hasSize(1)
-            );
+            assertAll(() -> assertThat(created.getId()).isNotNull(), () -> assertThat(created.getName()).isEqualTo("콜라 세트"), () -> assertThat(created.getPrice()).isEqualByComparingTo(BigDecimal.valueOf(1000)), () -> assertThat(created.isDisplayed()).isEqualTo(true), () -> assertThat(created.getMenuProducts()).hasSize(1));
         }
 
         @DisplayName("메뉴 가격이 0원 미만이면 실패")
@@ -83,8 +77,7 @@ class MenuServiceTest {
             Menu request = MenuFixture.menuWithDisplayTrue("콜라 세트", List.of(menuProduct), price, menuGroup.getId());
 
 
-            assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(PriceInvalidException.class);
+            assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(MenuException.class).hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_PRICE_INVALID).hasMessageContaining(ErrorCode.MENU_PRICE_INVALID.getMessage());
         }
 
         @Test
@@ -97,8 +90,7 @@ class MenuServiceTest {
             MenuProduct menuProduct = MenuFixture.menuProduct(cola, 1);
             Menu request = MenuFixture.menuWithDisplayTrue("콜라 세트", List.of(menuProduct), 1000, menuGroup.getId());
 
-            assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(MenuGroupNoExist.class);
+            assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(MenuException.class).hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_GROUP_NOT_FOUND).hasMessageContaining(ErrorCode.MENU_GROUP_NOT_FOUND.getMessage());
         }
 
         @Test
@@ -111,8 +103,7 @@ class MenuServiceTest {
 
             Menu request = MenuFixture.menuWithDisplayTrue("콜라 세트", List.of(), 1000, menuGroup.getId());
 
-            assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(MenuProductEmptyException.class);
+            assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(MenuException.class).hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_PRODUCTS_EMPTY);
         }
 
         @Test
@@ -129,8 +120,7 @@ class MenuServiceTest {
 
             Menu request = MenuFixture.menuWithDisplayTrue("콜라 세트", List.of(menuProduct, menuProduct2), 1000, menuGroup.getId());
 
-            assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(InvalidMenuProducts.class);
+            assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(MenuException.class).hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_PRODUCTS_SIZE_NOT_MATCHED).hasMessageContaining(ErrorCode.MENU_PRODUCTS_SIZE_NOT_MATCHED.getMessage());
         }
 
         //
@@ -147,8 +137,7 @@ class MenuServiceTest {
 
             Menu request = MenuFixture.menuWithDisplayTrue("콜라 세트", List.of(menuProduct), 1000, menuGroup.getId());
 
-            assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(MenuProductQuantityInvalidException.class);
+            assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(MenuException.class).hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_QUANTITY_NEGATIVE).hasMessageContaining(ErrorCode.MENU_QUANTITY_NEGATIVE.getMessage());
         }
 
         @Test
@@ -162,8 +151,7 @@ class MenuServiceTest {
             MenuProduct menuProduct = MenuFixture.menuProduct(cola, 1);
             Menu request = MenuFixture.menuWithDisplayTrue("콜라 세트", List.of(menuProduct), 2000, menuGroup.getId());
 
-            assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(MenuPriceInvalidException.class);
+            assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(MenuException.class).hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_PRICE_INVALID).hasMessageContaining(ErrorCode.MENU_PRICE_INVALID.getMessage());
         }
 
         @DisplayName("메뉴 이름에 비속어가 포함되면 실패")
@@ -180,8 +168,7 @@ class MenuServiceTest {
             Menu request = MenuFixture.menuWithDisplayTrue(menuName, List.of(menuProduct), 1000, menuGroup.getId());
 
             // when & then
-            assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(MenuNameInvalidException.class);
+            assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(MenuException.class).hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_NAME_INVALID).hasMessageContaining(ErrorCode.MENU_NAME_INVALID.getMessage());
         }
     }
 
@@ -222,8 +209,7 @@ class MenuServiceTest {
             Menu request = new Menu();
             ReflectionTestUtils.setField(request, "price", BigDecimal.valueOf(-1000));
 
-            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
-                    .isInstanceOf(PriceInvalidException.class);
+            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request)).isInstanceOf(MenuException.class).hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_PRICE_INVALID).hasMessageContaining(ErrorCode.MENU_PRICE_INVALID.getMessage());
         }
 
         @Test
@@ -241,8 +227,7 @@ class MenuServiceTest {
             Menu request = new Menu();
             ReflectionTestUtils.setField(request, "price", BigDecimal.valueOf(2000));
 
-            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
-                    .isInstanceOf(MenuPriceInvalidException.class);
+            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request)).isInstanceOf(MenuException.class).hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_PRICE_INVALID).hasMessageContaining(ErrorCode.MENU_PRICE_INVALID.getMessage());
         }
     }
 
@@ -279,8 +264,7 @@ class MenuServiceTest {
             Menu menu = MenuFixture.menuWithDisplayTrue("코오올라 세트", List.of(menuProduct), 1000, menuGroup.getId());
 
 
-            assertThatThrownBy(() -> menuService.display(menu.getId()))
-                    .isInstanceOf(NoSuchElementException.class);
+            assertThatThrownBy(() -> menuService.display(menu.getId())).isInstanceOf(MenuNotFoundException.class);
         }
     }
 }

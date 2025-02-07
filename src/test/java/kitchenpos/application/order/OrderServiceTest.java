@@ -1,8 +1,7 @@
 package kitchenpos.application.order;
 
-import kitchenpos.application.Exception.OrderLineItemNotFoundException;
-import kitchenpos.application.Exception.OrderLineSizeNotMatched;
-import kitchenpos.application.Exception.OrderTypeNotFoundException;
+import kitchenpos.application.Exception.ErrorCode;
+import kitchenpos.application.Exception.OrderException;
 import kitchenpos.application.OrderService;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.OrderRepository;
@@ -116,7 +115,9 @@ class OrderServiceTest {
             ReflectionTestUtils.setField(request, "orderLineItems", List.of(new OrderLineItem()));
 
             assertThatThrownBy(() -> orderService.create(request))
-                    .isInstanceOf(OrderTypeNotFoundException.class);
+                    .isInstanceOf(OrderException.class)
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_TYPE_INVALID)
+                    .hasMessageContaining(ErrorCode.ORDER_TYPE_INVALID.getMessage());
         }
 
         @Test
@@ -126,7 +127,9 @@ class OrderServiceTest {
             ReflectionTestUtils.setField(request, "type", OrderType.TAKEOUT);
 
             assertThatThrownBy(() -> orderService.create(request))
-                    .isInstanceOf(OrderLineItemNotFoundException.class);
+                    .isInstanceOf(OrderException.class)
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_LINE_ITEM_NOT_FOUND)
+                    .hasMessageContaining(ErrorCode.ORDER_LINE_ITEM_NOT_FOUND.getMessage());
         }
 
         @Test
@@ -144,7 +147,9 @@ class OrderServiceTest {
 
 
             assertThatThrownBy(() -> orderService.create(request))
-                    .isInstanceOf(OrderLineSizeNotMatched.class);
+                    .isInstanceOf(OrderException.class)
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_LINE_ITEM_SIZE_NOT_MATCHED)
+                    .hasMessageContaining(ErrorCode.ORDER_LINE_ITEM_SIZE_NOT_MATCHED.getMessage());
         }
     }
 
@@ -181,11 +186,13 @@ class OrderServiceTest {
             Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
 
             OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
-            Order order = OrderFixture.order(OrderType.TAKEOUT, OrderStatus.ACCEPTED, List.of(orderLineItem));
+            Order order = OrderFixture.acceptedTakeoutOrder(List.of(orderLineItem));
             orderRepository.save(order);
 
             assertThatThrownBy(() -> orderService.accept(order.getId()))
-                    .isInstanceOf(IllegalStateException.class);
+                    .isInstanceOf(OrderException.class)
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_STATUS_INVALID)
+                    .hasMessageContaining(ErrorCode.ORDER_STATUS_INVALID.getMessage());
         }
 
         @Test
@@ -198,7 +205,7 @@ class OrderServiceTest {
             Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
 
             OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
-            Order order = OrderFixture.order(OrderType.TAKEOUT, OrderStatus.ACCEPTED, List.of(orderLineItem));
+            Order order = OrderFixture.acceptedTakeoutOrder(List.of(orderLineItem));
             orderRepository.save(order);
 
             // when
@@ -218,11 +225,13 @@ class OrderServiceTest {
             Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
 
             OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
-            Order order = OrderFixture.order(OrderType.TAKEOUT, OrderStatus.WAITING, List.of(orderLineItem));
+            Order order = OrderFixture.waitingTakeoutOrder(List.of(orderLineItem));
             orderRepository.save(order);
 
             assertThatThrownBy(() -> orderService.serve(order.getId()))
-                    .isInstanceOf(IllegalStateException.class);
+                    .isInstanceOf(OrderException.class)
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_STATUS_INVALID)
+                    .hasMessageContaining(ErrorCode.ORDER_STATUS_INVALID.getMessage());
         }
     }
 
@@ -239,7 +248,7 @@ class OrderServiceTest {
             Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
 
             OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
-            Order order = OrderFixture.order(OrderType.DELIVERY, OrderStatus.SERVED, List.of(orderLineItem));
+            Order order = OrderFixture.servedDeliveryOrder(List.of(orderLineItem));
             ReflectionTestUtils.setField(order, "deliveryAddress", "서울시 강남구");
             orderRepository.save(order);
 
@@ -260,7 +269,7 @@ class OrderServiceTest {
             Menu menu = MenuFixture.menuWithDisplayTrue("돈까스", List.of(menuProduct), 10000, menuGroup.getId());
 
             OrderLineItem orderLineItem = OrderFixture.orderLineItem(menu, 2);
-            Order order = OrderFixture.order(OrderType.DELIVERY, OrderStatus.DELIVERING, List.of(orderLineItem));
+            Order order = OrderFixture.deliveringDeliveryOrder(List.of(orderLineItem));
             ReflectionTestUtils.setField(order, "deliveryAddress", "서울시 강남구");
             orderRepository.save(order);
 
