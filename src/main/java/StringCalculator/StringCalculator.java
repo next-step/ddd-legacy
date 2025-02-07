@@ -1,10 +1,11 @@
 package StringCalculator;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
-
+    private static final String DEFAULT_DELIMITER = "[,:]";
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     public int add(String text) {
@@ -12,22 +13,18 @@ public class StringCalculator {
             return 0;
         }
 
-        String delimiter = "[,:]";
-        String numbers = text;
+        String delimiter = DEFAULT_DELIMITER;
+        String numbersStr = text;
 
         Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
-        if (matcher.find()) {
+        if (matcher.matches()) {
             delimiter = Pattern.quote(matcher.group(1));
-            numbers = matcher.group(2);
+            numbersStr = matcher.group(2);
         }
 
-        String[] tokens = numbers.split(delimiter);
-        int sum = 0;
-        for (String token : tokens) {
-            Number number = new Number(token);
-            sum += number.getValue();
-        }
-
-        return sum;
+        return Arrays.stream(numbersStr.split(delimiter))
+                .map(Number::new)
+                .mapToInt(Number::getValue)
+                .sum();
     }
 }
