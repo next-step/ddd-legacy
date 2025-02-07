@@ -38,7 +38,6 @@ public class OrderTest {
     private static final UUID ORDER_TABLE_ID = UUID.fromString("8d710043-29b6-420e-8452-233f5a035520");
     private static final String 후라이드치킨_MENU_NAME = "후라이드 치킨메뉴";
     private static final UUID 후라이드치킨_MENU_UUID = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
-    private static final UUID 후라이드치킨_MENU_HIDE_UUID = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63c");
     private static final UUID 후라이드치킨_MENU_GROUP_UUID = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
     private static final String 한마리메뉴_MENU_GROUP_NAME = "한마리메뉴";
     private static final OrderStatus ORDER_STATUS_주문대기 = WAITING;
@@ -48,7 +47,6 @@ public class OrderTest {
     private static final OrderStatus ORDER_STATUS_제공완료 = SERVED;
     private static final OrderStatus ORDER_STATUS_주문완료 = COMPLETED;
     private static final OrderType ORDER_TYPE_배달주문 = DELIVERY;
-    private static final OrderType ORDER_TYPE_포장주문 = TAKEOUT;
     private static final OrderType ORDER_TYPE_매장내식사주문 = EAT_IN;
     private static final LocalDateTime ORDER_DATE_TIME_주문요청시간  = LocalDateTime.now();
 
@@ -76,14 +74,10 @@ public class OrderTest {
     @DisplayName(value = "주문 추가 기능")
     @Nested
     class OrderCreateTest {
-        private static final BigDecimal 후라이드치킨_MINUS_PRICE = new BigDecimal(-10);
-        private static final String 후라이드치킨_PROFANITY_MENU_NAME = "fucking 치킨메뉴";
         private static final int MINUS_QUANTITY = -1;
         private static final int DEFAULT_QUANTITY = 1;
         public static final OrderType ORDER_TYPE_미선택 = null;
-        private static final long ZERO_QUANTITY = 0;
         private static final String ORDER_TABLE_NAME = "1번";
-        public static final boolean TABLE_USABLE = true;
         private static final boolean TABLE_UNUSABLE = false;
 
         @DisplayName(value = "주문 추가기능 & 주문 검증이 끝나면 주문대기(WAITING) 상태가 됩니다")
@@ -367,14 +361,6 @@ public class OrderTest {
         return createMenuProduct(createProduct(), 1, 후라이드치킨_PRODUCT_UUID);
     }
 
-    private static Product createProduct(final UUID uuid, final String name, final BigDecimal price) {
-        Product product = new Product();
-        product.setId(uuid);
-        product.setName(name);
-        product.setPrice(price);
-        return product;
-
-    }
     private Product createProduct() {
         Product product = new Product();
         product.setId(후라이드치킨_PRODUCT_UUID);
@@ -382,7 +368,6 @@ public class OrderTest {
         product.setPrice(후라이드치킨_DEFAULT_PRICE);
         return product;
     }
-
 
     private static MenuGroup createMenuGroup(final String name, final UUID id) {
         MenuGroup menuGroup = new MenuGroup();
@@ -492,9 +477,6 @@ public class OrderTest {
         return createOrder(ORDER_UUID, orderType, ORDER_STATUS_주문대기, ORDER_DATE_TIME_주문요청시간,
                 createOrderLineItem(), "강남구");
     }
-
-
-
 
     private static OrderLineItem createOrderLineItem(UUID menuId, long quantity, BigDecimal price) {
         OrderLineItem orderLineItem = new OrderLineItem();
