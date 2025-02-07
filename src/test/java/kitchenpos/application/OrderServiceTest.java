@@ -71,10 +71,9 @@ class OrderServiceTest {
         @DisplayName("주문의 종류는 반드시 입력해야 한다")
         @NullSource
         @ParameterizedTest
-        void orderType(OrderType status) {
+        void orderType(OrderType orderType) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal("25000"), 1);
-            Order nullOrderTypeRequest = OrderFixture.createOrder(status, List.of(orderLineItem), "", null, null);
-
+            Order nullOrderTypeRequest = OrderFixture.createOrder(orderType, List.of(orderLineItem), "", null, null, null, LocalDateTime.now());
             assertThatIllegalArgumentException()
                     .isThrownBy(() -> orderService.create(nullOrderTypeRequest));
         }
@@ -121,7 +120,7 @@ class OrderServiceTest {
             OrderTable orderTable = orderTableRepository.save(request);
 
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal("25000"), 1);
-            Order orderRequest = createEatInOrder(List.of(orderLineItem), orderTable.getId(), LocalDateTime.now());
+            Order orderRequest = createEatInOrder(List.of(orderLineItem), orderTable, LocalDateTime.now());
 
             Order orderResult = orderService.create(orderRequest);
 
@@ -141,7 +140,7 @@ class OrderServiceTest {
             Order takeOutRequest = createTakeOutOrder(orderLineItems, LocalDateTime.now());
             Order deliveryOrderRequest = createDeliveryOrder(orderLineItems, "경기도 고양시..XX동 XX호", LocalDateTime.now());
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
-            Order eatInOrderRequest = createEatInOrder(orderLineItems, orderTable.getId(), LocalDateTime.now());
+            Order eatInOrderRequest = createEatInOrder(orderLineItems, orderTable, LocalDateTime.now());
 
             assertAll(
                     () -> assertThatIllegalArgumentException()
@@ -180,7 +179,7 @@ class OrderServiceTest {
             Order takeOutRequest = createTakeOutOrder(List.of(undisplayMenuOrderItem), LocalDateTime.now());
             Order deliveryOrderRequest = createDeliveryOrder(List.of(undisplayMenuOrderItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
-            Order eatInOrderRequest = createEatInOrder(List.of(undisplayMenuOrderItem), orderTable.getId(), LocalDateTime.now());
+            Order eatInOrderRequest = createEatInOrder(List.of(undisplayMenuOrderItem), orderTable, LocalDateTime.now());
 
             assertAll(
                     () -> assertThatIllegalStateException()
@@ -201,7 +200,7 @@ class OrderServiceTest {
             Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
             Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
-            Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), orderTable.getId(), LocalDateTime.now());
+            Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), orderTable, LocalDateTime.now());
 
             assertAll(
                     () -> assertThatIllegalArgumentException()
@@ -227,9 +226,9 @@ class OrderServiceTest {
         @DisplayName("매장 내 취식일 경우, 고객에게 배정된 주문 테이블이 있어야 한다")
         @Test
         void validateOrderTable() {
-            UUID unknownTableId = UUID.randomUUID();
+            OrderTable unknownTable = OrderTableFixture.createOrderTable(UUID.randomUUID(), "1번테이블", 0);
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), unknownTableId, LocalDateTime.now());
+            Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), unknownTable, LocalDateTime.now());
 
             assertThatThrownBy(() -> orderService.create(eatInOrderRequest))
                     .isInstanceOf(NoSuchElementException.class);
@@ -241,7 +240,7 @@ class OrderServiceTest {
             boolean tableOccupied = false;
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", tableOccupied, 0));
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), orderTable.getId(), LocalDateTime.now());
+            Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), orderTable, LocalDateTime.now());
 
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.create(eatInOrderRequest));
@@ -501,7 +500,7 @@ class OrderServiceTest {
 
         Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
         Order deliveryRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
-        Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), orderTable.getId(), LocalDateTime.now());
+        Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), orderTable, LocalDateTime.now());
 
         Order takeOutOrder = orderService.create(takeOutRequest);
         Order deliveryOrder = orderService.create(deliveryRequest);
@@ -513,7 +512,6 @@ class OrderServiceTest {
     }
     //endregion
 
-
     private Order createTakeOutOrder(List<OrderLineItem> orderLineItems, LocalDateTime orderDateTime) {
         return createTakeOutOrder(orderLineItems, null, orderDateTime);
     }
@@ -522,23 +520,20 @@ class OrderServiceTest {
         return createDeliveryOrder(orderLineItems, deliveryAddress, null, orderDateTime);
     }
 
-    private Order createEatInOrder(List<OrderLineItem> orderLineItems, UUID orderTableId, LocalDateTime orderDateTime) {
-        return createEatInOrder(orderLineItems, orderTableId, null, orderDateTime);
+    private Order createEatInOrder(List<OrderLineItem> orderLineItems, OrderTable orderTable, LocalDateTime orderDateTime) {
+        return createEatInOrder(orderLineItems, orderTable, null, orderDateTime);
     }
 
     private Order createTakeOutOrder(List<OrderLineItem> orderLineItems, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        return OrderFixture.createOrder(OrderType.TAKEOUT, orderLineItems, null, null, orderStatus, orderDateTime);
+        return OrderFixture.creatTakeOutOrder(orderLineItems, orderStatus, orderDateTime);
     }
 
     private Order createDeliveryOrder(List<OrderLineItem> orderLineItems, String deliveryAddress, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        return OrderFixture.createOrder(OrderType.DELIVERY, orderLineItems, deliveryAddress, null, orderStatus, orderDateTime);
+        return OrderFixture.createDeliveryOrder(orderLineItems, deliveryAddress, orderStatus, orderDateTime);
     }
 
     private Order createEatInOrder(List<OrderLineItem> orderLineItems, OrderTable orderTable, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        return OrderFixture.createOrder(OrderType.EAT_IN, orderLineItems, orderTable, orderStatus, orderDateTime);
+        return OrderFixture.createEatInOrder(orderLineItems, orderTable, orderStatus, orderDateTime);
     }
 
-    private Order createEatInOrder(List<OrderLineItem> orderLineItems, UUID orderTableId, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        return OrderFixture.createOrder(OrderType.EAT_IN, orderLineItems, orderTableId, orderStatus, orderDateTime);
-    }
 }

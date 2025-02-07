@@ -102,7 +102,7 @@ class OrderTableServiceTest {
         void validateOrderStatus(OrderStatus orderStatus) {
             //given
             OrderTable occupiedOrderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(UUID.randomUUID(), "1번테이블", true, 4));
-            Order order = createUnnamedOrder(occupiedOrderTable.getId(), orderStatus);
+            Order order = createUnnamedOrder(occupiedOrderTable, orderStatus);
             //when, then
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderTableService.clear(occupiedOrderTable.getId()));
@@ -113,7 +113,7 @@ class OrderTableServiceTest {
         void clear() {
             //given
             OrderTable occupiedOrderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(UUID.randomUUID(), "1번테이블", true, 4));
-            Order order = createUnnamedOrder(occupiedOrderTable.getId(), OrderStatus.COMPLETED);
+            Order order = createUnnamedOrder(occupiedOrderTable, OrderStatus.COMPLETED);
             //when
             ReflectionTestUtils.setField(order, "status", OrderStatus.COMPLETED);
             OrderTable clearOrder = orderTableService.clear(occupiedOrderTable.getId());
@@ -169,17 +169,17 @@ class OrderTableServiceTest {
     }
     //endregion
 
-    private Order createEatInOrder(List<OrderLineItem> orderLineItems, UUID orderTableId, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        return OrderFixture.createOrder(OrderType.EAT_IN, orderLineItems, null, orderTableId, orderStatus, orderDateTime);
+    private Order createEatInOrder(List<OrderLineItem> orderLineItems, OrderTable orderTable, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+        return OrderFixture.createEatInOrder(orderLineItems, orderTable, orderStatus, orderDateTime);
     }
 
-    private Order createUnnamedOrder(UUID orderTableId, OrderStatus orderStatus) {
+    private Order createUnnamedOrder(OrderTable orderTable, OrderStatus orderStatus) {
         Product unnamedProduct = productRepository.save(ProductFixture.createProduct(UUID.randomUUID(), "unnamed", BigDecimal.ZERO));
         MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.createMenuGroup(UUID.randomUUID(), "unnamed"));
         MenuProduct displayMenuProduct = MenuProductFixture.createMenuProduct(unnamedProduct, 1);
         Menu unknownMenu = menuRepository.save(MenuFixture.createMenu(UUID.randomUUID(), menuGroup, menuGroup.getId(), "unnamed", BigDecimal.ZERO, true, List.of(displayMenuProduct)));
 
         OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(unknownMenu.getId(), BigDecimal.ZERO, 1);
-        return orderService.create(createEatInOrder(List.of(orderLineItem), orderTableId, orderStatus, LocalDateTime.now()));
+        return orderService.create(createEatInOrder(List.of(orderLineItem), orderTable, orderStatus, LocalDateTime.now()));
     }
 }

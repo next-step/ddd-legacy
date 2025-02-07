@@ -1,6 +1,7 @@
 package kitchenpos.application.fixture;
 
 import kitchenpos.domain.*;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -9,53 +10,37 @@ import java.util.UUID;
 
 public class OrderFixture {
 
-    public static Order createOrder(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress, UUID orderTableId, LocalDateTime orderDateTime) {
-        return createOrder(orderType, orderLineItems, deliveryAddress, orderTableId, null, orderDateTime);
+    public static Order createDeliveryOrder(List<OrderLineItem> orderLineItems, String deliveryAddress, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+        return createOrder(OrderType.DELIVERY, orderLineItems, deliveryAddress, null, null, orderStatus, orderDateTime);
     }
 
-    public static Order createOrder(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress, UUID orderTableId, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        return createOrder(UUID.randomUUID(), orderType, orderLineItems, deliveryAddress, orderTableId, orderStatus, orderDateTime);
+    public static Order createEatInOrder(List<OrderLineItem> orderLineItems, OrderTable orderTable, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+        return createOrder(OrderType.EAT_IN, orderLineItems, null, orderTable.getId(), orderTable, orderStatus, orderDateTime);
     }
 
-    public static Order createOrder(OrderType orderType, List<OrderLineItem> orderLineItems, OrderTable orderTable, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+    public static Order creatTakeOutOrder(List<OrderLineItem> orderLineItems, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+        return createOrder(OrderType.TAKEOUT, orderLineItems, null, null, null, orderStatus, orderDateTime);
+    }
+
+    public static Order createOrder(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress, UUID orderTableId, OrderTable orderTable, OrderStatus orderStatus, LocalDateTime orderDateTime) {
         Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(orderType);
-        order.setOrderLineItems(orderLineItems);
-        order.setOrderTable(orderTable);
-        order.setStatus(orderStatus);
-        order.setOrderDateTime(orderDateTime);
-        return order;
-    }
+        ReflectionTestUtils.setField(order, "id", UUID.randomUUID());
+        ReflectionTestUtils.setField(order, "orderType", orderType);
+        ReflectionTestUtils.setField(order, "orderLineItems", orderLineItems);
+        ReflectionTestUtils.setField(order, "deliveryAddress", deliveryAddress);
+        ReflectionTestUtils.setField(order, "orderTable", orderTable);
+        ReflectionTestUtils.setField(order, "orderTableId", orderTableId);
+        ReflectionTestUtils.setField(order, "orderStatus", orderStatus);
+        ReflectionTestUtils.setField(order, "orderDateTime", orderDateTime);
 
-    public static Order createOrder(OrderType orderType, List<OrderLineItem> orderLineItems, UUID orderTableId, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(orderType);
-        order.setOrderLineItems(orderLineItems);
-        order.setOrderTableId(orderTableId);
-        order.setStatus(orderStatus);
-        order.setOrderDateTime(orderDateTime);
-        return order;
-    }
-
-    public static Order createOrder(UUID id, OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress, UUID orderTableId, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        Order order = new Order();
-        order.setId(id);
-        order.setType(orderType);
-        order.setOrderLineItems(orderLineItems);
-        order.setDeliveryAddress(deliveryAddress);
-        order.setOrderTableId(orderTableId);
-        order.setStatus(orderStatus);
-        order.setOrderDateTime(orderDateTime);
         return order;
     }
 
     public static OrderLineItem createOrderLineItem(UUID menuId, BigDecimal price, int quantity) {
         OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menuId);
-        orderLineItem.setPrice(price);
-        orderLineItem.setQuantity(quantity);
+        ReflectionTestUtils.setField(orderLineItem, "menuId", menuId);
+        ReflectionTestUtils.setField(orderLineItem, "price", price);
+        ReflectionTestUtils.setField(orderLineItem, "quantity", quantity);
         return orderLineItem;
     }
 
