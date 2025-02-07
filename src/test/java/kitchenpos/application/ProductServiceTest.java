@@ -15,6 +15,9 @@ import kitchenpos.mock.persistence.FakeProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.util.Pair;
 
@@ -51,9 +54,21 @@ class ProductServiceTest {
 
     @DisplayName("비속어 상품 이름으로 생성 시, 예외가 발생한다.")
     @Test
-    void createNameException() {
+    void createNameProfanityException() {
         // given
         Product product = ProductFixture.create(BAD_PRODUCT_NAME, PRICE);
+
+        // when then
+        assertThatThrownBy(() -> productService.create(product))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("이름 없이 상품을 생성 시, 예외가 발생한다.")
+    @ParameterizedTest
+    @NullSource
+    void createNameException(String name) {
+        // given
+        Product product = ProductFixture.create(name, PRICE);
 
         // when then
         assertThatThrownBy(() -> productService.create(product))
