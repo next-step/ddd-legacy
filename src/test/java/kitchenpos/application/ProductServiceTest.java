@@ -42,11 +42,12 @@ class ProductServiceTest {
     @Mock
     private PurgomalumClient purgomalumClient;
 
-    @Test
+    @ParameterizedTest
     @DisplayName("상품을 생성한다.")
-    void createProduct() {
+    @ValueSource(strings = {"10000","0"})
+    void createProduct(String price) {
         //given
-        Product product = ProductFixture.setProduct("새상품", "10000");
+        Product product = ProductFixture.setProduct("새상품", price);
         //when
         when(purgomalumClient.containsProfanity(any()))
                 .thenReturn(false);
