@@ -124,7 +124,7 @@ public class MenuService {
     @Transactional
     public Menu display(final UUID menuId) {
         final Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchElementException("해당 ID의 메뉴가 존재하지 않습니다."));
         BigDecimal sum = BigDecimal.ZERO;
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
             sum = sum.add(
@@ -134,7 +134,7 @@ public class MenuService {
             );
         }
         if (menu.getPrice().compareTo(sum) > 0) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("메뉴 가격이 포함된 상품 가격보다 높아 표시할 수 없습니다.");
         }
         menu.setDisplayed(true);
         return menu;

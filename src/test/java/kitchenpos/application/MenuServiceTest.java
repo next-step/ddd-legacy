@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 class MenuServiceTest extends IntegrationTestSupport {
@@ -123,6 +124,23 @@ class MenuServiceTest extends IntegrationTestSupport {
         assertThatThrownBy(() -> menuService.create(expected))
             .isInstanceOf(NoSuchElementException.class)
             .hasMessage("메뉴는 특정 메뉴 그룹에 속해야 한다.");
+    }
+
+    @DisplayName("메뉴에 포함된 상품이 없으면 등록할 수 없다.")
+    @Test
+    void createMenu_WhenMenuProductsAreEmpty_ShouldThrowException() {
+        // given
+        MenuGroup menuGroup = createMenuGroup("한식");
+        menuGroupRepository.save(menuGroup);
+
+        List<MenuProduct> emptyMenuProducts = List.of();
+
+        Menu expected = createMenu("김치찌개 세트", valueOf(8000), true, menuGroup, emptyMenuProducts);
+
+        // when & then
+        assertThatThrownBy(() -> menuService.create(expected))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("메뉴에 포함된 상품이 존재해야 합니다.");
     }
 
     @DisplayName("메뉴에 등록된 상품의 수량이 0개 미만이면 등록할 수 없다.")
@@ -270,4 +288,61 @@ class MenuServiceTest extends IntegrationTestSupport {
             .hasMessage("메뉴 가격은 포함된 상품 가격 합보다 클 수 없습니다.");
     }
 
+    @DisplayName("메뉴를 표시 상태로 변경할 수 있다.")
+    @Test
+    void displayMenu_Success() {
+        // given
+        Product product = createProduct("김치찌개", valueOf(8000));
+        productRepository.save(product);
+
+        MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+        List<MenuProduct> menuProducts = List.of(menuProduct);
+
+        MenuGroup menuGroup = createMenuGroup("한식");
+        menuGroupRepository.save(menuGroup);
+
+        Menu expected = createMenu("김치찌개 세트", valueOf(8000), true, menuGroup, menuProducts);
+        Menu actual = menuService.create(expected);
+
+        // when
+        Menu displayMenu = menuService.display(actual.getId());
+
+        // then
+        assertThat(displayMenu.isDisplayed()).isTrue();
+    }
+
+    @DisplayName("존재하지 않는 메뉴를 표시할 수 없다.")
+    @Test
+    void displayMenu_WhenMenuDoesNotExist_ShouldThrowException() {
+        // given
+        UUID NonExistedMenuId = UUID.randomUUID();
+
+        // when & then
+        assertThatThrownBy(() -> menuService.display(NonExistedMenuId))
+            .isInstanceOf(NoSuchElementException.class)
+            .hasMessage("해당 ID의 메뉴가 존재하지 않습니다.");
+    }
+
+    @DisplayName("메뉴 가격이 상품 가격 합보다 높으면 메뉴를 표시할 수 없다.")
+    @Test
+    void displayMenu_WhenPriceExceedsSum_ShouldThrowException() {
+        // given
+        Product product = createProduct("김치찌개", valueOf(8000));
+        productRepository.save(product);
+
+        MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+        List<MenuProduct> menuProducts = List.of(menuProduct);
+
+        MenuGroup menuGroup = createMenuGroup("한식");
+        menuGroupRepository.save(menuGroup);
+
+        // 상품 가격보다 높은 메뉴 가격 설정
+        Menu expected = createMenu("김치찌개 세트", valueOf(8001), false, menuGroup, menuProducts);
+        Menu actual = menuService.create(expected);
+
+        // when & then
+        assertThatThrownBy(() -> menuService.display(actual.getId()))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("메뉴 가격이 포함된 상품 가격보다 높아 표시할 수 없습니다.");
+    }
 }
