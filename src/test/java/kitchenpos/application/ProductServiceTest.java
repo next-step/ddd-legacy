@@ -68,7 +68,7 @@ class ProductServiceTest extends IntegrationTestSupport {
 
     @DisplayName("상품을 등록할 때 가격을 입력하지 않으면 예외가 발생한다.")
     @Test
-    void createProduct_WithoutPrice_ShouldThrowException() {
+    void createProduct_WhenPriceIsNull_ThrowsException() {
         // given
         Product request = new Product();
         request.setName(burger().getName());
@@ -81,7 +81,7 @@ class ProductServiceTest extends IntegrationTestSupport {
 
     @DisplayName("상품을 등록할 때 가격이 0보다 작으면 예외가 발생한다.")
     @Test
-    void createProduct_WithNegativePrice_ShouldThrowException() {
+    void createProduct_WhenPriceIsNegative_ThrowsException() {
         // given
         Product request = new Product();
         request.setName(burger().getName());
@@ -95,7 +95,7 @@ class ProductServiceTest extends IntegrationTestSupport {
 
     @DisplayName("상품을 등록할 때 이름이 존재하지 않으면 예외가 발생한다.")
     @Test
-    void createProduct_WithoutName_ShouldThrowException() {
+    void createProduct_WhenNameIsNull_ThrowsException() {
         // given
         Product request = new Product();
         request.setName(null);
@@ -108,7 +108,7 @@ class ProductServiceTest extends IntegrationTestSupport {
 
     @DisplayName("상품을 등록할 때 이름에 부적절한 단어(비속어)가 포함되면 예외가 발생한다.")
     @Test
-    void createProduct_WithProfanity_ShouldThrowException() {
+    void createProduct_WhenContainsProfanity_ThrowsException() {
         // given
         Product request = new Product();
         request.setName(PROFANITY);
@@ -126,7 +126,7 @@ class ProductServiceTest extends IntegrationTestSupport {
 
     @DisplayName("상품을 등록할 때 이름에 부적절한 단어(비속어)가 포함되지 않으면 정상적으로 등록된다.")
     @Test
-    void createProduct_WithValidName_ShouldSucceed() {
+    void createProduct_WhenNameIsValid_Success() {
         // given
         Product request = burger();
 
@@ -142,7 +142,7 @@ class ProductServiceTest extends IntegrationTestSupport {
 
     @DisplayName("상품의 가격을 변경할 수 있다.")
     @Test
-    void changePrice_Success() {
+    void changeProductPrice_Success() {
         // given
         Product request = burger();
         productRepository.save(request);
@@ -167,7 +167,7 @@ class ProductServiceTest extends IntegrationTestSupport {
 
     @DisplayName("상품 가격 변경시 가격이 null 이면 예외가 발생한다.")
     @Test
-    void changePrice_WithNullPrice_ShouldThrowException() {
+    void changeProductPrice_WhenPriceIsNull_ThrowsException() {
         // given
         Product request = burger();
         productRepository.save(request);
@@ -185,7 +185,7 @@ class ProductServiceTest extends IntegrationTestSupport {
 
     @DisplayName("상품 가격 변경시 가격이 0보다 작으면 예외가 발생한다.")
     @Test
-    void changePrice_WithNegativePrice_ShouldThrowException() {
+    void changeProductPrice_WhenPriceIsNegative_ThrowsException() {
         // given
         Product request = burger();
         productRepository.save(request);
@@ -204,7 +204,7 @@ class ProductServiceTest extends IntegrationTestSupport {
 
     @DisplayName("존재하지 않은 상품 ID로 가격을 변경하면 예외가 발생한다.")
     @Test
-    void changePrice_WithOutExistentProduct_ShouldThrowException() {
+    void changeProductPrice_WhenProductNotFound_ThrowsException() {
         // given
         UUID nonExistentProductUd = UUID.randomUUID();
         BigDecimal changedPrice = BigDecimal.valueOf(10000);
@@ -219,7 +219,7 @@ class ProductServiceTest extends IntegrationTestSupport {
 
     @DisplayName("상품을 전체 조회할 수 있다.")
     @Test
-    void findAllProduct() {
+    void findAllProducts_Success() {
         // given
         Product burger = burger();
         Product pizza = pizza();

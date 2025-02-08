@@ -33,7 +33,7 @@ class MenuGroupServiceTest extends IntegrationTestSupport {
 
     @DisplayName("메뉴 그룹을 등록할 수 있다.")
     @Test
-    void createMenuGroup() {
+    void createMenuGroup_Success() {
         // given
         final MenuGroup expected = createMenuGroupRequest("치킨");
         final MenuGroup actual = menuGroupService.create(expected);
@@ -49,7 +49,7 @@ class MenuGroupServiceTest extends IntegrationTestSupport {
     @DisplayName("메뉴 그룹의 이름이 존재하지 않으면 등록할 수 없다")
     @NullAndEmptySource
     @ParameterizedTest
-    void createMenuGroup_WithoutName_ShouldThrowException(final String name) {
+    void createMenuGroup_WhenNameIsNullOrEmpty_ThrowsException(final String name) {
         // given & when & then
         final MenuGroup expected = createMenuGroupRequest(name);
         assertThatThrownBy(() -> menuGroupService.create(expected))
@@ -59,7 +59,7 @@ class MenuGroupServiceTest extends IntegrationTestSupport {
 
     @DisplayName("메뉴 그룹의 목록을 조회할 수 있다.")
     @Test
-    void findAllMenuGroup() {
+    void findAllMenuGroups_Success() {
         // given
         final MenuGroup expected1 = createMenuGroupRequest("치킨");
         final MenuGroup expected2 = createMenuGroupRequest("피자");

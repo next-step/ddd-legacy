@@ -55,7 +55,7 @@ class MenuServiceTest extends IntegrationTestSupport {
 
     @DisplayName("메뉴를 등록할 수 있다.")
     @Test
-    void createMenu() {
+    void createMenu_Success() {
         // given
         Product product = createProduct("김치찌개", valueOf(8000));
         productRepository.save(product);
@@ -84,7 +84,7 @@ class MenuServiceTest extends IntegrationTestSupport {
 
     @DisplayName("메뉴에 가격이 0원 미만이면 등록할 수 없다.")
     @Test
-    void createMenu_WithoutPrice_shouldThrowException() {
+    void createMenu_WhenPriceIsNegative_ThrowsException() {
         // given
         Product product = createProduct("김치찌개", valueOf(-8000));
         productRepository.save(product);
@@ -105,7 +105,7 @@ class MenuServiceTest extends IntegrationTestSupport {
 
     @DisplayName("특정 메뉴 그룹이 존재하지 않으면 등록할 수 없다.")
     @Test
-    void createMenu_WithoutMenuGroup_shouldThrowException() {
+    void createMenu_WhenMenuGroupIsMissing_ThrowsException() {
         // given
         Product product = createProduct("김치찌개", valueOf(-8000));
         productRepository.save(product);
@@ -123,7 +123,7 @@ class MenuServiceTest extends IntegrationTestSupport {
 
     @DisplayName("메뉴에 등록된 상품의 수량이 0개 미만이면 등록할 수 없다.")
     @Test
-    void createMenu_negativeQuantity_shouldThrowException() {
+    void createMenu_WhenQuantityIsNegative_ThrowsException() {
         // given
         Product product = createProduct("김치찌개", valueOf(8000));
         productRepository.save(product);
@@ -143,7 +143,7 @@ class MenuServiceTest extends IntegrationTestSupport {
 
     @DisplayName("메뉴 이름이 없으면 등록할 수 없다.")
     @Test
-    void createMenu_withoutMenuName_shouldThrowException() {
+    void createMenu_WhenMenuNameIsNull_ThrowsException() {
         // given
         Product product = createProduct("김치찌개", valueOf(8000));
         productRepository.save(product);
@@ -165,7 +165,7 @@ class MenuServiceTest extends IntegrationTestSupport {
 
     @DisplayName("메뉴 이름에 부적절한 단어가 포함되면 등록할 수 없다.")
     @Test
-    void createMenu_withProfanity_shouldThrowException() {
+    void createMenu_WhenContainsProfanity_ThrowsException() {
         // given
         Product product = createProduct("김치찌개", valueOf(8000));
         productRepository.save(product);
