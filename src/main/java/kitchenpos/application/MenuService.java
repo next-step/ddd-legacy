@@ -97,12 +97,17 @@ public class MenuService {
     public Menu changePrice(final UUID menuId, final Menu request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("메뉴 변경시 가격이 0원 이상이어야 합니다.");
         }
         BigDecimal sum = BigDecimal.ZERO;
         final Menu menu = menuRepository.findById(menuId)
             .orElseThrow(NoSuchElementException::new);
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
+            Product product = menuProduct.getProduct();
+            if (Objects.isNull(product) || Objects.isNull(product.getPrice())) {
+                throw new IllegalArgumentException("상품 가격이 존재해야만 합니다.");
+            }
+
             sum = sum.add(
                 menuProduct.getProduct()
                     .getPrice()
@@ -110,7 +115,7 @@ public class MenuService {
             );
         }
         if (price.compareTo(sum) > 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("메뉴 가격은 포함된 상품 가격 합보다 클 수 없습니다.");
         }
         menu.setPrice(price);
         return menu;

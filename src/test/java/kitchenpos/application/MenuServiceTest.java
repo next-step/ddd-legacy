@@ -9,9 +9,10 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.fixtures.MenuFixtures;
+import static kitchenpos.fixtures.MenuFixtures.createMenu;
 import static kitchenpos.fixtures.MenuFixtures.createMenuGroup;
 import static kitchenpos.fixtures.MenuFixtures.createMenuProduct;
+import static kitchenpos.fixtures.MenuFixtures.createMenuWithoutMenuGroupId;
 import static kitchenpos.fixtures.MenuFixtures.createProduct;
 import kitchenpos.infra.PurgomalumClient;
 import org.assertj.core.api.Assertions;
@@ -69,7 +70,7 @@ class MenuServiceTest extends IntegrationTestSupport {
         MenuGroup menuGroup = createMenuGroup("한식");
         menuGroupRepository.save(menuGroup);
 
-        Menu expected = MenuFixtures.createMenu("김치찌개 세트", valueOf(8000), true, menuGroup, menuProducts);
+        Menu expected = createMenu("김치찌개 세트", valueOf(8000), true, menuGroup, menuProducts);
 
         // when
         Menu actual = menuService.create(expected);
@@ -98,7 +99,7 @@ class MenuServiceTest extends IntegrationTestSupport {
         MenuGroup menuGroup = createMenuGroup("한식");
         menuGroupRepository.save(menuGroup);
 
-        Menu expected = MenuFixtures.createMenu("김치찌개 세트", valueOf(-8000), true, menuGroup, menuProducts);
+        Menu expected = createMenu("김치찌개 세트", valueOf(-8000), true, menuGroup, menuProducts);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(expected))
@@ -116,7 +117,7 @@ class MenuServiceTest extends IntegrationTestSupport {
         MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
         List<MenuProduct> menuProducts = List.of(menuProduct);
 
-        Menu expected = MenuFixtures.createMenuWithoutMenuGroupId("김치찌개 세트", valueOf(8000), true, menuProducts);
+        Menu expected = createMenuWithoutMenuGroupId("김치찌개 세트", valueOf(8000), true, menuProducts);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(expected))
@@ -137,14 +138,14 @@ class MenuServiceTest extends IntegrationTestSupport {
         MenuGroup menuGroup = createMenuGroup("한식");
         menuGroupRepository.save(menuGroup);
 
-        Menu expected = MenuFixtures.createMenu("김치찌개 세트", valueOf(8000), true, menuGroup, menuProducts);
+        Menu expected = createMenu("김치찌개 세트", valueOf(8000), true, menuGroup, menuProducts);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(expected))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 이름이 null이거나 빈 값이면 등록할 수 없다.")
+    @DisplayName("메뉴 이름이 없으면(null, 빈 값) 등록할 수 없다.")
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "   "})
@@ -160,13 +161,13 @@ class MenuServiceTest extends IntegrationTestSupport {
         menuGroupRepository.save(menuGroup);
 
         // when
-        Menu expected = MenuFixtures.createMenu(invalidMenuName, valueOf(8000), true, menuGroup, menuProducts);
+        Menu expected = createMenu(invalidMenuName, valueOf(8000), true, menuGroup, menuProducts);
 
         // then
         Assertions.assertThatThrownBy(() -> menuService.create(expected))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("올바른 메뉴 이름을 입력해야 합니다.");
-     }
+    }
 
     @DisplayName("메뉴 이름에 부적절한 단어가 포함되면 등록할 수 없다.")
     @Test
@@ -186,11 +187,87 @@ class MenuServiceTest extends IntegrationTestSupport {
 
         // when
         when(purgomalumClient.containsProfanity(invalidMenuName)).thenReturn(true);
-        Menu expected = MenuFixtures.createMenu(invalidMenuName, valueOf(8000), true, menuGroup, menuProducts);
+        Menu expected = createMenu(invalidMenuName, valueOf(8000), true, menuGroup, menuProducts);
 
         // then
         Assertions.assertThatThrownBy(() -> menuService.create(expected))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("올바른 메뉴 이름을 입력해야 합니다.");
     }
+
+    @DisplayName("메뉴에 있는 가격을 상품들의 총 가격 이하로 변경할 수 있다.")
+    @Test
+    void changeMenuPrice_Success() {
+        // given
+        Product product = createProduct("김치찌개", valueOf(8000));
+        productRepository.save(product);
+
+        MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+        List<MenuProduct> menuProducts = List.of(menuProduct);
+
+        MenuGroup menuGroup = createMenuGroup("한식");
+        menuGroupRepository.save(menuGroup);
+
+        Menu expected = createMenu("김치찌개 세트", valueOf(8000), true, menuGroup, menuProducts);
+        Menu actual = menuService.create(expected);
+
+        // when
+        actual.setPrice(valueOf(7999));
+        Menu changePriceMenu = menuService.changePrice(actual.getId(), actual);
+
+        // then
+        assertThat(changePriceMenu.getPrice()).isEqualTo(valueOf(7999));
+
+    }
+
+    @DisplayName("메뉴 가격이 0원 미만이면 변경할 수 없다.")
+    @Test
+    void changeMenuPrice_WhenPriceIsNegative_ThrowsException() {
+        // given
+        Product product = createProduct("김치찌개", valueOf(8000));
+        productRepository.save(product);
+
+        MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+        List<MenuProduct> menuProducts = List.of(menuProduct);
+
+        MenuGroup menuGroup = createMenuGroup("한식");
+        menuGroupRepository.save(menuGroup);
+
+        Menu expected = createMenu("김치찌개 세트", valueOf(8000), true, menuGroup, menuProducts);
+        Menu actual = menuService.create(expected);
+
+        // when
+        actual.setPrice(valueOf(-1));
+
+        // then
+        assertThatThrownBy(() -> menuService.changePrice(actual.getId(), actual))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("메뉴 변경시 가격이 0원 이상이어야 합니다.");
+    }
+
+    @DisplayName("메뉴 가격이 상품 가격 합보다 크면 변경할 수 없다.")
+    @Test
+    void changeMenuPrice_WhenPriceExceedsSum_ShouldThrowException() {
+        // given
+        Product product = createProduct("김치찌개", valueOf(8000));
+        productRepository.save(product);
+
+        MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+        List<MenuProduct> menuProducts = List.of(menuProduct);
+
+        MenuGroup menuGroup = createMenuGroup("한식");
+        menuGroupRepository.save(menuGroup);
+
+        Menu expected = createMenu("김치찌개 세트", valueOf(8000), true, menuGroup, menuProducts);
+        Menu actual = menuService.create(expected);
+
+        // when
+        actual.setPrice(valueOf(10000));
+
+        // then
+        assertThatThrownBy(() -> menuService.changePrice(actual.getId(), actual))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("메뉴 가격은 포함된 상품 가격 합보다 클 수 없습니다.");
+    }
+
 }
