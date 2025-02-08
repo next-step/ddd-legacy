@@ -361,7 +361,7 @@ class MenuServiceTest extends IntegrationTestSupport {
             .hasMessage("메뉴 가격이 포함된 상품 가격보다 높아 표시할 수 없습니다.");
     }
 
-    @DisplayName("메뉴를 숨길 수 있다.")
+    @DisplayName("등록된 메뉴를 숨길 수 있다.")
     @Test
     void hideMenu_Success() {
         // given
@@ -384,7 +384,7 @@ class MenuServiceTest extends IntegrationTestSupport {
         assertThat(hidMenu.isDisplayed()).isFalse();
     }
 
-    @DisplayName("메뉴를 조회할 수 있다.")
+    @DisplayName("등록된 메뉴를 모두 조회할 수 있다.")
     @Test
     void findAllMenu_Success() {
         // given

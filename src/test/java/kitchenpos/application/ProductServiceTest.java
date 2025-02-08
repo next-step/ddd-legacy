@@ -44,6 +44,9 @@ class ProductServiceTest extends IntegrationTestSupport {
     @MockBean
     private PurgomalumClient purgomalumClient;
 
+    /**
+     * 매 테스트 실행 후 DB를 정리하여 일관된 테스트 환경을 유지한다.
+     */
     @AfterEach
     void tearDown() {
         menuRepository.deleteAllInBatch();
