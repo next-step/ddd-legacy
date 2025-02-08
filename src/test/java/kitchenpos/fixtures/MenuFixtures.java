@@ -3,21 +3,12 @@ package kitchenpos.fixtures;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 public class MenuFixtures {
-
-    public static Product createProduct(final String name, final BigDecimal price) {
-        Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setName(name);
-        product.setPrice(price);
-        return product;
-    }
 
     public static MenuProduct createMenuProduct(final UUID productId, final long quantity) {
         MenuProduct menuProduct = new MenuProduct();
@@ -41,7 +32,7 @@ public class MenuFixtures {
         final MenuGroup menuGroup,
         final List<MenuProduct> menuProducts
     ) {
-        Menu menu  = new Menu();
+        Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setName(name);
         menu.setPrice(price);

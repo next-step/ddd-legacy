@@ -14,7 +14,7 @@ import static kitchenpos.fixtures.MenuFixtures.createMenu;
 import static kitchenpos.fixtures.MenuFixtures.createMenuGroup;
 import static kitchenpos.fixtures.MenuFixtures.createMenuProduct;
 import static kitchenpos.fixtures.MenuFixtures.createMenuWithoutMenuGroupId;
-import static kitchenpos.fixtures.MenuFixtures.createProduct;
+import static kitchenpos.fixtures.ProductFixtures.createProduct;
 import kitchenpos.infra.PurgomalumClient;
 import org.assertj.core.api.Assertions;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
