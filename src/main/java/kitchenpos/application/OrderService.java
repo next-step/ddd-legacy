@@ -44,11 +44,11 @@ public class OrderService {
     public Order create(final Order request) {
         final OrderType type = request.getType();
         if (Objects.isNull(type)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("주문 유형이 존재해야 합니다");
         }
         final List<OrderLineItem> orderLineItemRequests = request.getOrderLineItems();
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("주문 항목이 존재해야 합니다.");
         }
         final List<Menu> menus = menuRepository.findAllByIdIn(
             orderLineItemRequests.stream()
@@ -63,16 +63,16 @@ public class OrderService {
             final long quantity = orderLineItemRequest.getQuantity();
             if (type != OrderType.EAT_IN) {
                 if (quantity < 0) {
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException("주문 유형이 `배달` 혹은 `테이크아웃`시 주문 수량이 0보다 커야 합니다");
                 }
             }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                 .orElseThrow(NoSuchElementException::new);
             if (!menu.isDisplayed()) {
-                throw new IllegalStateException();
+                throw new IllegalStateException("메뉴가 표시되어야 주문이 가능합니다.");
             }
             if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("주문항목에 있는 가격이 메뉴에 있는 가격과 동일해야 합니다.");
             }
             final OrderLineItem orderLineItem = new OrderLineItem();
             orderLineItem.setMenu(menu);
@@ -88,7 +88,7 @@ public class OrderService {
         if (type == OrderType.DELIVERY) {
             final String deliveryAddress = request.getDeliveryAddress();
             if (Objects.isNull(deliveryAddress) || deliveryAddress.isEmpty()) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("주문 유형이 `배달`이면 배달에 필요한 주소가 존재해야 한다.");
             }
             order.setDeliveryAddress(deliveryAddress);
         }
@@ -96,7 +96,7 @@ public class OrderService {
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
                 .orElseThrow(NoSuchElementException::new);
             if (!orderTable.isOccupied()) {
-                throw new IllegalStateException();
+                throw new IllegalStateException("주문 유형이 `매장 내 식사`이면 가게 안에 자리가 꽉 차지 않아야 한다.");
             }
             order.setOrderTable(orderTable);
         }
