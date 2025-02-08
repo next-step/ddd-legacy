@@ -50,7 +50,7 @@ class ProductServiceTest extends IntegrationTestSupport {
         productRepository.deleteAllInBatch();
     }
 
-    @DisplayName("상품을 정상적으로 등록할 수 있다.")
+    @DisplayName("상품을 등록할 수 있다.")
     @Test
     void createProduct_Success() {
         // given
@@ -66,7 +66,7 @@ class ProductServiceTest extends IntegrationTestSupport {
         assertThat(savedProduct.getPrice()).isEqualTo(BURGER_PRICE);
     }
 
-    @DisplayName("상품을 등록할 때 가격을 입력하지 않으면 예외가 발생한다.")
+    @DisplayName("상품 가격을 입력하지 않으면 등록할 수 없다.")
     @Test
     void createProduct_WhenPriceIsNull_ThrowsException() {
         // given
@@ -79,7 +79,7 @@ class ProductServiceTest extends IntegrationTestSupport {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품을 등록할 때 가격이 0보다 작으면 예외가 발생한다.")
+    @DisplayName("상품 가격이 0원 미만이면 등록할 수 없다.")
     @Test
     void createProduct_WhenPriceIsNegative_ThrowsException() {
         // given
@@ -93,7 +93,7 @@ class ProductServiceTest extends IntegrationTestSupport {
     }
 
 
-    @DisplayName("상품을 등록할 때 이름이 존재하지 않으면 예외가 발생한다.")
+    @DisplayName("상품 이름이 존재하지 않으면 등록할 수 없다.")
     @Test
     void createProduct_WhenNameIsNull_ThrowsException() {
         // given
@@ -106,7 +106,7 @@ class ProductServiceTest extends IntegrationTestSupport {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품을 등록할 때 이름에 부적절한 단어(비속어)가 포함되면 예외가 발생한다.")
+    @DisplayName("상품 이름에 부적절한 단어(비속어)가 포함되면 등록할 수 없다.")
     @Test
     void createProduct_WhenContainsProfanity_ThrowsException() {
         // given
@@ -124,7 +124,7 @@ class ProductServiceTest extends IntegrationTestSupport {
         verify(purgomalumClient, times(1)).containsProfanity(request.getName()); // API 호출되었는지 검증
     }
 
-    @DisplayName("상품을 등록할 때 이름에 부적절한 단어(비속어)가 포함되지 않으면 정상적으로 등록된다.")
+    @DisplayName("상품을 등록할 때 이름에 부적절한 단어(비속어)가 포함되지 않으면 정상적으로 등록할 수 있다.")
     @Test
     void createProduct_WhenNameIsValid_Success() {
         // given
@@ -165,7 +165,7 @@ class ProductServiceTest extends IntegrationTestSupport {
             .isEqualTo(CHANGE_BURGER_PRICE.stripTrailingZeros()); // stripTrailingZeros()를 사용하면 소수점이 필요 없는 경우 자동으로 정리함
     }
 
-    @DisplayName("상품 가격 변경시 가격이 null 이면 예외가 발생한다.")
+    @DisplayName("상품 가격 변경시 가격이 null 이면 변경할 수 없다.")
     @Test
     void changeProductPrice_WhenPriceIsNull_ThrowsException() {
         // given
@@ -183,7 +183,7 @@ class ProductServiceTest extends IntegrationTestSupport {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품 가격 변경시 가격이 0보다 작으면 예외가 발생한다.")
+    @DisplayName("상품 가격 변경시 가격이 0원 미만이면 변경할 수 없다.")
     @Test
     void changeProductPrice_WhenPriceIsNegative_ThrowsException() {
         // given
@@ -202,7 +202,7 @@ class ProductServiceTest extends IntegrationTestSupport {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("존재하지 않은 상품 ID로 가격을 변경하면 예외가 발생한다.")
+    @DisplayName("존재하지 않은 상품 ID로 가격을 변경할 수 없다.")
     @Test
     void changeProductPrice_WhenProductNotFound_ThrowsException() {
         // given
