@@ -13,6 +13,7 @@ import jakarta.persistence.Transient;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Table(name = "menu")
@@ -103,6 +104,9 @@ public class Menu {
     }
 
     public UUID getMenuGroupId() {
+        if (menuGroup == null) {
+            throw new NoSuchElementException("메뉴는 특정 메뉴 그룹에 속해야 한다.");
+        }
         return menuGroupId;
     }
 

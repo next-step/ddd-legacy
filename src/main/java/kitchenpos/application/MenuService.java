@@ -41,7 +41,7 @@ public class MenuService {
     public Menu create(final Menu request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("가격이 존재하거나 0원 이상이어야 합니다.");
         }
         final MenuGroup menuGroup = menuGroupRepository.findById(request.getMenuGroupId())
             .orElseThrow(NoSuchElementException::new);
@@ -80,7 +80,7 @@ public class MenuService {
         }
         final String name = request.getName();
         if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("올바른 메뉴 이름을 입력해야 합니다.");
         }
         final Menu menu = new Menu();
         menu.setId(UUID.randomUUID());

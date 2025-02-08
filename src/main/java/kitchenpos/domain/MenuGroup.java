@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Table(name = "menu_group")
@@ -34,5 +35,17 @@ public class MenuGroup {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MenuGroup menuGroup)) return false;
+        return Objects.equals(getId(), menuGroup.getId()) && Objects.equals(getName(), menuGroup.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName());
     }
 }

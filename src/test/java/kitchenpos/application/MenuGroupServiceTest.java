@@ -35,14 +35,14 @@ class MenuGroupServiceTest extends IntegrationTestSupport {
     @Test
     void createMenuGroup() {
         // given
-        final MenuGroup request = createMenuGroupRequest("치킨");
-        final MenuGroup response = menuGroupService.create(request);
+        final MenuGroup expected = createMenuGroupRequest("치킨");
+        final MenuGroup actual = menuGroupService.create(expected);
 
         // when & then
-        assertThat(response.getId()).isNotNull();
+        assertThat(actual.getId()).isNotNull();
         assertAll(
-            () -> assertThat(response.getId()).isNotNull(),
-            () -> assertThat(response.getName()).isEqualTo(request.getName())
+            () -> assertThat(actual.getId()).isNotNull(),
+            () -> assertThat(actual.getName()).isEqualTo(expected.getName())
         );
     }
 
@@ -51,8 +51,8 @@ class MenuGroupServiceTest extends IntegrationTestSupport {
     @ParameterizedTest
     void createMenuGroup_WithoutName_ShouldThrowException(final String name) {
         // given & when & then
-        final MenuGroup request = createMenuGroupRequest(name);
-        assertThatThrownBy(() -> menuGroupService.create(request))
+        final MenuGroup expected = createMenuGroupRequest(name);
+        assertThatThrownBy(() -> menuGroupService.create(expected))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("메뉴 그룹의 이름이 존재해야 합니다.");
     }
@@ -61,12 +61,12 @@ class MenuGroupServiceTest extends IntegrationTestSupport {
     @Test
     void findAllMenuGroup() {
         // given
-        final MenuGroup request1 = createMenuGroupRequest("치킨");
-        final MenuGroup request2 = createMenuGroupRequest("피자");
+        final MenuGroup expected1 = createMenuGroupRequest("치킨");
+        final MenuGroup expected2 = createMenuGroupRequest("피자");
 
         // when
-        menuGroupService.create(request1);
-        menuGroupService.create(request2);
+        menuGroupService.create(expected1);
+        menuGroupService.create(expected2);
         final List<MenuGroup> response = menuGroupService.findAll();
 
         // then
