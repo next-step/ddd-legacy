@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import io.micrometer.common.util.StringUtils;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -79,7 +80,7 @@ public class MenuService {
             throw new IllegalArgumentException();
         }
         final String name = request.getName();
-        if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
+        if (StringUtils.isBlank(name) || purgomalumClient.containsProfanity(name)) {
             throw new IllegalArgumentException("올바른 메뉴 이름을 입력해야 합니다.");
         }
         final Menu menu = new Menu();

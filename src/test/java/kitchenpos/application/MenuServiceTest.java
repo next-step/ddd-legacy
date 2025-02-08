@@ -20,6 +20,9 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -141,9 +144,11 @@ class MenuServiceTest extends IntegrationTestSupport {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 이름이 없으면 등록할 수 없다.")
-    @Test
-    void createMenu_WhenMenuNameIsNull_ThrowsException() {
+    @DisplayName("메뉴 이름이 null이거나 빈 값이면 등록할 수 없다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "   "})
+    void createMenu_WhenMenuNameIsNull_ThrowsException(String invalidMenuName) {
         // given
         Product product = createProduct("김치찌개", valueOf(8000));
         productRepository.save(product);
@@ -155,7 +160,7 @@ class MenuServiceTest extends IntegrationTestSupport {
         menuGroupRepository.save(menuGroup);
 
         // when
-        Menu expected = MenuFixtures.createMenu(null, valueOf(8000), true, menuGroup, menuProducts);
+        Menu expected = MenuFixtures.createMenu(invalidMenuName, valueOf(8000), true, menuGroup, menuProducts);
 
         // then
         Assertions.assertThatThrownBy(() -> menuService.create(expected))
