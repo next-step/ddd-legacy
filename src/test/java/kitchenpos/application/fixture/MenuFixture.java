@@ -1,0 +1,41 @@
+package kitchenpos.application.fixture;
+
+import io.micrometer.common.util.StringUtils;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuProduct;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+
+public class MenuFixture {
+    public static final Menu DEFAULT_MENU = setMenu(
+            MenuGroupFixture.DEFAULT_MENUGROUP,
+            "기본메뉴",
+            "10000",
+            MenuProductFixture.DEFAULT_MENU_PRODUCTS
+    );
+
+    public static Menu setMenu(MenuGroup menuGroup, String name, String price, List<MenuProduct> products) {
+        Menu menu = new Menu();
+
+        menu.setMenuGroup(menuGroup);
+        if(menuGroup != null){
+            menu.setMenuGroupId(menuGroup.getId());
+        }
+        menu.setName(name);
+        menu.setId(UUID.randomUUID());
+        menu.setDisplayed(true);
+        if(!StringUtils.isBlank(price)){
+            menu.setPrice(BigDecimal.valueOf(Double.parseDouble(price)));
+        }
+        menu.setMenuProducts(products);
+
+        return menu;
+    }
+
+    public static Menu create(String name, String price){
+        return setMenu(MenuGroupFixture.DEFAULT_MENUGROUP, name, price, MenuProductFixture.DEFAULT_MENU_PRODUCTS);
+    }
+}

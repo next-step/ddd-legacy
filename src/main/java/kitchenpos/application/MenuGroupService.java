@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import io.micrometer.common.util.StringUtils;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class MenuGroupService {
     @Transactional
     public MenuGroup create(final MenuGroup request) {
         final String name = request.getName();
-        if (Objects.isNull(name) || name.isEmpty()) {
+        if (StringUtils.isBlank(name)) {
             throw new IllegalArgumentException();
         }
         final MenuGroup menuGroup = new MenuGroup();
