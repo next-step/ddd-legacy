@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.infra.FakePurgomalumClient;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class MenuServiceTest {
     private final MenuRepository menuRepository = mock(MenuRepository.class);
     private final MenuGroupRepository menuGroupRepository = mock(MenuGroupRepository.class);
     private final ProductRepository productRepository = mock(ProductRepository.class);
-    private final PurgomalumClient purgomalumClient = mock(PurgomalumClient.class);
+    private final PurgomalumClient purgomalumClient = new FakePurgomalumClient();
     private final MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
 
     @DisplayName("메뉴를 등록할 수 있다.")
@@ -122,13 +123,12 @@ class MenuServiceTest {
         Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
         MenuProduct menuProduct = makeTestMenuProduct(product);
         MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
-        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(5000), menuGroup, menuProduct);
+        Menu menu = makeTestMenu("fuck", BigDecimal.valueOf(5000), menuGroup, menuProduct);
 
         // when
         when(menuGroupRepository.findById(any(UUID.class))).thenReturn(Optional.of(menuGroup));
         when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(product));
         when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
-        when(purgomalumClient.containsProfanity(any(String.class))).thenReturn(true);
 
         // then
         assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
