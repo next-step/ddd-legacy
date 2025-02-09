@@ -9,18 +9,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 
+@UnitTest
 @DisplayName("메뉴 그룹 서비스 테스트")
 class MenuGroupServiceTest {
 
@@ -56,7 +51,7 @@ class MenuGroupServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 이름 미지정 이면 IllegalArgumentException 발생")
+        @DisplayName("실패: 이름 미지정 이면 MenuGroupNameException 발생")
         void createMenuGroupWithoutNameThrowsIllegalArgumentException() {
             // given
             MenuGroup request = MenuGroupFixture.메뉴그룹_Request(null);
@@ -74,19 +69,24 @@ class MenuGroupServiceTest {
         @DisplayName("성공: 메뉴 그룹이 존재하면 모두 조회")
         void findAllMenuGroups() {
             // given
-            List<MenuGroup> menuGroups = List.of(
-                    MenuGroupFixture.추천_메뉴그룹_Request(),
-                    MenuGroupFixture.신_메뉴그룹()
-            );
+            int expectedSize = 2;
 
-            int expectedSize = menuGroups.size();
+            MenuGroup request1 = MenuGroupFixture.메뉴그룹_Request("추천 메뉴 그룹");
+            MenuGroup request2 = MenuGroupFixture.메뉴그룹_Request("신 메뉴 그룹");
+
+            menuGroupRepository.save(request1);
+            menuGroupRepository.save(request2);
 
             // when
             List<MenuGroup> result = sut.findAll();
 
             // then
-            assertThat(result).hasSize(expectedSize);
-            verify(menuGroupRepository).findAll();
+            assertAll(
+                    () -> assertThat(result).isNotNull(),
+                    () -> assertThat(result).hasSize(expectedSize),
+                    () -> assertThat(result).extracting(MenuGroup::getName)
+                            .containsExactlyInAnyOrder(request1.getName(), request2.getName())
+            );
         }
     }
 }

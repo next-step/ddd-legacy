@@ -1,6 +1,5 @@
 package kitchenpos;
 
-import kitchenpos.infra.IdGenerator;
 import helper.PriceGenerator;
 import helper.SequenceGenerator;
 import kitchenpos.domain.Menu;
@@ -12,40 +11,36 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MenuFixture {
 
-    private static final IdGenerator menuIdGenerator = UUID::randomUUID;
-    private static final PriceGenerator priceGenerator = BigDecimal::new;
+    private static final PriceGenerator priceGenerator = new PriceGenerator();
     private static final SequenceGenerator sequenceGenerator = () -> ThreadLocalRandom.current().nextLong();
 
-    public static Menu 양념_치킨_메뉴() {
+    public static Menu 양념_치킨_메뉴_Request() {
         Menu menu = new Menu();
-        menu.setId(menuIdGenerator.ramdom());
         menu.setName("양념 치킨 메뉴");
         menu.setPrice(priceGenerator.of(17000));
         return menu;
     }
 
-    public static Menu 후라이드_치킨_메뉴() {
+    public static Menu 후라이드_치킨_메뉴_Request() {
         Menu menu = new Menu();
-        menu.setId(menuIdGenerator.ramdom());
         menu.setName("후라이드 치킨 메뉴");
         menu.setPrice(priceGenerator.of(16000));
         return menu;
     }
 
-    public static Menu 후라이드_치킨_메뉴(MenuGroup menuGroup) {
-        Menu menu = 후라이드_치킨_메뉴();
+    public static Menu 후라이드_치킨_메뉴_Request(MenuGroup menuGroup) {
+        Menu menu = 후라이드_치킨_메뉴_Request();
         menu.setMenuGroup(menuGroup);
         menu.setMenuGroupId(menuGroup.getId());
         return menu;
     }
 
-    public static Menu 후라이드_치킨_메뉴(MenuGroup menuGroup, Product... products) {
-        Menu menu = 후라이드_치킨_메뉴(menuGroup);
+    public static Menu 후라이드_치킨_메뉴_Request(MenuGroup menuGroup, Product... products) {
+        Menu menu = 후라이드_치킨_메뉴_Request(menuGroup);
         addMenuProducts(menu, products);
         return menu;
     }
@@ -78,8 +73,8 @@ public class MenuFixture {
         return clone;
     }
 
-    public static Menu 구성_상품_가격_총합과_동일한_메뉴(MenuGroup menuGroup, Product... products) {
-        Menu menu = 후라이드_치킨_메뉴(menuGroup, products);
+    public static Menu 구성_상품_가격_총합과_동일한_메뉴_Request(MenuGroup menuGroup, Product... products) {
+        Menu menu = 후라이드_치킨_메뉴_Request(menuGroup, products);
         BigDecimal sum = Arrays.stream(products)
                 .map(p -> p.getPrice().multiply(BigDecimal.valueOf(1L)))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -87,8 +82,8 @@ public class MenuFixture {
         return menu;
     }
 
-    public static Menu 구성_상품_가격_총합을_초과한_메뉴(MenuGroup menuGroup, Product... products) {
-        Menu menu = 후라이드_치킨_메뉴(menuGroup, products);
+    public static Menu 구성_상품_가격_총합을_초과한_메뉴_Request(MenuGroup menuGroup, Product... products) {
+        Menu menu = 후라이드_치킨_메뉴_Request(menuGroup, products);
         BigDecimal sum = Arrays.stream(products)
                 .map(p -> p.getPrice().multiply(BigDecimal.valueOf(1L)))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

@@ -1,5 +1,7 @@
 package kitchenpos.application;
 
+import config.UnitTest;
+import helper.PriceGenerator;
 import kitchenpos.MenuFixture;
 import kitchenpos.MenuGroupFixture;
 import kitchenpos.ProductFixture;
@@ -18,9 +20,8 @@ import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 
+@UnitTest
 @DisplayName("상품 서비스 테스트")
 class ProductServiceTest {
 
@@ -62,18 +63,18 @@ class ProductServiceTest {
         }
 
         @ParameterizedTest
-        @DisplayName("실패: 가격이 음수이면 IllegalArgumentException 발생")
+        @DisplayName("실패: 가격이 음수이면 ProductPriceException 발생")
         @ValueSource(longs = {-1, -1000, -10000})
         void createProductFailWhenPriceIsNegative(long price) {
             // given
-            Product request = ProductFixture.후라이드_치킨_상품_Request(BigDecimal.valueOf(price));
+            Product request = ProductFixture.후라이드_치킨_상품_Request(PriceGenerator.of(price));
 
             // when & then
             assertThrows(ProductPriceException.class, () -> sut.create(request));
         }
 
         @Test
-        @DisplayName("실패: 가격이 null이면 IllegalArgumentException 발생")
+        @DisplayName("실패: 가격이 null이면 ProductPriceException 발생")
         void createProductFailWhenPriceIsNull() {
             // given
             Product request = ProductFixture.후라이드_치킨_상품_Request(null);
@@ -83,7 +84,7 @@ class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 상품명이 null이면 IllegalArgumentException 발생")
+        @DisplayName("실패: 상품명이 null이면 ProductNameException 발생")
         void createProductFailWhenNameIsNull() {
             // given
             Product request = ProductFixture.후라이드_치킨_상품_Request();
@@ -94,7 +95,7 @@ class ProductServiceTest {
         }
 
         @ParameterizedTest
-        @DisplayName("실패: 상품명에 비속어가 포함되어 있으면 IllegalArgumentException 발생")
+        @DisplayName("실패: 상품명에 비속어가 포함되어 있으면 ProductNameException 발생")
         @ValueSource(strings = {"욕설1", "욕설2", "비속어1", "비속어2"})
         void createProductFailWhenNameContainsProfanity(String profanity) {
             // given
@@ -115,7 +116,7 @@ class ProductServiceTest {
         @ValueSource(longs = {1000, 10000, 100000})
         void changePriceSuccess(long price) {
             // given
-            BigDecimal changedPrice = BigDecimal.valueOf(price);
+            BigDecimal changedPrice = PriceGenerator.of(price);
             Product saved = productRepository.save(ProductFixture.후라이드_치킨_상품_Request());
             Product request = ProductFixture.가격만_변경된_상품(saved, changedPrice);
 
@@ -131,19 +132,19 @@ class ProductServiceTest {
         }
 
         @ParameterizedTest
-        @DisplayName("실패: 변경 가격이 음수이면 IllegalArgumentException 발생")
+        @DisplayName("실패: 변경 가격이 음수이면 ProductPriceException 발생")
         @ValueSource(longs = {-1, -1000, -10000})
         void changePriceFailWhenNegative(long price) {
             // given
             Product saved = productRepository.save(ProductFixture.후라이드_치킨_상품_Request());
-            Product request = ProductFixture.후라이드_치킨_상품_Request(BigDecimal.valueOf(price));
+            Product request = ProductFixture.후라이드_치킨_상품_Request(PriceGenerator.of(price));
 
             // when & then
             assertThrows(ProductPriceException.class, () -> sut.changePrice(saved.getId(), request));
         }
 
         @Test
-        @DisplayName("실패: 변경 가격이 null이면 IllegalArgumentException 발생")
+        @DisplayName("실패: 변경 가격이 null이면 ProductPriceException 발생")
         void changePriceFailWhenNull() {
             // given
             Product saved = productRepository.save(ProductFixture.후라이드_치킨_상품_Request());
@@ -154,7 +155,7 @@ class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 존재하지 않는 상품 ID일 경우 NoSuchElementException 발생")
+        @DisplayName("실패: 존재하지 않는 상품 ID일 경우 ProductNotFoundException 발생")
         void changePriceFailWhenProductNotFound() {
             // given
             Product request = ProductFixture.후라이드_치킨_상품_Request();
@@ -168,14 +169,15 @@ class ProductServiceTest {
         @DisplayName("특수 케이스: 가격 변경 후 메뉴 가격이 더 크면 메뉴가 숨김 처리된다.")
         void changePriceHidesMenuWhenInvalid() {
             // given
-            BigDecimal lowerPrice = new BigDecimal(10000);
-            BigDecimal higherPrice = new BigDecimal(20000);
+            long price = 10000;
+            BigDecimal lowerPrice = PriceGenerator.smallerThan(price);
+            BigDecimal higherPrice = PriceGenerator.biggerThan(price);
 
             MenuGroup recommendedMenuGroup = MenuGroupFixture.추천_메뉴그룹_Request();
             Product savedProduct = productRepository.save(ProductFixture.후라이드_치킨_상품_Request());
             Product requestProduct = ProductFixture.가격만_변경된_상품(savedProduct, lowerPrice);
 
-            Menu menuBeforePriceChange = MenuFixture.후라이드_치킨_메뉴(recommendedMenuGroup, savedProduct);
+            Menu menuBeforePriceChange = MenuFixture.후라이드_치킨_메뉴_Request(recommendedMenuGroup, savedProduct);
             menuBeforePriceChange.setPrice(higherPrice); // 메뉴 가격이 상품 가격 합보다 높게 설정됨
             menuBeforePriceChange.setDisplayed(true);
             Menu savedMenu = menuRepository.save(menuBeforePriceChange);
