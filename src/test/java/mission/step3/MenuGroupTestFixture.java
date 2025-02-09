@@ -6,6 +6,8 @@ import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,9 +21,24 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+public class MenuGroupTestFixture {
+    public static MenuGroup createMenuGroup(String name) {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(UUID.randomUUID());
+        menuGroup.setName(name);
+        return menuGroup;
+    }
+
+    public static MenuGroup createRequestMenuGroup(String name) {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setName(name);
+        return menuGroup;
+    }
+}
+
+
 @ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
-
     @Mock
     private MenuGroupRepository menuGroupRepository;
 
@@ -32,12 +49,8 @@ class MenuGroupServiceTest {
     @DisplayName("메뉴 그룹을 생성한다")
     void create() {
         // given
-        MenuGroup request = new MenuGroup();
-        request.setName("음료");
-
-        MenuGroup expected = new MenuGroup();
-        expected.setId(UUID.randomUUID());
-        expected.setName("음료");
+        MenuGroup request = MenuGroupTestFixture.createRequestMenuGroup("음료");
+        MenuGroup expected = MenuGroupTestFixture.createMenuGroup("음료");
 
         given(menuGroupRepository.save(any(MenuGroup.class)))
                 .willReturn(expected);
@@ -50,12 +63,12 @@ class MenuGroupServiceTest {
         verify(menuGroupRepository).save(any(MenuGroup.class));
     }
 
-    @Test
-    @DisplayName("메뉴 그룹의 이름이 null이면 예외가 발생한다")
-    void createWithNullName() {
+    @ParameterizedTest
+    @DisplayName("메뉴 그룹의 이름이 null 이거나 비어있으면 예외가 발생한다")
+    @NullAndEmptySource
+    void createWithInvalidName(String invalidName) {
         // given
-        MenuGroup request = new MenuGroup();
-        request.setName(null);
+        MenuGroup request = MenuGroupTestFixture.createRequestMenuGroup(invalidName);
 
         // when & then
         assertThatThrownBy(() -> menuGroupService.create(request))
@@ -66,8 +79,7 @@ class MenuGroupServiceTest {
     @DisplayName("메뉴 그룹의 이름이 비어있으면 예외가 발생한다")
     void createWithEmptyName() {
         // given
-        MenuGroup request = new MenuGroup();
-        request.setName("");
+        MenuGroup request = MenuGroupTestFixture.createRequestMenuGroup("");
 
         // when & then
         assertThatThrownBy(() -> menuGroupService.create(request))
@@ -78,16 +90,11 @@ class MenuGroupServiceTest {
     @DisplayName("모든 메뉴 그룹을 조회한다")
     void findAll() {
         // given
-        MenuGroup group1 = new MenuGroup();
-        group1.setId(UUID.randomUUID());
-        group1.setName("음료");
-
-        MenuGroup group2 = new MenuGroup();
-        group2.setId(UUID.randomUUID());
-        group2.setName("메인");
+        MenuGroup beverageGroup = MenuGroupTestFixture.createMenuGroup("음료");
+        MenuGroup mainGroup = MenuGroupTestFixture.createMenuGroup("메인");
 
         given(menuGroupRepository.findAll())
-                .willReturn(List.of(group1, group2));
+                .willReturn(List.of(beverageGroup, mainGroup));
 
         // when
         List<MenuGroup> menuGroups = menuGroupService.findAll();
