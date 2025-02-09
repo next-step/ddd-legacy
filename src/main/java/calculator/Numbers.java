@@ -2,19 +2,19 @@ package calculator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Numbers {
 
-    private List<Integer> numbers = new ArrayList<>();
+    private final List<Number> numbers;
 
     public Numbers() {
+        this.numbers = new ArrayList<>();
     }
 
-    public Numbers(List<String> numbers) {
-        this.numbers = numbers.stream()
+    public Numbers(List<String> stringNumbers) {
+        this.numbers = stringNumbers.stream()
                 .map(Numbers::convertNumber)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public boolean isNullOrEmpty() {
@@ -22,23 +22,23 @@ public class Numbers {
     }
 
     public boolean hasNegativeNumber() {
-        return numbers.stream().anyMatch(n -> n < 0);
+        return numbers.stream().anyMatch(n -> n.intValue() < 0);
     }
 
     public int sum() {
-        return numbers.stream().mapToInt(Integer::intValue).sum();
+        return numbers.stream().mapToInt(Number::intValue).sum();
     }
 
     /* convertNumber : String > Integer 변환 */
-    public static int convertNumber(String input) {
+    public static Number convertNumber(String input) {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            throw new RuntimeException("non-numeric found : " + input);
+            throw new NumberFormatException("non-numeric found : " + input);
         }
     }
 
-    public List<Integer> getNumbers() {
+    public List<Number> getNumbers() {
         return numbers;
     }
 }

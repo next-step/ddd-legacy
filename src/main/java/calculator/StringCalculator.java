@@ -6,8 +6,6 @@ import java.util.List;
 
 public class StringCalculator {
 
-    private Integer result = 0;
-
     /* add : 문자열 덧셈 계산 */
     public Integer add(String input) {
 
@@ -21,7 +19,7 @@ public class StringCalculator {
         // 2. 숫자 - 나눈 문자열을 숫자로 변환하기
         Numbers numbers = new Numbers(splits);
         if (numbers.isNullOrEmpty()) {
-            throw new RuntimeException("invalid numbers : " + numbers.getNumbers());
+            throw new IllegalArgumentException("invalid numbers : " + numbers.getNumbers());
         }
         if (numbers.hasNegativeNumber()) {
             throw new NegativeNumberException("negative numbers found : " + numbers.getNumbers());
