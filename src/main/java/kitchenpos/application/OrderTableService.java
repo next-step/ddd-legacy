@@ -26,7 +26,7 @@ public class OrderTableService {
     public OrderTable create(final OrderTable request) {
         final String name = request.getName();
         if (Objects.isNull(name) || name.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new OrderTableNameException();
         }
         final OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
@@ -39,7 +39,7 @@ public class OrderTableService {
     @Transactional
     public OrderTable sit(final UUID orderTableId) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(OrderTableNotFoundException::new);
         orderTable.setOccupied(true);
         return orderTable;
     }

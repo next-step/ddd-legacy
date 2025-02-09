@@ -1,7 +1,8 @@
 package kitchenpos.application;
 
-import static org.junit.jupiter.api.Assertions.*;
+import config.UnitTest;
 
+@UnitTest
 class OrderServiceTest {
 
 }

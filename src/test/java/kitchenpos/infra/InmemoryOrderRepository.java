@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class InmemoryOrderRepository implements OrderRepository {
 
+    private final IdGenerator idGenerator = UUID::randomUUID;
     private final Map<UUID, Order> store = new ConcurrentHashMap<>();
 
     @Override
@@ -22,7 +23,7 @@ public class InmemoryOrderRepository implements OrderRepository {
     @Override
     public Order save(Order order) {
         if (order.getId() == null) {
-            order.setId(UUID.randomUUID());
+            order.setId(idGenerator.ramdom());
         }
         store.put(order.getId(), order);
         return order;
