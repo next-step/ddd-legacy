@@ -63,7 +63,7 @@ class MenuServiceTest {
         Product product = makeTestProduct("짜장면", BigDecimal.valueOf(5000));
         MenuProduct menuProduct = makeTestMenuProduct(product);
         MenuGroup menuGroup = makeTestMenuGroup("추천메뉴");
-        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(-5000), menuGroup, menuProduct);
+        Menu menu = makeTestMenu("중식", BigDecimal.valueOf(-1), menuGroup, menuProduct);
 
         // then
         assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
