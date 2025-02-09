@@ -247,7 +247,7 @@ class OrderServiceTest {
         order.setOrderLineItems(List.of(item));
 
         if (type == OrderType.DELIVERY) {
-            order.setDeliveryAddress("Test Address");
+            order.setDeliveryAddress("서울시 강남구 개포로 111");
         }
 
         return order;

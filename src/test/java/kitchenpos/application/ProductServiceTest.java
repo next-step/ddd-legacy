@@ -5,6 +5,7 @@ import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -46,12 +47,13 @@ class ProductServiceTest {
                 () -> productService.create(request));
     }
 
-    @Test
-    void createWithNegativePrice() {
+    @ParameterizedTest
+    @ValueSource(ints = {-1000, -1})
+    void createWithNegativePrice(int price) {
         // given
         Product request = new Product();
         request.setName("양념치킨");
-        request.setPrice(BigDecimal.valueOf(-1000));
+        request.setPrice(BigDecimal.valueOf(price));
 
         // when & then
         assertThrows(IllegalArgumentException.class,

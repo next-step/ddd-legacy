@@ -3,6 +3,8 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -38,7 +40,7 @@ class MenuServiceTest {
     void createWithNegativePrice() {
         //given
         Menu menu = new Menu();
-        menu.setName("Test");
+        menu.setName("간장치킨");
         menu.setPrice(BigDecimal.valueOf(-1));
 
         //when
@@ -49,7 +51,7 @@ class MenuServiceTest {
     void createWithNoMenuGroup() {
         //given
         Menu menu = new Menu();
-        menu.setName("Test");
+        menu.setName("간장치킨");
         menu.setPrice(BigDecimal.valueOf(100));
         menu.setMenuGroupId(UUID.randomUUID());
 
@@ -61,13 +63,13 @@ class MenuServiceTest {
     void createWithNonMatchingProducts() {
         //given
         Menu menu = new Menu();
-        menu.setName("Test");
+        menu.setName("간장치킨");
         menu.setPrice(BigDecimal.valueOf(100));
         UUID menuGroupId = UUID.randomUUID();
         menu.setMenuGroupId(menuGroupId);
 
         MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName("Test");
+        menuGroup.setName("간장치킨");
         menuGroup.setId(menuGroupId);
         menuGroupRepository.save(menuGroup);
 
@@ -86,13 +88,13 @@ class MenuServiceTest {
     void createWithNegativeQuantity() {
         //given
         Menu menu = new Menu();
-        menu.setName("Test");
+        menu.setName("간장치킨");
         menu.setPrice(BigDecimal.valueOf(100));
         UUID menuGroupId = UUID.randomUUID();
         menu.setMenuGroupId(menuGroupId);
 
         MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName("Test");
+        menuGroup.setName("한마리 메뉴");
         menuGroup.setId(menuGroupId);
         menuGroupRepository.save(menuGroup);
 
@@ -215,12 +217,13 @@ class MenuServiceTest {
         assertEquals(1, created.getMenuProducts().size());
     }
 
-    @Test
-    void changePriceWithNegativePrice() {
+    @ParameterizedTest
+    @ValueSource(ints = {-1000, -1})
+    void changePriceWithNegativePrice(int price) {
         //given
         UUID menuId = UUID.randomUUID();
         Menu request = new Menu();
-        request.setPrice(BigDecimal.valueOf(-1));
+        request.setPrice(BigDecimal.valueOf(price));
 
         //when
         assertThrows(IllegalArgumentException.class,
