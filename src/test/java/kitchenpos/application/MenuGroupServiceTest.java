@@ -25,7 +25,7 @@ class MenuGroupServiceTest {
 
     @AfterEach
     void tearDown() {
-        menuGroupRepository.deleteAll();
+        menuGroupRepository.deleteAllInBatch();
     }
 
     @Test
