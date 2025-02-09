@@ -45,12 +45,12 @@ public class OrderTableTest {
 
     @BeforeEach
     void setUp() {
-        orderRepository = spy(new InMemoryOrderRepository());
+        orderRepository = new InMemoryOrderRepository();
         orderTableRepository = new InMemoryOrderTableRepository();
         menuRepository = new InMemoryMenuRepository();
         menuGroupRepository = new InMemoryMenuGroupRepository();
         fakeKitchenridersClient = new FakeKitchenridersClient();
-        orderService = spy(new OrderService(orderRepository, menuRepository, orderTableRepository, fakeKitchenridersClient));
+        orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, fakeKitchenridersClient);
         orderTableService = new OrderTableService(orderTableRepository, orderRepository);
     }
 

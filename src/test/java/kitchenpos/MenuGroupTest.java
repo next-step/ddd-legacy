@@ -2,13 +2,14 @@ package kitchenpos;
 
 import kitchenpos.application.InMemoryMenuGroupRepository;
 import kitchenpos.application.MenuGroupService;
-import kitchenpos.domain.*;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.test.context.jdbc.Sql;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @DisplayName(value = " Menu 테스트")
 public class MenuGroupTest {
@@ -29,8 +31,8 @@ public class MenuGroupTest {
 
     @BeforeEach
     void setUp() {
-        menuGroupRepository = spy(new InMemoryMenuGroupRepository());
-        menuGroupService = spy(new MenuGroupService(menuGroupRepository));
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        menuGroupService = new MenuGroupService(menuGroupRepository);
     }
 
     @DisplayName(value = "메뉴 그룹등록 기능")
@@ -41,18 +43,19 @@ public class MenuGroupTest {
         void createMenu() {
             MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
             MenuGroup responseMenuGroup = menuGroupService.create(menuGroup);
-            //행위검증
-            verify(menuGroupRepository, times(1)).save(Mockito.any());
+
             assertAll(
                     () -> assertThat(responseMenuGroup.getId()).isNotNull(),
-                    () -> assertThat(responseMenuGroup.getName()).isEqualTo(menuGroup.getName())
+                    () -> assertThat(responseMenuGroup.getName()).isEqualTo(menuGroup.getName()),
+                    () -> assertThat(menuGroupRepository.findById(responseMenuGroup.getId())).isNotNull()
             );
         }
 
         @DisplayName(value = "메뉴그룹의 이름은 없으면 안됩니다.")
-        @Test
-        void invalidMenuAmount() {
-            MenuGroup menuGroup = createMenuGroup("", 후라이드치킨_MENU_GROUP_UUID);
+        @ParameterizedTest
+        @NullAndEmptySource
+        void invalidMenuAmount(String menuGroupName) {
+            MenuGroup menuGroup = createMenuGroup(menuGroupName, 후라이드치킨_MENU_GROUP_UUID);
             ThrowingCallable throwingCallable = () -> menuGroupService.create(menuGroup);
             assertThatIllegalArgumentException().isThrownBy(throwingCallable);
         }
@@ -67,9 +70,10 @@ public class MenuGroupTest {
         void createMenu() {
             MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
             menuGroupService.create(menuGroup);
-           List<MenuGroup> responseMenuGroups = menuGroupService.findAll();
-            verify(menuGroupRepository, times(1)).findAll();
+            List<MenuGroup> responseMenuGroups = menuGroupService.findAll();
+
             assertThat(responseMenuGroups.size()).isEqualTo(1);
+
 
         }
     }

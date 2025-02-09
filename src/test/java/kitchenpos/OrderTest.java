@@ -62,12 +62,12 @@ public class OrderTest {
 
     @BeforeEach
     void setUp() {
-        orderRepository = spy(new InMemoryOrderRepository());
+        orderRepository = new InMemoryOrderRepository();
         orderTableRepository = new InMemoryOrderTableRepository();
         menuRepository = new InMemoryMenuRepository();
         menuGroupRepository = new InMemoryMenuGroupRepository();
         fakeKitchenridersClient = new FakeKitchenridersClient();
-        orderService = spy(new OrderService(orderRepository,menuRepository,orderTableRepository,fakeKitchenridersClient));
+        orderService = new OrderService(orderRepository,menuRepository,orderTableRepository,fakeKitchenridersClient);
     }
 
     @DisplayName(value = "주문 추가 기능")
@@ -82,12 +82,9 @@ public class OrderTest {
         @DisplayName(value = "주문 추가기능 & 주문 검증이 끝나면 주문대기(WAITING) 상태가 됩니다")
         @Test
         void validateStateWaiting() {
-            Mockito.clearInvocations(orderService, orderRepository);
             menuRepository.save(createMenu(후라이드치킨_DEFAULT_PRICE, true, createMenuProduct()));
             Order orderRequest = createOrder();
             Order orderResponse = orderService.create(orderRequest);
-            verify(orderService, times(1)).create(Mockito.any());
-            verify(orderRepository, times(1)).save(Mockito.any());
 
             assertAll(
                     () -> assertThat(orderResponse).isNotNull(),
@@ -96,7 +93,9 @@ public class OrderTest {
                     () -> assertThat(orderResponse.getType()).isEqualTo(orderRequest.getType()),
                     () -> assertThat(orderResponse.getOrderDateTime()).isNotNull(),
                     () -> assertThat(orderResponse.getOrderLineItems()).hasSize(1),
-                    () -> assertThat(orderResponse.getStatus()).isEqualTo(WAITING)
+                    () -> assertThat(orderResponse.getStatus()).isEqualTo(WAITING),
+                    () -> assertThat(orderRepository.findById(orderResponse.getId()).get().getStatus()).isEqualTo(WAITING)
+
             );
         }
 
@@ -179,19 +178,17 @@ public class OrderTest {
             @DisplayName(value = "시작 주문의 상태가 주문대기(WAITING)이고, 주문 수락(ACCEPTED) 상태가 되어야 합니다")
             @Test
             void validateStateWaiting() {
-                Mockito.clearInvocations(orderService, orderRepository);
                 var menu = createMenu(후라이드치킨_DEFAULT_PRICE, true, createMenuProduct());
                 menuRepository.save(menu);
                 Order orderRequest = createOrder(createOrderLineItem(menu));
                 orderRepository.save(orderRequest);
                 Order orderResponse = orderService.accept(orderRequest.getId());
-                verify(orderService,times(1)).accept(Mockito.any());
-                verify(orderRepository,times(1)).findById(Mockito.any());
 
                 assertAll(
                         () -> assertThat(orderResponse).isNotNull(),
                         () -> assertThat(orderResponse.getId()).isNotNull(),
-                        () -> assertThat(orderResponse.getStatus()).isEqualTo(ACCEPTED)
+                        () -> assertThat(orderResponse.getStatus()).isEqualTo(ACCEPTED),
+                        () -> assertThat(orderRepository.findById(orderResponse.getId()).get().getStatus()).isEqualTo(ACCEPTED)
                 );
             }
     }

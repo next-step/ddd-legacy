@@ -47,11 +47,11 @@ public class ProductTest {
 
     @BeforeEach
     void setUp() {
-        productRepository = spy(new InMemoryProductRepository());
-        menuGroupRepository = spy(new InMemoryMenuGroupRepository());
-        menuRepository = spy(new InMemoryMenuRepository());
-        purgomalumClient = spy(new FakeDefaultPurgomalumClient());
-        productService = spy(new ProductService(productRepository, menuRepository, purgomalumClient));
+        productRepository = new InMemoryProductRepository();
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        menuRepository = new InMemoryMenuRepository();
+        purgomalumClient = new FakeDefaultPurgomalumClient();
+        productService = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
     @DisplayName(value = "상품 등록 기능")
@@ -84,11 +84,10 @@ public class ProductTest {
             //상품명에 빈값이나 비속어가 들어간 경우
             Product product = ProductTest.createProduct(후라이드치킨_PRODUCT_UUID, TEST_PRODUCT_NAME, BigDecimal.ONE);
             //에러처리
-            productService.create(product);
+            var responseProduct = productService.create(product);
 
-            //행위검증
-            verify(productRepository, times(1)).save(ArgumentCaptor.forClass(Product.class).capture());
-        }
+            assertThat(productRepository.findById(responseProduct.getId())).isNotNull();
+            }
 
     }
 
@@ -146,7 +145,6 @@ public class ProductTest {
             Product product = createProduct();
             productRepository.save(product);
             List<Product> products = productService.findAll();
-            verify(productRepository, times(1)).findAll();
             assertThat(products.size()).isEqualTo(1);
         }
     }

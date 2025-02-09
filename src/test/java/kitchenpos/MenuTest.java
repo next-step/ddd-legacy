@@ -43,9 +43,9 @@ public class MenuTest {
 
     @BeforeEach
     void initialize() {
-        productRepository = spy(new InMemoryProductRepository());
-        menuGroupRepository = spy(new InMemoryMenuGroupRepository());
-        menuRepository = spy(new InMemoryMenuRepository());
+        productRepository = new InMemoryProductRepository();
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        menuRepository = new InMemoryMenuRepository();
         purgomalumClient = new FakeDefaultPurgomalumClient();
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
     }
@@ -62,21 +62,13 @@ public class MenuTest {
         @DisplayName(value = "메뉴를 등록할 수 있다.")
         @Test
         void createMenuTest() {
-            Mockito.clearInvocations(menuRepository, productRepository);
             Product product = createProduct();
             productRepository.save(product);
             MenuGroup menuGroup = createMenuGroup();
             menuGroupRepository.save(menuGroup);
-            MenuProduct menuProduct = createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID);
             Menu menuRequest = createMenu();
             Menu menu = menuService.create(menuRequest);
             //행위검증
-            verify(menuRepository, times(1)).save(ArgumentCaptor.forClass(Menu.class).capture());
-            verify(productRepository, times(1)).findAllByIdIn(Mockito.anyList());
-            verify(productRepository, times(1)).findById(Mockito.any());
-            verify(menuGroupRepository, times(1)).findById(Mockito.any());
-
-
             assertAll(
                     () -> assertThat(menu.getId()).isNotNull(),
                     () -> assertThat(menu.getMenuGroup().getId()).isEqualTo(menuRequest.getMenuGroupId()),
@@ -157,9 +149,10 @@ public class MenuTest {
             menuRepository.save( createMenu());
             Menu menuRequest = createMenu(후라이드치킨_CHANGE_PRICE);
             Menu menu = menuService.changePrice(후라이드치킨_MENU_UUID, menuRequest);
-            //행위검증
-            verify(menuRepository,times(1)).findById(Mockito.any());
+
             assertThat(menu.getPrice()).isEqualTo(menuRequest.getPrice());
+            assertThat(menuRepository.findById(menuRequest.getId()).get().getPrice()).isEqualTo(menuRequest.getPrice());
+
         }
 
         @DisplayName(value = "메뉴의 가격은 0원 이상이어야 한다.")
@@ -229,7 +222,6 @@ public class MenuTest {
             Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE);
             menuRepository.save(menu);
             List<Menu> ResponseMenu = menuService.findAll();
-            verify(menuRepository, times(1)).findAll();
             assertThat(ResponseMenu.size()).isEqualTo(1);
 
         }
