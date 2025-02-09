@@ -56,8 +56,7 @@ public class MenuGroupTest {
         @NullAndEmptySource
         void invalidMenuAmount(String menuGroupName) {
             MenuGroup menuGroup = createMenuGroup(menuGroupName, 후라이드치킨_MENU_GROUP_UUID);
-            ThrowingCallable throwingCallable = () -> menuGroupService.create(menuGroup);
-            assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+            assertThatIllegalArgumentException().isThrownBy(() -> menuGroupService.create(menuGroup));
         }
 
     }

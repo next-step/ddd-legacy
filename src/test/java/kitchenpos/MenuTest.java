@@ -4,12 +4,6 @@ import kitchenpos.application.*;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.*;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,7 +12,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
 
 @DisplayName(value = " Menu 테스트")
 public class MenuTest {
@@ -57,25 +50,27 @@ public class MenuTest {
         private static final String 후라이드치킨_PROFANITY_MENU_NAME = "fucking 치킨메뉴";
         private static final int MINUS_QUANTITY = -1;
 
-
-
         @DisplayName(value = "메뉴를 등록할 수 있다.")
         @Test
         void createMenuTest() {
+            //given
             Product product = createProduct();
             productRepository.save(product);
             MenuGroup menuGroup = createMenuGroup();
             menuGroupRepository.save(menuGroup);
             Menu menuRequest = createMenu();
-            Menu menu = menuService.create(menuRequest);
-            //행위검증
+
+            //when
+            Menu sut = menuService.create(menuRequest);
+
+            //then
             assertAll(
-                    () -> assertThat(menu.getId()).isNotNull(),
-                    () -> assertThat(menu.getMenuGroup().getId()).isEqualTo(menuRequest.getMenuGroupId()),
-                    () -> assertThat(menu.getName()).isEqualTo(menuRequest.getName()),
-                    () -> assertThat(menu.getMenuProducts()).hasSize(menuRequest.getMenuProducts().size()),
-                    () -> assertThat(menu.isDisplayed()).isEqualTo(menuRequest.isDisplayed()),
-                    () -> assertThat(menu.getPrice()).isEqualTo(menuRequest.getPrice())
+                    () -> assertThat(sut.getId()).isNotNull(),
+                    () -> assertThat(sut.getMenuGroup().getId()).isEqualTo(menuRequest.getMenuGroupId()),
+                    () -> assertThat(sut.getName()).isEqualTo(menuRequest.getName()),
+                    () -> assertThat(sut.getMenuProducts()).hasSize(menuRequest.getMenuProducts().size()),
+                    () -> assertThat(sut.isDisplayed()).isEqualTo(menuRequest.isDisplayed()),
+                    () -> assertThat(sut.getPrice()).isEqualTo(menuRequest.getPrice())
             );
 
         }
@@ -85,8 +80,7 @@ public class MenuTest {
         void invalidMenuAmount() {
             //상품명이나 가격이 없을때 에러처리
             Menu menu = MenuTest.createMenu(후라이드치킨_MINUS_PRICE);
-            ThrowingCallable throwingCallable = () -> menuService.create(menu);
-            assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+            assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
         }
 
         @DisplayName(value = "메뉴의 주문 상품이 1개 이상 존재해야 합니다")
@@ -95,8 +89,7 @@ public class MenuTest {
             MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
             menuGroupRepository.save(menuGroup);
             Menu menu = MenuTest.createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, 후라이드치킨_MENU_GROUP_UUID);
-            ThrowingCallable throwingCallable = () -> menuService.create(menu);
-            assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+            assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
         }
 
         @DisplayName(value = "메뉴 내부 상품의 수량은 0개 이상이어야 합니다.")
@@ -107,8 +100,7 @@ public class MenuTest {
             menuGroupRepository.save(menuGroup);
             var menuProducts = createMenuProduct(product, MINUS_QUANTITY, 후라이드치킨_PRODUCT_UUID);
             Menu menu = MenuTest.createMenu(menuGroup, menuProducts);
-            ThrowingCallable throwingCallable = () -> menuService.create(menu);
-            assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+            assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
         }
 
         @DisplayName(value = "등록하려는 메뉴의 가격이 메뉴에 포함된 상품의 총 가격보다 높으면 안됩니다.")
@@ -117,8 +109,7 @@ public class MenuTest {
             menuGroupRepository.save(createMenuGroup());
             Menu menu = MenuTest.createMenu(후라이드치킨_OVER_PRICE);
 
-            ThrowingCallable throwingCallable = () -> menuService.create(menu);
-            assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+            assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
         }
 
         @DisplayName(value = "메뉴의 이름이 없거나 비속어가 들어가 있으면 안됩니다.")
@@ -130,8 +121,7 @@ public class MenuTest {
             List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
             Menu menu = MenuTest.createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_PROFANITY_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
 
-            ThrowingCallable throwingCallable = () -> menuService.create(menu);
-            assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+            assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
         }
     }
 
@@ -159,9 +149,7 @@ public class MenuTest {
         @Test
         void invalidMenuAmount() {
            Menu menuRequest = createMenu(후라이드치킨_MINUS_PRICE);
-
-            ThrowingCallable throwingCallable = () -> menuService.changePrice(후라이드치킨_MENU_UUID, menuRequest);
-            assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+            assertThatIllegalArgumentException().isThrownBy(() -> menuService.changePrice(후라이드치킨_MENU_UUID, menuRequest));
         }
 
         @DisplayName(value = "메뉴의 변경 금액은 메뉴에 포함된 상품들의 가격 합보다 크면 안됩니다.")
@@ -170,8 +158,7 @@ public class MenuTest {
             Menu menu = createMenu();
             menuRepository.save(menu);
             Menu menuRequest = createMenu(후라이드치킨_OVER_PRICE);
-            ThrowingCallable throwingCallable = () -> menuService.changePrice(후라이드치킨_MENU_UUID, menuRequest);
-            assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+            assertThatIllegalArgumentException().isThrownBy(() -> menuService.changePrice(후라이드치킨_MENU_UUID, menuRequest));
         }
 
     }
@@ -185,8 +172,7 @@ public class MenuTest {
         void invalidMenuAmount() {
             Menu menu = createMenu(후라이드치킨_OVER_PRICE);
             menuRepository.save(menu);
-            ThrowingCallable throwingCallable = () -> menuService.display(후라이드치킨_MENU_UUID);
-            assertThatIllegalStateException().isThrownBy(throwingCallable);
+            assertThatIllegalStateException().isThrownBy(() -> menuService.display(후라이드치킨_MENU_UUID));
         }
 
 

@@ -63,8 +63,7 @@ public class ProductTest {
         void createProduct() {
             //상품명이나 가격이 없을때 에러처리
             Product product = ProductTest.createProduct(후라이드치킨_PRODUCT_UUID, "", BIG_DECIMAL_MINUS_ONE);
-            ThrowingCallable throwingCallable = () -> productService.create(product);
-            assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+            assertThatIllegalArgumentException().isThrownBy(() -> productService.create(product));
         }
 
         @DisplayName(value = "상품명이 없거나 비속어가 있으면 안됩니다.")
@@ -74,8 +73,7 @@ public class ProductTest {
             Product product = ProductTest.createProduct(후라이드치킨_PRODUCT_UUID, 비속어_NAME, BigDecimal.ONE);
             Mockito.when(purgomalumClient.containsProfanity(Mockito.anyString())).thenReturn(true);
             //에러처리
-            ThrowingCallable throwingCallable = () -> productService.create(product);
-            assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+            assertThatIllegalArgumentException().isThrownBy(() -> productService.create(product));
         }
 
         @DisplayName(value = "상품을 등록합니다.")
@@ -118,8 +116,7 @@ public class ProductTest {
         void zeroProductPrice() {
             //상품명이나 가격이 없을때 에러처리
             Product product = createProduct(BIG_DECIMAL_MINUS_ONE);
-            ThrowingCallable throwingCallable = () -> productService.changePrice(ProductTest.후라이드치킨_PRODUCT_UUID, product);
-            assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+            assertThatIllegalArgumentException().isThrownBy(() -> productService.changePrice(ProductTest.후라이드치킨_PRODUCT_UUID, product));
         }
 
         @DisplayName(value = "메뉴의 가격이 메뉴의 상품들의 총 가격 합보다 크면, 비노출처리합니다")
