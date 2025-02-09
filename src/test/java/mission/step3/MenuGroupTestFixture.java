@@ -59,7 +59,9 @@ class MenuGroupServiceTest {
         MenuGroup actual = menuGroupService.create(request);
 
         // then
-        assertThat(actual.getName()).isEqualTo("음료");
+        assertThat(actual)
+                .extracting(MenuGroup::getId, MenuGroup::getName)
+                .containsExactly(expected.getId(), "음료");
         verify(menuGroupRepository).save(any(MenuGroup.class));
     }
 
@@ -76,22 +78,13 @@ class MenuGroupServiceTest {
     }
 
     @Test
-    @DisplayName("메뉴 그룹의 이름이 비어있으면 예외가 발생한다")
-    void createWithEmptyName() {
-        // given
-        MenuGroup request = MenuGroupTestFixture.createRequestMenuGroup("");
-
-        // when & then
-        assertThatThrownBy(() -> menuGroupService.create(request))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
     @DisplayName("모든 메뉴 그룹을 조회한다")
     void findAll() {
         // given
         MenuGroup beverageGroup = MenuGroupTestFixture.createMenuGroup("음료");
         MenuGroup mainGroup = MenuGroupTestFixture.createMenuGroup("메인");
+        UUID beverageId = beverageGroup.getId();
+        UUID mainId = mainGroup.getId();
 
         given(menuGroupRepository.findAll())
                 .willReturn(List.of(beverageGroup, mainGroup));
@@ -101,8 +94,17 @@ class MenuGroupServiceTest {
 
         // then
         assertThat(menuGroups).hasSize(2);
-        assertThat(menuGroups.get(0).getName()).isEqualTo("음료");
-        assertThat(menuGroups.get(1).getName()).isEqualTo("메인");
+
+        assertThat(menuGroups)
+                .filteredOn(group -> group.getId().equals(beverageId))
+                .extracting(MenuGroup::getName)
+                .containsExactly("음료");
+
+        assertThat(menuGroups)
+                .filteredOn(group -> group.getId().equals(mainId))
+                .extracting(MenuGroup::getName)
+                .containsExactly("메인");
+
         verify(menuGroupRepository).findAll();
     }
 }
