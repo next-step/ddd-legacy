@@ -6,33 +6,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.jdbc.Sql;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.UUID;
-
-import static kitchenpos.domain.OrderStatus.*;
-import static kitchenpos.domain.OrderType.DELIVERY;
+import static kitchenpos.domain.OrderStatus.COMPLETED;
+import static kitchenpos.domain.OrderStatus.SERVED;
+import static kitchenpos.fixture.OrderFixture.createOrder;
+import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.spy;
 
 
 @DisplayName(value = " OrderTable 테스트")
 public class OrderTableTest {
 
-   private static final UUID ORDER_UUID = UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd8");
-    private static final BigDecimal 후라이드치킨_DEFAULT_PRICE = new BigDecimal(20000);
-     private static final UUID 후라이드치킨_MENU_UUID = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
-     private static final OrderStatus ORDER_STATUS_제공완료 = SERVED;
+    private static final OrderStatus ORDER_STATUS_제공완료 = SERVED;
     private static final OrderStatus ORDER_STATUS_주문완료 = COMPLETED;
-    private static final OrderType ORDER_TYPE_배달주문 = DELIVERY;
-
-    private static final LocalDateTime ORDER_DATE_TIME_주문요청시간 = LocalDateTime.now();
-    private static final int DEFAULT_QUANTITY = 1;
-    public static final String ORDER_TABLE_DEFAULT_NAME = "1번";
+    private static final String ORDER_TABLE_DEFAULT_NAME = "1번";
 
 
     private MenuRepository menuRepository;
@@ -158,8 +146,6 @@ public class OrderTableTest {
         }
     }
 
-
-
     @DisplayName(value = "모든 주물 테이블 조회 기능.")
     @Nested
     class OrderFindAllTest {
@@ -172,63 +158,5 @@ public class OrderTableTest {
             var orders = orderTableService.findAll();
             assertThat(orders.size()).isOne();
         }
-    }
-
-    private OrderTable createOrderTable() {
-        var orderTable = new OrderTable();
-        orderTable.setName("1번");
-        return orderTable;
-    }
-
-    private OrderTable createOrderTable(String name) {
-        return createOrderTable(name,1);
-    }
-
-    private OrderTable createOrderTable(String name, int numberOfGuests) {
-        var orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName(name);
-        orderTable.setNumberOfGuests(numberOfGuests);
-        orderTable.setOccupied(true);
-        return orderTable;
-    }
-
-    private OrderTable createOrderTable(String name, boolean isOcupied) {
-        var orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName(name);
-        orderTable.setNumberOfGuests(1);
-        orderTable.setOccupied(isOcupied);
-        return orderTable;
-    }
-
-    private static Order createOrder(OrderStatus orderStatus, OrderTable orderTable) {
-        return createOrder(ORDER_UUID, ORDER_TYPE_배달주문, orderStatus, ORDER_DATE_TIME_주문요청시간,
-                createOrderLineItem(), "강남구", orderTable);
-    }
-
-    private static Order createOrder(UUID id, OrderType orderType, OrderStatus orderStatus, LocalDateTime orderDateTime, OrderLineItem orderLineItem, String deliveryAddress, OrderTable orderTable) {
-        Order order = new Order();
-        order.setId(id);
-        order.setType(orderType);
-        order.setStatus(orderStatus);
-        order.setOrderLineItems(Arrays.asList(orderLineItem));
-        order.setOrderDateTime(orderDateTime);
-        order.setDeliveryAddress(deliveryAddress);
-        order.setOrderTable(orderTable);
-        order.setOrderTableId(orderTable.getId());
-        return order;
-    }
-
-    private static OrderLineItem createOrderLineItem(UUID menuId, long quantity, BigDecimal price) {
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setQuantity(quantity);
-        orderLineItem.setMenuId(menuId);
-        orderLineItem.setPrice(price);
-        return orderLineItem;
-    }
-
-    private static OrderLineItem createOrderLineItem() {
-        return createOrderLineItem(후라이드치킨_MENU_UUID, DEFAULT_QUANTITY, 후라이드치킨_DEFAULT_PRICE);
     }
 }

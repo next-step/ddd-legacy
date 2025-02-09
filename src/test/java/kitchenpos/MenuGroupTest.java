@@ -14,11 +14,10 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @DisplayName(value = " Menu 테스트")
@@ -66,22 +65,14 @@ public class MenuGroupTest {
     class findAllMenuGroupTest {
         @DisplayName(value = "모든 메뉴그룹을 조회할 수 있다.")
         @Test
-        void createMenu() {
+        void findAllMenuGroup() {
             MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
             menuGroupService.create(menuGroup);
             List<MenuGroup> responseMenuGroups = menuGroupService.findAll();
 
             assertThat(responseMenuGroups.size()).isEqualTo(1);
-
-
         }
     }
 
-    private static MenuGroup createMenuGroup(final String name, final UUID id) {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName(name);
-        menuGroup.setId(id);
-        return menuGroup;
-    }
 
 }

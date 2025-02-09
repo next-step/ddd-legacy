@@ -9,6 +9,11 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.TestConstant.*;
+import static kitchenpos.fixture.MenuFixture.createMenu;
+import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
+import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
+import static kitchenpos.fixture.productFixture.createProduct;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -16,17 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName(value = " Menu 테스트")
 public class MenuTest {
 
-    private static final String TEST_PRODUCT_NAME = "TEST치킨";
     private static final String PRODUCT_NAME_비속어 = "fucking 치킨";
-
     private static final UUID 후라이드치킨_PRODUCT_UUID = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
     private static final BigDecimal 후라이드치킨_DEFAULT_PRICE = new BigDecimal(20000);
     private static final BigDecimal 후라이드치킨_OVER_PRICE = new BigDecimal(21000);
     private static final String 후라이드치킨_MENU_NAME = "후라이드 치킨메뉴";
-    private static final UUID 후라이드치킨_MENU_UUID = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
-    private static final UUID 후라이드치킨_MENU_GROUP_UUID = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
-    private static final String 한마리메뉴_MENU_GROUP_NAME = "한마리메뉴";
-
 
     private ProductRepository productRepository;
     private MenuService menuService;
@@ -79,7 +78,7 @@ public class MenuTest {
         @Test
         void invalidMenuAmount() {
             //상품명이나 가격이 없을때 에러처리
-            Menu menu = MenuTest.createMenu(후라이드치킨_MINUS_PRICE);
+            Menu menu = createMenu(후라이드치킨_MINUS_PRICE);
             assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
         }
 
@@ -88,7 +87,7 @@ public class MenuTest {
         void invalidMenuProduct() {
             MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
             menuGroupRepository.save(menuGroup);
-            Menu menu = MenuTest.createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, 후라이드치킨_MENU_GROUP_UUID);
+            Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, 후라이드치킨_MENU_GROUP_UUID);
             assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
         }
 
@@ -99,7 +98,7 @@ public class MenuTest {
             MenuGroup menuGroup = createMenuGroup();
             menuGroupRepository.save(menuGroup);
             var menuProducts = createMenuProduct(product, MINUS_QUANTITY, 후라이드치킨_PRODUCT_UUID);
-            Menu menu = MenuTest.createMenu(menuGroup, menuProducts);
+            Menu menu = createMenu(menuGroup, menuProducts);
             assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
         }
 
@@ -107,7 +106,7 @@ public class MenuTest {
         @Test
         void invalidTotalMenuAmount() {
             menuGroupRepository.save(createMenuGroup());
-            Menu menu = MenuTest.createMenu(후라이드치킨_OVER_PRICE);
+            Menu menu = createMenu(후라이드치킨_OVER_PRICE);
 
             assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
         }
@@ -119,7 +118,7 @@ public class MenuTest {
             MenuGroup menuGroup = createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
             menuGroupRepository.save(menuGroup);
             List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1, 후라이드치킨_PRODUCT_UUID));
-            Menu menu = MenuTest.createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_PROFANITY_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
+            Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_PROFANITY_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, menuGroup, menuProducts, 후라이드치킨_MENU_GROUP_UUID);
 
             assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
         }
@@ -212,123 +211,4 @@ public class MenuTest {
 
         }
     }
-
-    private static Menu createMenu() {
-        Menu menu = new Menu();
-        menu.setId(후라이드치킨_MENU_UUID);
-        menu.setName(후라이드치킨_MENU_NAME);
-        menu.setPrice(후라이드치킨_DEFAULT_PRICE);
-        menu.setMenuGroup(createMenuGroup());
-        menu.setDisplayed(true);
-        menu.setMenuProducts(List.of(createMenuProduct()));
-        menu.setMenuGroupId(후라이드치킨_MENU_GROUP_UUID);
-        return menu;
-    }
-
-    private static Menu createMenu(BigDecimal price) {
-        Menu menu = new Menu();
-        menu.setId(후라이드치킨_MENU_UUID);
-        menu.setName(후라이드치킨_MENU_NAME);
-        menu.setPrice(price);
-        menu.setMenuGroup(createMenuGroup());
-        menu.setDisplayed(true);
-        menu.setMenuProducts(List.of(createMenuProduct()));
-        menu.setMenuGroupId(후라이드치킨_MENU_GROUP_UUID);
-        return menu;
-    }
-
-    private static Menu createMenu(final UUID id, final String name, final BigDecimal price, final MenuGroup menuGroup, final List<MenuProduct> menuProducts, final UUID menugroupId) {
-        Menu menu = new Menu();
-        menu.setId(id);
-        menu.setName(name);
-        menu.setPrice(price);
-        menu.setMenuGroup(menuGroup);
-        menu.setDisplayed(true);
-        menu.setMenuProducts(menuProducts);
-        menu.setMenuGroupId(menugroupId);
-        return menu;
-    }
-
-    private static Menu createMenu(final UUID id, final String name, final BigDecimal price, final MenuGroup menuGroup, final UUID menugroupId) {
-        Menu menu = new Menu();
-        menu.setId(id);
-        menu.setName(name);
-        menu.setPrice(price);
-        menu.setMenuGroup(menuGroup);
-        menu.setDisplayed(true);
-        menu.setMenuGroupId(menugroupId);
-        return menu;
-    }
-
-    private static Menu createMenu(MenuGroup menuGroup, MenuProduct menuProducts) {
-        Menu menu = new Menu();
-        menu.setId(후라이드치킨_MENU_UUID);
-        menu.setName(후라이드치킨_MENU_NAME);
-        menu.setPrice(후라이드치킨_DEFAULT_PRICE);
-        menu.setMenuGroup(menuGroup);
-        menu.setDisplayed(true);
-        menu.setMenuProducts(List.of(menuProducts));
-        menu.setMenuGroupId(후라이드치킨_MENU_GROUP_UUID);
-        return menu;
-    }
-
-    private Menu createMenu(UUID id, String name, BigDecimal price) {
-        Menu menu = new Menu();
-        menu.setId(id);
-        menu.setName(name);
-        menu.setPrice(price);
-        return menu;
-    }
-
-
-    private static MenuProduct createMenuProduct() {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(createProduct());
-        menuProduct.setQuantity(1);
-        menuProduct.setProductId(후라이드치킨_PRODUCT_UUID);
-        return menuProduct;
-    }
-
-    private static MenuProduct createMenuProduct(final Product product, final int quantity, final UUID productId) {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setQuantity(quantity);
-        menuProduct.setProductId(productId);
-        return menuProduct;
-    }
-
-    private static Product createProduct(final UUID uuid, final String name, final BigDecimal price) {
-        Product product = new Product();
-        product.setId(uuid);
-        product.setName(name);
-        product.setPrice(price);
-        return product;
-    }
-
-    private static Product createProduct() {
-        Product product = new Product();
-        product.setId(후라이드치킨_PRODUCT_UUID);
-        product.setName(TEST_PRODUCT_NAME);
-        product.setPrice(후라이드치킨_DEFAULT_PRICE);
-        return product;
-    }
-
-
-
-    private static MenuGroup createMenuGroup(final String name, final UUID id) {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName(name);
-        menuGroup.setId(id);
-        return menuGroup;
-    }
-
-    private static MenuGroup createMenuGroup() {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName(한마리메뉴_MENU_GROUP_NAME);
-        menuGroup.setId(후라이드치킨_MENU_GROUP_UUID);
-        return menuGroup;
-    }
-
-
-
 }
