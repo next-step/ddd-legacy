@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
 
 @DisplayName(value = " Menu 테스트")
-@Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class MenuTest {
 
     private static final String TEST_PRODUCT_NAME = "TEST치킨";

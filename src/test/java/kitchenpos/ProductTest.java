@@ -25,7 +25,6 @@ import static org.mockito.Mockito.*;
 
 
 @DisplayName(value = "ProductService 테스트")
-@Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class ProductTest {
 
     private static final BigDecimal BIG_DECIMAL_MINUS_ONE = BigDecimal.valueOf(-1);

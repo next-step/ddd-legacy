@@ -21,7 +21,6 @@ import static org.mockito.Mockito.spy;
 
 
 @DisplayName(value = " OrderTable 테스트")
-@Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class OrderTableTest {
 
    private static final UUID ORDER_UUID = UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd8");
