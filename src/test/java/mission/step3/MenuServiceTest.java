@@ -251,6 +251,34 @@ class MenuServiceTest {
         }
 
         @Test
+        @DisplayName("메뉴 가격이 구성 상품들의 총합보다 높으면 보임 상태로 변경되지 않고 예외가 발생한다")
+        void displayFailsWhenMenuPriceExceedsTotalProductPrice() {
+
+            // given
+            UUID menuId = UUID.randomUUID();
+            Product product = new Product();
+            product.setPrice(BigDecimal.valueOf(4000));
+
+            MenuProduct menuProduct = new MenuProduct();
+            menuProduct.setProduct(product);
+            menuProduct.setQuantity(1);
+
+            Menu menu = new Menu();
+            menu.setId(menuId);
+
+            menu.setPrice(BigDecimal.valueOf(5000));
+            menu.setMenuProducts(List.of(menuProduct));
+            menu.setDisplayed(false);
+
+            given(menuRepository.findById(menuId))
+                    .willReturn(Optional.of(menu));
+
+            // when & then
+            assertThatThrownBy(() -> menuService.display(menuId))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @Test
         @DisplayName("메뉴를 숨김 상태로 변경한다")
         void hide() {
             // given
