@@ -4,7 +4,6 @@ import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,7 +38,7 @@ class ProductServiceTest {
     void createWithNullPrice(BigDecimal price) {
         // given
         Product request = new Product();
-        request.setName("Test Product");
+        request.setName("양념치킨");
         request.setPrice(price);
 
         // when & then
@@ -51,7 +50,7 @@ class ProductServiceTest {
     void createWithNegativePrice() {
         // given
         Product request = new Product();
-        request.setName("Test Product");
+        request.setName("양념치킨");
         request.setPrice(BigDecimal.valueOf(-1000));
 
         // when & then
@@ -75,10 +74,10 @@ class ProductServiceTest {
     void createWithProfanityName() {
         // given
         Product request = new Product();
-        request.setName("Bad Word");
+        request.setName("미친치킨");
         request.setPrice(BigDecimal.valueOf(1000));
 
-        when(purgomalumClient.containsProfanity("Bad Word")).thenReturn(true);
+        when(purgomalumClient.containsProfanity("미친치킨")).thenReturn(true);
 
         // when & then
         assertThrows(IllegalArgumentException.class,
@@ -89,24 +88,24 @@ class ProductServiceTest {
     void createSuccessfully() {
         // given
         Product request = new Product();
-        request.setName("Test Product");
+        request.setName("양념치킨");
         request.setPrice(BigDecimal.valueOf(1000));
 
-        when(purgomalumClient.containsProfanity("Test Product")).thenReturn(false);
+        when(purgomalumClient.containsProfanity("양념치킨")).thenReturn(false);
 
         // when
         Product created = productService.create(request);
 
         // then
         assertNotNull(created.getId());
-        assertEquals("Test Product", created.getName());
+        assertEquals("양념치킨", created.getName());
         assertEquals(BigDecimal.valueOf(1000), created.getPrice());
     }
 
     @Test
     void changePriceWithNullPrice() {
         // given
-        Product product = createProduct("Test Product", BigDecimal.valueOf(1000));
+        Product product = createProduct("양념치킨", BigDecimal.valueOf(1000));
         Product request = new Product();
         request.setPrice(null);
 
@@ -118,7 +117,7 @@ class ProductServiceTest {
     @Test
     void changePriceWithNegativePrice() {
         // given
-        Product product = createProduct("Test Product", BigDecimal.valueOf(1000));
+        Product product = createProduct("양념치킨", BigDecimal.valueOf(1000));
         Product request = new Product();
         request.setPrice(BigDecimal.valueOf(-1000));
 
@@ -141,12 +140,12 @@ class ProductServiceTest {
     @Test
     void changePriceAffectingMenuDisplay() {
         // given
-        Product product = createProduct("Test Product", BigDecimal.valueOf(3000));
-        MenuGroup menuGroup = createMenuGroup("Test Group");
+        Product product = createProduct("양념치킨", BigDecimal.valueOf(3000));
+        MenuGroup menuGroup = createMenuGroup("신메뉴");
 
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
-        menu.setName("Test Menu");
+        menu.setName("양념치킨");
         menu.setPrice(BigDecimal.valueOf(2000));
         menu.setMenuGroup(menuGroup);
         menu.setDisplayed(true);

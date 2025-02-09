@@ -49,14 +49,14 @@ class OrderTableServiceTest {
     void createSuccessfully() {
         // given
         OrderTable request = new OrderTable();
-        request.setName("Table 1");
+        request.setName("1번");
 
         // when
         OrderTable created = orderTableService.create(request);
 
         // then
         assertNotNull(created.getId());
-        assertEquals("Table 1", created.getName());
+        assertEquals("1번", created.getName());
         assertEquals(0, created.getNumberOfGuests());
         assertFalse(created.isOccupied());
     }
@@ -71,7 +71,7 @@ class OrderTableServiceTest {
     @Test
     void sitSuccessfully() {
         // given
-        OrderTable table = createTable("Table 1");
+        OrderTable table = createTable("1번");
 
         // when
         OrderTable occupied = orderTableService.sit(table.getId());
@@ -90,7 +90,7 @@ class OrderTableServiceTest {
     @Test
     void clearTableWithIncompleteOrder() {
         // given
-        OrderTable table = createTable("Table 1");
+        OrderTable table = createTable("1번");
         table.setOccupied(true);
         orderTableRepository.save(table);
 
@@ -110,7 +110,7 @@ class OrderTableServiceTest {
     @Test
     void clearTableSuccessfully() {
         // given
-        OrderTable table = createTable("Table 1");
+        OrderTable table = createTable("1번");
         table.setOccupied(true);
         table.setNumberOfGuests(4);
         orderTableRepository.save(table);
@@ -126,7 +126,7 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuestsWithNegativeNumber() {
         // given
-        OrderTable table = createTable("Table 1");
+        OrderTable table = createTable("1번");
         OrderTable request = new OrderTable();
         request.setNumberOfGuests(-1);
 
@@ -149,7 +149,7 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuestsAtUnoccupiedTable() {
         // given
-        OrderTable table = createTable("Table 1");
+        OrderTable table = createTable("1번");
         OrderTable request = new OrderTable();
         request.setNumberOfGuests(4);
 
@@ -161,7 +161,7 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuestsSuccessfully() {
         // given
-        OrderTable table = createTable("Table 1");
+        OrderTable table = createTable("1번");
         table.setOccupied(true);
         orderTableRepository.save(table);
 

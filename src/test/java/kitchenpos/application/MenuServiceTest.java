@@ -98,7 +98,7 @@ class MenuServiceTest {
 
         Product product = new Product();
         product.setId(UUID.randomUUID());
-        product.setName("Test Product");
+        product.setName("양념치킨");
         product.setPrice(BigDecimal.valueOf(100));
         productRepository.save(product);
 
@@ -117,19 +117,19 @@ class MenuServiceTest {
     void createWithPriceHigherThanSum() {
         //given
         Menu menu = new Menu();
-        menu.setName("Test");
+        menu.setName("후라이드");
         menu.setPrice(BigDecimal.valueOf(1000));
         UUID menuGroupId = UUID.randomUUID();
         menu.setMenuGroupId(menuGroupId);
 
         MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName("Test");
+        menuGroup.setName("한마리 메뉴");
         menuGroup.setId(menuGroupId);
         menuGroupRepository.save(menuGroup);
 
         Product product = new Product();
         product.setId(UUID.randomUUID());
-        product.setName("Test Product");
+        product.setName("후라이드");
         product.setPrice(BigDecimal.valueOf(100));
         productRepository.save(product);
 
@@ -148,19 +148,19 @@ class MenuServiceTest {
     void createWithProfanityName() {
         //given
         Menu menu = new Menu();
-        menu.setName("BadWord");
+        menu.setName("미친치킨");
         menu.setPrice(BigDecimal.valueOf(100));
         UUID menuGroupId = UUID.randomUUID();
         menu.setMenuGroupId(menuGroupId);
 
         MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName("Test");
+        menuGroup.setName("한마리 메뉴");
         menuGroup.setId(menuGroupId);
         menuGroupRepository.save(menuGroup);
 
         Product product = new Product();
         product.setId(UUID.randomUUID());
-        product.setName("Test Product");
+        product.setName("미친치킨");
         product.setPrice(BigDecimal.valueOf(100));
         productRepository.save(product);
 
@@ -172,7 +172,7 @@ class MenuServiceTest {
         menu.setMenuProducts(menuProducts);
 
         //when
-        when(purgomalumClient.containsProfanity("BadWord")).thenReturn(true);
+        when(purgomalumClient.containsProfanity("미친치킨")).thenReturn(true);
         assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
     }
 
@@ -180,19 +180,19 @@ class MenuServiceTest {
     void createSuccessfully() {
         //given
         Menu menu = new Menu();
-        menu.setName("Test Menu");
+        menu.setName("양념치킨");
         menu.setPrice(BigDecimal.valueOf(100));
         UUID menuGroupId = UUID.randomUUID();
         menu.setMenuGroupId(menuGroupId);
 
         MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName("Test");
+        menuGroup.setName("신메뉴");
         menuGroup.setId(menuGroupId);
         menuGroupRepository.save(menuGroup);
 
         Product product = new Product();
         product.setId(UUID.randomUUID());
-        product.setName("Test Product");
+        product.setName("양념치킨");
         product.setPrice(BigDecimal.valueOf(100));
         productRepository.save(product);
 
@@ -204,12 +204,12 @@ class MenuServiceTest {
         menu.setMenuProducts(menuProducts);
 
         //when
-        when(purgomalumClient.containsProfanity("Test Menu")).thenReturn(false);
+        when(purgomalumClient.containsProfanity("양념치킨")).thenReturn(false);
         Menu created = menuService.create(menu);
 
         //then
         assertNotNull(created.getId());
-        assertEquals("Test Menu", created.getName());
+        assertEquals("양념치킨", created.getName());
         assertEquals(BigDecimal.valueOf(100), created.getPrice());
         assertEquals(menuGroupId, created.getMenuGroup().getId());
         assertEquals(1, created.getMenuProducts().size());
@@ -244,18 +244,18 @@ class MenuServiceTest {
         //given
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("Test Group");
+        menuGroup.setName("한마리 메뉴");
         menuGroupRepository.save(menuGroup);
 
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
-        menu.setName("Test Menu");
+        menu.setName("양념치킨");
         menu.setPrice(BigDecimal.valueOf(100));
         menu.setMenuGroup(menuGroup);
 
         Product product = new Product();
         product.setId(UUID.randomUUID());
-        product.setName("Test Product");
+        product.setName("양념치킨");
         product.setPrice(BigDecimal.valueOf(50));
         productRepository.save(product);
 
@@ -278,18 +278,18 @@ class MenuServiceTest {
         //given
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("Test Group");
+        menuGroup.setName("한마리 메뉴");
         menuGroupRepository.save(menuGroup);
 
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
-        menu.setName("Test Menu");
+        menu.setName("양념치킨");
         menu.setPrice(BigDecimal.valueOf(100));
         menu.setMenuGroup(menuGroup);
 
         Product product = new Product();
         product.setId(UUID.randomUUID());
-        product.setName("Test Product");
+        product.setName("양념치킨");
         product.setPrice(BigDecimal.valueOf(50));
         productRepository.save(product);
 
@@ -323,18 +323,18 @@ class MenuServiceTest {
         //given
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("Test Group");
+        menuGroup.setName("한마리 메뉴");
         menuGroupRepository.save(menuGroup);
 
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
-        menu.setName("Test Menu");
+        menu.setName("양념치킨");
         menu.setPrice(BigDecimal.valueOf(100));
         menu.setMenuGroup(menuGroup);
 
         Product product = new Product();
         product.setId(UUID.randomUUID());
-        product.setName("Test Product");
+        product.setName("양념치킨");
         product.setPrice(BigDecimal.valueOf(50));
         productRepository.save(product);
 
@@ -353,19 +353,19 @@ class MenuServiceTest {
         //given
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("Test Group");
+        menuGroup.setName("한마리 메뉴");
         menuGroupRepository.save(menuGroup);
 
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setPrice(BigDecimal.valueOf(50));
-        menu.setName("Test Menu");
+        menu.setName("양념치킨");
         menu.setDisplayed(false);
         menu.setMenuGroup(menuGroup);
 
         Product product = new Product();
         product.setId(UUID.randomUUID());
-        product.setName("Test Product");
+        product.setName("양념치킨");
         product.setPrice(BigDecimal.valueOf(50));
         productRepository.save(product);
 
@@ -396,7 +396,7 @@ class MenuServiceTest {
         //given
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("Test Group");
+        menuGroup.setName("한마리 메뉴");
         menuGroupRepository.save(menuGroup);
 
         Menu menu = new Menu();
@@ -404,7 +404,7 @@ class MenuServiceTest {
         menu.setPrice(BigDecimal.valueOf(50));
         menu.setDisplayed(true);
         menu.setMenuGroup(menuGroup);  // MenuGroup 설정
-        menu.setName("Test Menu");     // name도 필요할 수 있음
+        menu.setName("양념치킨");     // name도 필요할 수 있음
         menuRepository.save(menu);
 
         //when

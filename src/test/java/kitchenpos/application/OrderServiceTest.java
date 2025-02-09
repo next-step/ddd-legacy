@@ -37,12 +37,12 @@ class OrderServiceTest {
     private Menu createMenu(boolean displayed) {
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("Test Group");
+        menuGroup.setName("신메뉴");
         menuGroupRepository.save(menuGroup);
 
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
-        menu.setName("Test Menu");
+        menu.setName("간장치킨");
         menu.setPrice(BigDecimal.valueOf(1000));
         menu.setMenuGroup(menuGroup);
         menu.setDisplayed(displayed);
