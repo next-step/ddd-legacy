@@ -1,13 +1,11 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -33,6 +31,15 @@ class OrderServiceTest {
 
     @Autowired
     private MenuGroupRepository menuGroupRepository;
+
+    private static OrderLineItem createOrderLineItem(Menu menu) {
+        OrderLineItem item = new OrderLineItem();
+        item.setMenu(menu);
+        item.setMenuId(menu.getId());
+        item.setPrice(menu.getPrice());
+        item.setQuantity(1);
+        return item;
+    }
 
     private Menu createMenu(boolean displayed) {
         MenuGroup menuGroup = new MenuGroup();
@@ -94,10 +101,7 @@ class OrderServiceTest {
         Order request = new Order();
         request.setType(OrderType.TAKEOUT);
 
-        OrderLineItem item = new OrderLineItem();
-        item.setMenuId(menu.getId());
-        item.setPrice(menu.getPrice());
-        item.setQuantity(1);
+        OrderLineItem item = createOrderLineItem(menu);
         request.setOrderLineItems(List.of(item));
 
         // when & then
@@ -112,10 +116,7 @@ class OrderServiceTest {
         Order request = new Order();
         request.setType(OrderType.DELIVERY);
 
-        OrderLineItem item = new OrderLineItem();
-        item.setMenuId(menu.getId());
-        item.setPrice(menu.getPrice());
-        item.setQuantity(1);
+        OrderLineItem item = createOrderLineItem(menu);
         request.setOrderLineItems(List.of(item));
 
         // when & then
@@ -131,10 +132,7 @@ class OrderServiceTest {
         request.setType(OrderType.DELIVERY);
         request.setDeliveryAddress("address");
 
-        OrderLineItem item = new OrderLineItem();
-        item.setMenuId(menu.getId());
-        item.setPrice(menu.getPrice());
-        item.setQuantity(1);
+        OrderLineItem item = createOrderLineItem(menu);
         request.setOrderLineItems(List.of(item));
 
         // when & then
@@ -151,10 +149,7 @@ class OrderServiceTest {
         request.setType(OrderType.EAT_IN);
         request.setOrderTableId(UUID.randomUUID());
 
-        OrderLineItem item = new OrderLineItem();
-        item.setMenuId(menu.getId());
-        item.setPrice(menu.getPrice());
-        item.setQuantity(1);
+        OrderLineItem item = createOrderLineItem(menu);
         request.setOrderLineItems(List.of(item));
 
         // when & then
@@ -233,26 +228,6 @@ class OrderServiceTest {
                 () -> orderService.completeDelivery(order.getId()));
     }
 
-    private Order createOrder(OrderType type) {
-        Menu menu = createMenu(true);
-
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(type);
-        order.setStatus(OrderStatus.WAITING);
-
-        OrderLineItem item = new OrderLineItem();
-        item.setMenu(menu);
-        item.setQuantity(1);
-        order.setOrderLineItems(List.of(item));
-
-        if (type == OrderType.DELIVERY) {
-            order.setDeliveryAddress("서울시 강남구 개포로 111");
-        }
-
-        return order;
-    }
-
     @Test
     void completeOrderSuccessfully() {
         // given
@@ -291,5 +266,23 @@ class OrderServiceTest {
         assertEquals(OrderStatus.COMPLETED, completed.getStatus());
         assertFalse(completed.getOrderTable().isOccupied());
         assertEquals(0, completed.getOrderTable().getNumberOfGuests());
+    }
+
+    private Order createOrder(OrderType type) {
+        Menu menu = createMenu(true);
+
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(type);
+        order.setStatus(OrderStatus.WAITING);
+
+        OrderLineItem item = createOrderLineItem(menu);
+        order.setOrderLineItems(List.of(item));
+
+        if (type == OrderType.DELIVERY) {
+            order.setDeliveryAddress("서울시 강남구 개포로 111");
+        }
+
+        return order;
     }
 }

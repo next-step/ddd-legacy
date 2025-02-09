@@ -144,7 +144,21 @@ class ProductServiceTest {
         // given
         Product product = createProduct("양념치킨", BigDecimal.valueOf(3000));
         MenuGroup menuGroup = createMenuGroup("신메뉴");
+        Menu menu = createMenu(menuGroup, product);
 
+        Product request = new Product();
+        request.setPrice(BigDecimal.valueOf(1000));
+
+        // when
+        Product updated = productService.changePrice(product.getId(), request);
+
+        // then
+        assertEquals(BigDecimal.valueOf(1000), updated.getPrice());
+        Menu updatedMenu = menuRepository.findById(menu.getId()).orElseThrow();
+        assertFalse(updatedMenu.isDisplayed());
+    }
+
+    private Menu createMenu(MenuGroup menuGroup, Product product) {
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setName("양념치킨");
@@ -157,17 +171,7 @@ class ProductServiceTest {
         menuProduct.setQuantity(1);
         menu.setMenuProducts(List.of(menuProduct));
         menuRepository.save(menu);
-
-        Product request = new Product();
-        request.setPrice(BigDecimal.valueOf(1000));
-
-        // when
-        Product updated = productService.changePrice(product.getId(), request);
-
-        // then
-        assertEquals(BigDecimal.valueOf(1000), updated.getPrice());
-        Menu updatedMenu = menuRepository.findById(menu.getId()).orElseThrow();
-        assertFalse(updatedMenu.isDisplayed());
+        return menu;
     }
 
     private Product createProduct(String name, BigDecimal price) {
