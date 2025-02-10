@@ -8,6 +8,9 @@ import static kitchenpos.TestConstant.한마리메뉴_MENU_GROUP_NAME;
 import static kitchenpos.TestConstant.후라이드치킨_MENU_GROUP_UUID;
 
 public class MenuGroupFixture {
+    private MenuGroupFixture() {
+    }
+
     public static MenuGroup createMenuGroup() {
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setName(한마리메뉴_MENU_GROUP_NAME);

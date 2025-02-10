@@ -5,6 +5,10 @@ import kitchenpos.domain.OrderTable;
 import java.util.UUID;
 
 public class OrderTableFixture {
+
+    private OrderTableFixture() {
+    }
+
     public static OrderTable createOrderTable() {
         var orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());

@@ -14,7 +14,8 @@ import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
 
 public class MenuFixture {
-
+    private MenuFixture() {
+    }
 
     public static Menu createMenu() {
         Menu menu = new Menu();

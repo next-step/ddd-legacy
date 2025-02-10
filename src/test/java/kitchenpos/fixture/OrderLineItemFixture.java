@@ -11,6 +11,9 @@ import static kitchenpos.TestConstant.*;
 
 public class OrderLineItemFixture {
 
+    private OrderLineItemFixture() {
+    }
+
     public static OrderLineItem createOrderLineItem(UUID menuId, long quantity, BigDecimal price) {
         OrderLineItem orderLineItem = new OrderLineItem();
         orderLineItem.setQuantity(quantity);

@@ -9,6 +9,9 @@ import static kitchenpos.TestConstant.*;
 
 public class productFixture {
 
+    private productFixture() {
+    }
+
     public static Product createProduct() {
         Product product = new Product();
         product.setId(후라이드치킨_PRODUCT_UUID);

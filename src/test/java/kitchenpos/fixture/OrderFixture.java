@@ -11,6 +11,9 @@ import static kitchenpos.fixture.OrderLineItemFixture.createOrderLineItem;
 
 public class OrderFixture {
 
+    private OrderFixture() {
+    }
+
     public static Order createOrder(final UUID id, final OrderType orderType, final OrderStatus orderStatus, final LocalDateTime orderDateTime,
                                     final OrderLineItem orderLineItem, final String deliveryAddress) {
         Order order = new Order();
