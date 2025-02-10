@@ -24,8 +24,16 @@ public class StringCalculator {
     private int sum(String[] numbers) {
         int total = 0;
         for (String number : numbers) {
-            total += Integer.parseInt(number);
+            total += parseInt(number);
         }
         return total;
+    }
+
+    private int parseInt(String number) {
+        int result = Integer.parseInt(number);
+        if (result < 0) {
+            throw new RuntimeException();
+        }
+        return result;
     }
 }
