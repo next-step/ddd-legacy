@@ -18,9 +18,13 @@ public class Car {
         this.carName = carName;
     }
 
+    public boolean movable(int num) {
+        return num >= 4;
+    }
+
     public boolean movable() {
         Random random = new Random();
         var num = random.nextInt(10);
-        return num >= 4;
+        return movable(num);
     }
 }

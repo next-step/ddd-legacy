@@ -20,6 +20,7 @@ public class CarTest {
     @DisplayName("자동차는 무작위 값이 4이상인 경우 움직인다.")
     void moving() {
         Car car = new Car("가나다라마");
-        assertThat(car.movable()).isTrue();
+        assertThat(car.movable(4)).isTrue();
+        assertThat(car.movable(3)).isFalse();
     }
 }
