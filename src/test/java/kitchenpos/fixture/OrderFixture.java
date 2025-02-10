@@ -41,55 +41,27 @@ public class OrderFixture {
     }
 
     public static Order createOrder(OrderLineItem orderLineItem, String deliveryAddress) {
-        Order order = new Order();
-        order.setId(ORDER_UUID);
-        order.setType(ORDER_TYPE_배달주문);
-        order.setStatus(ORDER_STATUS_주문대기);
-        order.setOrderLineItems(Arrays.asList(orderLineItem));
-        order.setDeliveryAddress(deliveryAddress);
-        return order;
-    }
+        return createOrder(ORDER_UUID, ORDER_TYPE_배달주문, ORDER_STATUS_주문대기,null, orderLineItem, deliveryAddress);
+      }
 
     public static Order createOrder(OrderLineItem orderLineItem) {
-        Order order = new Order();
-        order.setId(ORDER_UUID);
-        order.setType(ORDER_TYPE_배달주문);
-        order.setStatus(ORDER_STATUS_주문대기);
-        order.setOrderLineItems(Arrays.asList(orderLineItem));
-        order.setDeliveryAddress("강남구");
-        return order;
+        return createOrder(ORDER_UUID, ORDER_TYPE_배달주문, ORDER_STATUS_주문대기, null,
+                orderLineItem, "강남구");
     }
 
     public static Order createOrder(OrderLineItem orderLineItem, OrderStatus orderStatus) {
-        Order order = new Order();
-        order.setId(ORDER_UUID);
-        order.setType(ORDER_TYPE_배달주문);
-        order.setStatus(orderStatus);
-        order.setOrderLineItems(Arrays.asList(orderLineItem));
-        order.setDeliveryAddress("강남구");
-        return order;
+        return createOrder(ORDER_UUID, ORDER_TYPE_배달주문, orderStatus, null,
+                orderLineItem, "강남구");
     }
 
     public static Order createOrder(OrderLineItem orderLineItem, OrderType orderType, OrderStatus orderStatus, OrderTable orderTable) {
-        Order order = new Order();
-        order.setId(ORDER_UUID);
-        order.setType(orderType);
-        order.setStatus(orderStatus);
-        order.setOrderLineItems(Arrays.asList(orderLineItem));
-        order.setDeliveryAddress("강남구");
-        order.setOrderTable(orderTable);
-        order.setOrderTableId(orderTable.getId());
-        return order;
-    }
+        return createOrder(ORDER_UUID, orderType, orderStatus, null,
+                orderLineItem, "강남구", orderTable, orderTable.getId());
+        }
 
     public static Order createOrder(OrderLineItem orderLineItem, OrderType orderType, OrderStatus orderStatus) {
-        Order order = new Order();
-        order.setId(ORDER_UUID);
-        order.setType(orderType);
-        order.setStatus(orderStatus);
-        order.setOrderLineItems(Arrays.asList(orderLineItem));
-        order.setDeliveryAddress("강남구");
-        return order;
+        return createOrder(ORDER_UUID, orderType, orderStatus, null,
+                orderLineItem, "강남구");
     }
 
     public static Order createOrder() {

@@ -14,10 +14,11 @@ public class MenuProductFixture {
     }
 
     public static MenuProduct createMenuProduct(Product product, int quantity) {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setQuantity(quantity);
-        return menuProduct;
+        return createMenuProduct(product, quantity, product.getId());
+    }
+
+    public static MenuProduct createMenuProduct() {
+        return createMenuProduct(createProduct(), 1, 후라이드치킨_PRODUCT_UUID);
     }
 
     public static MenuProduct createMenuProduct(final Product product, final int quantity, final UUID productId) {
@@ -28,7 +29,5 @@ public class MenuProductFixture {
         return menuProduct;
     }
 
-    public static MenuProduct createMenuProduct() {
-        return createMenuProduct(createProduct(), 1, 후라이드치킨_PRODUCT_UUID);
-    }
+
 }

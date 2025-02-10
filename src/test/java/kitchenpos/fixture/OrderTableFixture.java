@@ -10,16 +10,11 @@ public class OrderTableFixture {
     }
 
     public static OrderTable createOrderTable() {
-        var orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName("1번");
-        orderTable.setNumberOfGuests(1);
-        orderTable.setOccupied(true);
-        return orderTable;
-    }
+        return createOrderTable(UUID.randomUUID(), "1번", 1, true);
+        }
 
     public static OrderTable createOrderTable(UUID orderTableId, String orderTableName, int numberOfGuest, boolean istableUsable) {
-        OrderTable orderTable = new OrderTable();
+        var orderTable = new OrderTable();
         orderTable.setId(orderTableId);
         orderTable.setName(orderTableName);
         orderTable.setNumberOfGuests(numberOfGuest);
@@ -32,13 +27,8 @@ public class OrderTableFixture {
     }
 
     public static OrderTable createOrderTable(String name, int numberOfGuests) {
-        var orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName(name);
-        orderTable.setNumberOfGuests(numberOfGuests);
-        orderTable.setOccupied(true);
-        return orderTable;
-    }
+        return createOrderTable(UUID.randomUUID(), name, numberOfGuests, true);
+        }
 
     public static OrderTable createOrderTable(String name, boolean isOcupied) {
         var orderTable = new OrderTable();

@@ -12,10 +12,7 @@ public class MenuGroupFixture {
     }
 
     public static MenuGroup createMenuGroup() {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName(한마리메뉴_MENU_GROUP_NAME);
-        menuGroup.setId(후라이드치킨_MENU_GROUP_UUID);
-        return menuGroup;
+        return createMenuGroup(한마리메뉴_MENU_GROUP_NAME, 후라이드치킨_MENU_GROUP_UUID);
     }
 
     public static MenuGroup createMenuGroup(final String name, final UUID id) {

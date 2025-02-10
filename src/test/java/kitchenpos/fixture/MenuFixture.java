@@ -18,36 +18,26 @@ public class MenuFixture {
     }
 
     public static Menu createMenu() {
-        Menu menu = new Menu();
-        menu.setId(후라이드치킨_MENU_UUID);
-        menu.setName(후라이드치킨_MENU_NAME);
-        menu.setPrice(후라이드치킨_DEFAULT_PRICE);
-        menu.setMenuGroup(createMenuGroup());
-        menu.setDisplayed(true);
-        menu.setMenuProducts(List.of(createMenuProduct()));
-        menu.setMenuGroupId(후라이드치킨_MENU_GROUP_UUID);
-        return menu;
+        return createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE, createMenuGroup(),
+                true, List.of(createMenuProduct()), 후라이드치킨_MENU_GROUP_UUID);
     }
 
     public static Menu createMenu(BigDecimal price) {
-        Menu menu = new Menu();
-        menu.setId(후라이드치킨_MENU_UUID);
-        menu.setName(후라이드치킨_MENU_NAME);
-        menu.setPrice(price);
-        menu.setMenuGroup(createMenuGroup());
-        menu.setDisplayed(true);
-        menu.setMenuProducts(List.of(createMenuProduct()));
-        menu.setMenuGroupId(후라이드치킨_MENU_GROUP_UUID);
-        return menu;
+        return createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, price, createMenuGroup(),
+                true, List.of(createMenuProduct()), 후라이드치킨_MENU_GROUP_UUID);
     }
 
     public static Menu createMenu(final UUID id, final String name, final BigDecimal price, final MenuGroup menuGroup, final List<MenuProduct> menuProducts, final UUID menugroupId) {
+        return createMenu(id, name, price, menuGroup, true, menuProducts, menugroupId);
+        }
+
+    public static Menu createMenu(final UUID id, final String name, final BigDecimal price, final MenuGroup menuGroup, final boolean isDisplayed, final List<MenuProduct> menuProducts, final UUID menugroupId) {
         Menu menu = new Menu();
         menu.setId(id);
         menu.setName(name);
         menu.setPrice(price);
         menu.setMenuGroup(menuGroup);
-        menu.setDisplayed(true);
+        menu.setDisplayed(isDisplayed);
         menu.setMenuProducts(menuProducts);
         menu.setMenuGroupId(menugroupId);
         return menu;
@@ -60,6 +50,7 @@ public class MenuFixture {
         menu.setPrice(price);
         menu.setMenuGroup(menuGroup);
         menu.setDisplayed(true);
+        menu.setMenuProducts(List.of(createMenuProduct()));
         menu.setMenuGroupId(menugroupId);
         return menu;
     }
