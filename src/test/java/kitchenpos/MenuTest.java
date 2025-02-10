@@ -130,14 +130,12 @@ public class MenuTest {
     @DisplayName(value = "메뉴 가격 수정 기능")
     @Nested
     class MenuChangePriceTest {
-        private static final BigDecimal 후라이드치킨_MINUS_PRICE = new BigDecimal(-10);
-        private static final BigDecimal 후라이드치킨_CHANGE_PRICE = new BigDecimal(19000);
 
         @DisplayName(value = "메뉴가격을 수정할 수 있다.")
         @Test
         void changeMenu() {
             createAndSaveMenu();
-            Menu menuRequest = createMenu(후라이드치킨_CHANGE_PRICE);
+            Menu menuRequest = createMenu(new BigDecimal(19000));
             Menu menu = menuService.changePrice(후라이드치킨_MENU_UUID, menuRequest);
 
             assertThat(menu.getPrice()).isEqualTo(menuRequest.getPrice());
@@ -148,7 +146,7 @@ public class MenuTest {
         @DisplayName(value = "메뉴의 가격은 0원 이상이어야 한다.")
         @Test
         void invalidMenuAmount() {
-            Menu menuRequest = createMenu(후라이드치킨_MINUS_PRICE);
+            Menu menuRequest = createMenu(new BigDecimal(-10));
             assertThatIllegalArgumentException().isThrownBy(() -> menuService.changePrice(후라이드치킨_MENU_UUID, menuRequest));
         }
 
