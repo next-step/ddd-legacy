@@ -1,5 +1,7 @@
 package racingcar;
 
+import java.util.Random;
+
 public class Car {
 
     private String carName;
@@ -14,5 +16,11 @@ public class Car {
         }
 
         this.carName = carName;
+    }
+
+    public boolean movable() {
+        Random random = new Random();
+        var num = random.nextInt(10);
+        return num >= 4;
     }
 }
