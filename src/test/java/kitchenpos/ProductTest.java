@@ -92,8 +92,7 @@ public class ProductTest {
         @Test
         void changeProductPrice() {
 
-            Product product = createProduct();
-            productRepository.save(product);
+            Product product = createAndSaveProduct();
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = createMenu(createMenuGroup(), menuProduct);
             menuRepository.save(menu);
@@ -116,8 +115,7 @@ public class ProductTest {
         @DisplayName(value = "메뉴의 가격이 메뉴의 상품들의 총 가격 합보다 크면, 비노출처리합니다")
         @Test
         void invalidTotalProductPrice() {
-            Product product = createProduct();
-            productRepository.save(product);
+            Product product = createAndSaveProduct();
             Menu menu = createMenu(createMenuGroup(), createMenuProduct(product, 1));
             menuRepository.save(menu);
             product.setPrice(BigDecimal.valueOf(19000));
@@ -133,10 +131,15 @@ public class ProductTest {
         @DisplayName(value = "모든 상품을 조회합니다")
         @Test
         void changeProductPrice() {
-            Product product = createProduct();
-            productRepository.save(product);
+            Product product = createAndSaveProduct();
             List<Product> products = productService.findAll();
             assertThat(products.size()).isEqualTo(1);
         }
+    }
+
+    private Product createAndSaveProduct() {
+        Product product = createProduct();
+        productRepository.save(product);
+        return product;
     }
 }

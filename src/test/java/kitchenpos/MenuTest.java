@@ -3,7 +3,10 @@ package kitchenpos;
 import kitchenpos.application.*;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,7 +18,6 @@ import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
 import static kitchenpos.fixture.productFixture.createProduct;
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName(value = " Menu 테스트")
@@ -125,7 +127,6 @@ public class MenuTest {
     }
 
 
-
     @DisplayName(value = "메뉴 가격 수정 기능")
     @Nested
     class MenuChangePriceTest {
@@ -135,7 +136,7 @@ public class MenuTest {
         @DisplayName(value = "메뉴가격을 수정할 수 있다.")
         @Test
         void changeMenu() {
-            menuRepository.save( createMenu());
+            createAndSaveMenu();
             Menu menuRequest = createMenu(후라이드치킨_CHANGE_PRICE);
             Menu menu = menuService.changePrice(후라이드치킨_MENU_UUID, menuRequest);
 
@@ -147,15 +148,14 @@ public class MenuTest {
         @DisplayName(value = "메뉴의 가격은 0원 이상이어야 한다.")
         @Test
         void invalidMenuAmount() {
-           Menu menuRequest = createMenu(후라이드치킨_MINUS_PRICE);
+            Menu menuRequest = createMenu(후라이드치킨_MINUS_PRICE);
             assertThatIllegalArgumentException().isThrownBy(() -> menuService.changePrice(후라이드치킨_MENU_UUID, menuRequest));
         }
 
         @DisplayName(value = "메뉴의 변경 금액은 메뉴에 포함된 상품들의 가격 합보다 크면 안됩니다.")
         @Test
         void invalidTotalMenuAmount() {
-            Menu menu = createMenu();
-            menuRepository.save(menu);
+            createAndSaveMenu();
             Menu menuRequest = createMenu(후라이드치킨_OVER_PRICE);
             assertThatIllegalArgumentException().isThrownBy(() -> menuService.changePrice(후라이드치킨_MENU_UUID, menuRequest));
         }
@@ -169,8 +169,7 @@ public class MenuTest {
         @DisplayName(value = "메뉴내에 포함된 금액의 합이 메뉴 금액보다 크면 안됩니다.")
         @Test
         void invalidMenuAmount() {
-            Menu menu = createMenu(후라이드치킨_OVER_PRICE);
-            menuRepository.save(menu);
+            createAndSaveMenu(후라이드치킨_OVER_PRICE);
             assertThatIllegalStateException().isThrownBy(() -> menuService.display(후라이드치킨_MENU_UUID));
         }
 
@@ -178,12 +177,13 @@ public class MenuTest {
         @DisplayName(value = "메뉴를 노출시킵니다.")
         @Test
         void displayMenu() {
-            Menu menu = createMenu();
-            menuRepository.save(menu);
+            createAndSaveMenu();
             Menu ResponseMenu = menuService.display(후라이드치킨_MENU_UUID);
             assertThat(ResponseMenu.isDisplayed()).isTrue();
         }
     }
+
+    
 
     @DisplayName(value = "메뉴 비노출 기능")
     @Nested
@@ -191,8 +191,7 @@ public class MenuTest {
         @DisplayName(value = "메뉴를 비노출시킵니다.")
         @Test
         void displayMenu() {
-            Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE);
-            menuRepository.save(menu);
+            createAndSaveMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE);
             Menu ResponseMenu = menuService.hide(후라이드치킨_MENU_UUID);
             assertThat(ResponseMenu.isDisplayed()).isFalse();
         }
@@ -204,11 +203,26 @@ public class MenuTest {
         @DisplayName(value = "모든 메뉴를 조회합니다.")
         @Test
         void displayMenu() {
-            Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE);
-            menuRepository.save(menu);
+            createAndSaveMenu(후라이드치킨_MENU_UUID, 후라이드치킨_MENU_NAME, 후라이드치킨_DEFAULT_PRICE);
             List<Menu> ResponseMenu = menuService.findAll();
             assertThat(ResponseMenu.size()).isEqualTo(1);
 
         }
     }
+
+    private void createAndSaveMenu(BigDecimal price) {
+        Menu menu = createMenu(price);
+        menuRepository.save(menu);
+    }
+
+    private void createAndSaveMenu(UUID id, String name, BigDecimal price) {
+        Menu menu = createMenu(id, name, price);
+        menuRepository.save(menu);
+    }
+
+    private void createAndSaveMenu() {
+        Menu menu = createMenu();
+        menuRepository.save(menu);
+    }
+    
 }

@@ -73,8 +73,7 @@ public class OrderTableTest {
         @DisplayName(value = "주문 테이블 등록시 첫인원은 0명, 테이블은 사용가능으로 등록합니다.")
         @Test
         void sitOrderTable() {
-            var orderTable = createOrderTable(ORDER_TABLE_DEFAULT_NAME);
-            orderTableRepository.save(orderTable);
+            var orderTable = createAndSaveOrderTable();
             var orderTableResponse = orderTableService.sit(orderTable.getId());
             assertThat(orderTableResponse.isOccupied()).isTrue();
         }
@@ -86,20 +85,16 @@ public class OrderTableTest {
         @DisplayName(value = "테이블의 주문상태가 주문 완료여야 합니다.")
         @Test
         void invalidOrderStatus() {
-            var orderTable = createOrderTable(ORDER_TABLE_DEFAULT_NAME);
-            var order = createOrder(ORDER_STATUS_제공완료, orderTable);
-            orderRepository.save(order);
-            orderTableRepository.save(orderTable);
+            var orderTable = createAndSaveOrderTable(ORDER_TABLE_DEFAULT_NAME);
+            var order = createAndSaveOrder(ORDER_STATUS_제공완료, orderTable);
             assertThatIllegalStateException().isThrownBy(() -> orderTableService.clear(orderTable.getId()));
         }
 
         @DisplayName(value = "테이블의 주문상태가 주문 완료여야 합니다.")
         @Test
         void clearOrderTable() {
-            var orderTable = createOrderTable(ORDER_TABLE_DEFAULT_NAME);
-            var order = createOrder(ORDER_STATUS_주문완료, orderTable);
-            orderRepository.save(order);
-            orderTableRepository.save(orderTable);
+            var orderTable = createAndSaveOrderTable(ORDER_TABLE_DEFAULT_NAME);
+            var order = createAndSaveOrder(ORDER_STATUS_주문완료, orderTable);
             OrderTable orderTableResponse = orderTableService.clear(orderTable.getId());
 
             assertAll(
@@ -107,6 +102,12 @@ public class OrderTableTest {
                     () -> assertThat(orderTableResponse.isOccupied()).isFalse()
             );
         }
+    }
+
+    private Order createAndSaveOrder(OrderStatus orderStatus, OrderTable orderTable) {
+        var order = createOrder(orderStatus, orderTable);
+        orderRepository.save(order);
+        return order;
     }
 
     @DisplayName(value = "테이블 인원 변경 기능.")
@@ -120,8 +121,7 @@ public class OrderTableTest {
         @DisplayName(value = "인원의 수는 음수가 되면 안됩니다.")
         @Test
         void invalidNumberOfGuests() {
-            var orderTable = createOrderTable(ORDER_TABLE_DEFAULT_NAME, MINUS_NUMBER_OF_GUESTS);
-            orderTableRepository.save(orderTable);
+            var orderTable = createAndOrderTable(ORDER_TABLE_DEFAULT_NAME, MINUS_NUMBER_OF_GUESTS);
             assertThatIllegalArgumentException()
                     .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
         }
@@ -129,8 +129,7 @@ public class OrderTableTest {
         @DisplayName(value = "테이블이 사용가능 상태이면 안됩니다.")
         @Test
         void invalidOccupied() {
-            var orderTable = createOrderTable(ORDER_TABLE_DEFAULT_NAME, 주문테이블_사용가능);
-            orderTableRepository.save(orderTable);
+            var orderTable = createAndSaveOrderTable(ORDER_TABLE_DEFAULT_NAME, 주문테이블_사용가능);
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
         }
@@ -138,12 +137,17 @@ public class OrderTableTest {
         @DisplayName(value = "테이블의 주문상태가 주문 완료여야 합니다.")
         @Test
         void changeNumberOfGuests() {
-            var orderTable = createOrderTable(ORDER_TABLE_DEFAULT_NAME);
-            orderTableRepository.save(orderTable);
+            var orderTable = createAndSaveOrderTable();
             orderTable.setNumberOfGuests(CHANGED_NUMBER_OF_GUESTS);
             OrderTable orderTableResponse = orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
             assertThat(orderTableResponse.getNumberOfGuests()).isEqualTo(CHANGED_NUMBER_OF_GUESTS);
         }
+    }
+
+    private OrderTable createAndOrderTable(String name, int numberOfGuests) {
+        var orderTable = createOrderTable(name, numberOfGuests);
+        orderTableRepository.save(orderTable);
+        return orderTable;
     }
 
     @DisplayName(value = "모든 주물 테이블 조회 기능.")
@@ -153,10 +157,27 @@ public class OrderTableTest {
         @DisplayName(value = "모든 주문 테이블을 조회할 수 있다.")
         @Test
         void findAllTest() {
-            var orderTable = createOrderTable(ORDER_TABLE_DEFAULT_NAME);
-            orderTableRepository.save(orderTable);
+            createAndSaveOrderTable();
             var orders = orderTableService.findAll();
             assertThat(orders.size()).isOne();
         }
+    }
+
+    private OrderTable createAndSaveOrderTable() {
+        var orderTable = createOrderTable(ORDER_TABLE_DEFAULT_NAME);
+        orderTableRepository.save(orderTable);
+        return orderTable;
+    }
+
+    private OrderTable createAndSaveOrderTable(String orderTableName) {
+        var orderTable = createOrderTable(orderTableName);
+        orderTableRepository.save(orderTable);
+        return orderTable;
+    }
+
+    private OrderTable createAndSaveOrderTable(String orderTableName, Boolean isOccupied) {
+        var orderTable = createOrderTable(orderTableName, isOccupied);
+        orderTableRepository.save(orderTable);
+        return orderTable;
     }
 }

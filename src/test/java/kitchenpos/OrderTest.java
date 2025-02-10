@@ -2,24 +2,18 @@ package kitchenpos;
 
 import kitchenpos.application.*;
 import kitchenpos.domain.*;
-import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.UUID;
 
 import static kitchenpos.TestConstant.*;
 import static kitchenpos.domain.OrderStatus.*;
-import static kitchenpos.domain.OrderType.DELIVERY;
-import static kitchenpos.domain.OrderType.EAT_IN;
 import static kitchenpos.fixture.MenuFixture.createMenu;
 import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
 import static kitchenpos.fixture.OrderFixture.createOrder;
