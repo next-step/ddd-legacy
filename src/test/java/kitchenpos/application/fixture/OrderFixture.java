@@ -10,27 +10,46 @@ import java.util.UUID;
 
 public class OrderFixture {
 
-    public static Order createDeliveryOrder(List<OrderLineItem> orderLineItems, String deliveryAddress, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        return createOrder(OrderType.DELIVERY, orderLineItems, deliveryAddress, null, null, orderStatus, orderDateTime);
+    public static class Delivery {
+
+        public static Order initializeOrder(List<OrderLineItem> orderLineItems, String deliveryAddress, LocalDateTime orderDateTime) {
+            return createOrder(OrderType.DELIVERY, orderLineItems, deliveryAddress, null, null, null, orderDateTime);
+        }
+
+        public static Order createOrderByStatus(List<OrderLineItem> orderLineItems, String deliveryAddress, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+            return createOrder(OrderType.DELIVERY, orderLineItems, deliveryAddress, null, null, orderStatus, orderDateTime);
+        }
     }
 
-    public static Order createEatInOrder(List<OrderLineItem> orderLineItems, OrderTable orderTable, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        return createOrder(OrderType.EAT_IN, orderLineItems, null, orderTable.getId(), orderTable, orderStatus, orderDateTime);
+    public static class EatIn {
+        public static Order initializeOrder(List<OrderLineItem> orderLineItems, OrderTable orderTable, LocalDateTime orderDateTime) {
+            return createOrder(OrderType.EAT_IN, orderLineItems, null, orderTable.getId(), orderTable, null, orderDateTime);
+        }
+
+        public static Order createOrderByStatus(List<OrderLineItem> orderLineItems, OrderTable orderTable, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+            return createOrder(OrderType.EAT_IN, orderLineItems, null, orderTable.getId(), orderTable, orderStatus, orderDateTime);
+        }
     }
 
-    public static Order creatTakeOutOrder(List<OrderLineItem> orderLineItems, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        return createOrder(OrderType.TAKEOUT, orderLineItems, null, null, null, orderStatus, orderDateTime);
+    public static class TakeOut {
+        public static Order initializeOrder(List<OrderLineItem> orderLineItems, LocalDateTime orderDateTime) {
+            return createOrder(OrderType.TAKEOUT, orderLineItems, null, null, null, null, orderDateTime);
+        }
+
+        public static Order createOrderByStatus(List<OrderLineItem> orderLineItems, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+            return createOrder(OrderType.TAKEOUT, orderLineItems, null, null, null, orderStatus, orderDateTime);
+        }
     }
 
-    public static Order createOrder(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress, UUID orderTableId, OrderTable orderTable, OrderStatus orderStatus, LocalDateTime orderDateTime) {
+    public static Order createOrder(OrderType type, List<OrderLineItem> orderLineItems, String deliveryAddress, UUID orderTableId, OrderTable orderTable, OrderStatus status, LocalDateTime orderDateTime) {
         Order order = new Order();
         ReflectionTestUtils.setField(order, "id", UUID.randomUUID());
-        ReflectionTestUtils.setField(order, "orderType", orderType);
+        ReflectionTestUtils.setField(order, "type", type);
         ReflectionTestUtils.setField(order, "orderLineItems", orderLineItems);
         ReflectionTestUtils.setField(order, "deliveryAddress", deliveryAddress);
         ReflectionTestUtils.setField(order, "orderTable", orderTable);
         ReflectionTestUtils.setField(order, "orderTableId", orderTableId);
-        ReflectionTestUtils.setField(order, "orderStatus", orderStatus);
+        ReflectionTestUtils.setField(order, "status", status);
         ReflectionTestUtils.setField(order, "orderDateTime", orderDateTime);
 
         return order;

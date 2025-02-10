@@ -169,10 +169,6 @@ class OrderTableServiceTest {
     }
     //endregion
 
-    private Order createEatInOrder(List<OrderLineItem> orderLineItems, OrderTable orderTable, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        return OrderFixture.createEatInOrder(orderLineItems, orderTable, orderStatus, orderDateTime);
-    }
-
     private Order createUnnamedOrder(OrderTable orderTable, OrderStatus orderStatus) {
         Product unnamedProduct = productRepository.save(ProductFixture.createProduct(UUID.randomUUID(), "unnamed", BigDecimal.ZERO));
         MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.createMenuGroup(UUID.randomUUID(), "unnamed"));
@@ -180,6 +176,6 @@ class OrderTableServiceTest {
         Menu unknownMenu = menuRepository.save(MenuFixture.createMenu(UUID.randomUUID(), menuGroup, menuGroup.getId(), "unnamed", BigDecimal.ZERO, true, List.of(displayMenuProduct)));
 
         OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(unknownMenu.getId(), BigDecimal.ZERO, 1);
-        return orderService.create(createEatInOrder(List.of(orderLineItem), orderTable, orderStatus, LocalDateTime.now()));
+        return orderService.create(OrderFixture.EatIn.createOrderByStatus(List.of(orderLineItem), orderTable, orderStatus, LocalDateTime.now()));
     }
 }

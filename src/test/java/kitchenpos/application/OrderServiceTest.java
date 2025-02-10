@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -74,6 +73,7 @@ class OrderServiceTest {
         void orderType(OrderType orderType) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal("25000"), 1);
             Order nullOrderTypeRequest = OrderFixture.createOrder(orderType, List.of(orderLineItem), "", null, null, null, LocalDateTime.now());
+
             assertThatIllegalArgumentException()
                     .isThrownBy(() -> orderService.create(nullOrderTypeRequest));
         }
@@ -82,7 +82,7 @@ class OrderServiceTest {
         @Test
         void takeOutOrder() {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal("25000"), 1);
-            Order orderRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
+            Order orderRequest = OrderFixture.TakeOut.initializeOrder(List.of(orderLineItem), LocalDateTime.now());
 
             Order orderResult = orderService.create(orderRequest);
 
@@ -99,7 +99,7 @@ class OrderServiceTest {
         @Test
         void deliveryOrder() {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal("25000"), 1);
-            Order orderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
+            Order orderRequest = OrderFixture.Delivery.initializeOrder(List.of(orderLineItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
 
             Order orderResult = orderService.create(orderRequest);
 
@@ -120,7 +120,7 @@ class OrderServiceTest {
             OrderTable orderTable = orderTableRepository.save(request);
 
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal("25000"), 1);
-            Order orderRequest = createEatInOrder(List.of(orderLineItem), orderTable, LocalDateTime.now());
+            Order orderRequest = OrderFixture.EatIn.initializeOrder(List.of(orderLineItem), orderTable, LocalDateTime.now());
 
             Order orderResult = orderService.create(orderRequest);
 
@@ -137,10 +137,10 @@ class OrderServiceTest {
         @ParameterizedTest
         @MethodSource("nullOrEmptyList")
         void notNullOrderLineItems(List<OrderLineItem> orderLineItems) {
-            Order takeOutRequest = createTakeOutOrder(orderLineItems, LocalDateTime.now());
-            Order deliveryOrderRequest = createDeliveryOrder(orderLineItems, "경기도 고양시..XX동 XX호", LocalDateTime.now());
+            Order takeOutRequest = OrderFixture.TakeOut.initializeOrder(orderLineItems, LocalDateTime.now());
+            Order deliveryOrderRequest = OrderFixture.Delivery.initializeOrder(orderLineItems, "경기도 고양시..XX동 XX호", LocalDateTime.now());
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
-            Order eatInOrderRequest = createEatInOrder(orderLineItems, orderTable, LocalDateTime.now());
+            Order eatInOrderRequest = OrderFixture.EatIn.initializeOrder(orderLineItems, orderTable, LocalDateTime.now());
 
             assertAll(
                     () -> assertThatIllegalArgumentException()
@@ -161,8 +161,8 @@ class OrderServiceTest {
         void validateQuantity() {
             int negativeQuantity = -1;
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal("25000"), negativeQuantity);
-            Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
-            Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
+            Order takeOutRequest = OrderFixture.TakeOut.initializeOrder(List.of(orderLineItem), LocalDateTime.now());
+            Order deliveryOrderRequest = OrderFixture.Delivery.initializeOrder(List.of(orderLineItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
 
             assertAll(
                     () -> assertThatIllegalArgumentException()
@@ -175,11 +175,11 @@ class OrderServiceTest {
         @DisplayName("메뉴판에 전시하지 않은 메뉴는 주문할 수 없다")
         @Test
         void validateMenuOrder() {
-            OrderLineItem undisplayMenuOrderItem = OrderFixture.createOrderLineItem(UNDISPLAYED_MENU_ID, new BigDecimal("25000"), 1);
-            Order takeOutRequest = createTakeOutOrder(List.of(undisplayMenuOrderItem), LocalDateTime.now());
-            Order deliveryOrderRequest = createDeliveryOrder(List.of(undisplayMenuOrderItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
+            OrderLineItem unDisplayMenuOrderItem = OrderFixture.createOrderLineItem(UNDISPLAYED_MENU_ID, new BigDecimal("25000"), 1);
+            Order takeOutRequest = OrderFixture.TakeOut.initializeOrder(List.of(unDisplayMenuOrderItem), LocalDateTime.now());
+            Order deliveryOrderRequest = OrderFixture.Delivery.initializeOrder(List.of(unDisplayMenuOrderItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
-            Order eatInOrderRequest = createEatInOrder(List.of(undisplayMenuOrderItem), orderTable, LocalDateTime.now());
+            Order eatInOrderRequest = OrderFixture.EatIn.initializeOrder(List.of(unDisplayMenuOrderItem), orderTable, LocalDateTime.now());
 
             assertAll(
                     () -> assertThatIllegalStateException()
@@ -197,10 +197,10 @@ class OrderServiceTest {
             BigDecimal menuPrice = menuRepository.findById(DISPLAY_MENU_ID).get().getPrice();
 
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, menuPrice.add(BigDecimal.ONE), 1);
-            Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
-            Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
+            Order takeOutRequest = OrderFixture.TakeOut.initializeOrder(List.of(orderLineItem), LocalDateTime.now());
+            Order deliveryOrderRequest = OrderFixture.Delivery.initializeOrder(List.of(orderLineItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
-            Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), orderTable, LocalDateTime.now());
+            Order eatInOrderRequest = OrderFixture.EatIn.initializeOrder(List.of(orderLineItem), orderTable, LocalDateTime.now());
 
             assertAll(
                     () -> assertThatIllegalArgumentException()
@@ -217,7 +217,7 @@ class OrderServiceTest {
         @NullAndEmptySource
         void notNullOrNotEmpty(String deliveryAddress) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order deliveryOrderRequest = createDeliveryOrder(List.of(orderLineItem), deliveryAddress, LocalDateTime.now());
+            Order deliveryOrderRequest = OrderFixture.Delivery.initializeOrder(List.of(orderLineItem), deliveryAddress, LocalDateTime.now());
 
             assertThatIllegalArgumentException()
                     .isThrownBy(() -> orderService.create(deliveryOrderRequest));
@@ -228,7 +228,7 @@ class OrderServiceTest {
         void validateOrderTable() {
             OrderTable unknownTable = OrderTableFixture.createOrderTable(UUID.randomUUID(), "1번테이블", 0);
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), unknownTable, LocalDateTime.now());
+            Order eatInOrderRequest = OrderFixture.EatIn.initializeOrder(List.of(orderLineItem), unknownTable, LocalDateTime.now());
 
             assertThatThrownBy(() -> orderService.create(eatInOrderRequest))
                     .isInstanceOf(NoSuchElementException.class);
@@ -240,7 +240,7 @@ class OrderServiceTest {
             boolean tableOccupied = false;
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", tableOccupied, 0));
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), orderTable, LocalDateTime.now());
+            Order eatInOrderRequest = OrderFixture.EatIn.initializeOrder(List.of(orderLineItem), orderTable, LocalDateTime.now());
 
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.create(eatInOrderRequest));
@@ -252,11 +252,11 @@ class OrderServiceTest {
     @Nested
     class OrderAccepter {
         @DisplayName("대기 중인 주문을 수락한다")
-        @Test
-        void acceptOrderStatus() {
+        @EnumSource(value = OrderStatus.class, names = "WAITING", mode = EnumSource.Mode.INCLUDE)
+        @ParameterizedTest
+        void acceptOrderStatus(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
-            Order takeOutOrder = orderService.create(takeOutRequest);
+            Order takeOutOrder = orderRepository.save(OrderFixture.TakeOut.createOrderByStatus(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
 
             Order acceptOrder = orderService.accept(takeOutOrder.getId());
 
@@ -268,7 +268,7 @@ class OrderServiceTest {
         @ParameterizedTest
         void validateAcceptStatus(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order takeOutOrder = orderRepository.save(createTakeOutOrder(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
+            Order takeOutOrder = orderRepository.save(OrderFixture.TakeOut.createOrderByStatus(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
 
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.accept(takeOutOrder.getId()));
@@ -285,7 +285,7 @@ class OrderServiceTest {
         @ParameterizedTest
         void served(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order acceptOrder = orderRepository.save(createTakeOutOrder(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
+            Order acceptOrder = orderRepository.save(OrderFixture.TakeOut.createOrderByStatus(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
 
             Order servedOrder = orderService.serve(acceptOrder.getId());
 
@@ -297,7 +297,7 @@ class OrderServiceTest {
         @ParameterizedTest
         void validateServedStatus(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order order = orderRepository.save(createTakeOutOrder(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
+            Order order = orderRepository.save(OrderFixture.TakeOut.createOrderByStatus(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
 
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.serve(order.getId()));
@@ -314,7 +314,7 @@ class OrderServiceTest {
         @ParameterizedTest
         void startDelivery(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order order = orderRepository.save(createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
+            Order order = orderRepository.save(OrderFixture.Delivery.createOrderByStatus(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
 
             Order deliveryStartorder = orderService.startDelivery(order.getId());
 
@@ -326,7 +326,7 @@ class OrderServiceTest {
         @ParameterizedTest
         void validateDeliveryStartStatus(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order order = orderRepository.save(createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
+            Order order = orderRepository.save(OrderFixture.Delivery.createOrderByStatus(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
 
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.startDelivery(order.getId()));
@@ -342,7 +342,7 @@ class OrderServiceTest {
         @EnumSource(value = OrderStatus.class, names = "DELIVERING", mode = EnumSource.Mode.INCLUDE)
         void endDelivery(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order order = orderRepository.save(createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
+            Order order = orderRepository.save(OrderFixture.Delivery.createOrderByStatus(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
 
             Order deliveryStartorder = orderService.completeDelivery(order.getId());
 
@@ -355,7 +355,7 @@ class OrderServiceTest {
         void validateDeliveryEndStatus(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
 
-            Order order = orderService.create(createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
+            Order order = orderService.create(OrderFixture.Delivery.createOrderByStatus(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
 
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.completeDelivery(order.getId()));
@@ -372,7 +372,7 @@ class OrderServiceTest {
         void complete(OrderStatus orderStatus) {
             //given
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order order = orderRepository.save(createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
+            Order order = orderRepository.save(OrderFixture.Delivery.createOrderByStatus(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
             //when
             Order complete = orderService.complete(order.getId());
             //then
@@ -384,7 +384,7 @@ class OrderServiceTest {
         @ParameterizedTest
         void completeOrderByDelivery(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order order = orderRepository.save(createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
+            Order order = orderRepository.save(OrderFixture.Delivery.createOrderByStatus(List.of(orderLineItem), "경기도 고양시..XX동 XXX호", orderStatus, LocalDateTime.now()));
 
             assertThatIllegalStateException()
                     .isThrownBy(() -> orderService.complete(order.getId()));
@@ -396,7 +396,7 @@ class OrderServiceTest {
         void completeByTakeOut(OrderStatus orderStatus) {
             //given
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order servedOrder = orderRepository.save(createTakeOutOrder(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
+            Order servedOrder = orderRepository.save(OrderFixture.TakeOut.createOrderByStatus(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
             //when
             Order complete = orderService.complete(servedOrder.getId());
             //then
@@ -409,7 +409,7 @@ class OrderServiceTest {
         void completeByEatIn(OrderStatus orderStatus) {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
-            Order servedOrder = orderRepository.save(createEatInOrder(List.of(orderLineItem), orderTable, orderStatus, LocalDateTime.now()));
+            Order servedOrder = orderRepository.save(OrderFixture.EatIn.createOrderByStatus(List.of(orderLineItem), orderTable, orderStatus, LocalDateTime.now()));
             //when
             Order complete = orderService.complete(servedOrder.getId());
             //then
@@ -422,17 +422,12 @@ class OrderServiceTest {
         void completeOrderByEatInOrTakeOut(OrderStatus orderStatus) {
             //given
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
-            Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
 
+            Order takeoutOrder = orderRepository.save(OrderFixture.TakeOut.createOrderByStatus(List.of(orderLineItem), orderStatus, LocalDateTime.now()));
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
-            Order eatInRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
+            Order eatInOrder = orderRepository.save(OrderFixture.EatIn.createOrderByStatus(List.of(orderLineItem), orderTable, orderStatus, LocalDateTime.now()));
 
-            Order takeoutOrder = orderService.create(takeOutRequest);
-            Order eatInOrder = orderService.create(eatInRequest);
-            //when
-            ReflectionTestUtils.setField(takeoutOrder, "status", orderStatus);
-            ReflectionTestUtils.setField(eatInOrder, "status", orderStatus);
-            //then
+            //when, then
             assertAll(
                     () -> assertThatIllegalStateException()
                             .isThrownBy(() -> orderService.complete(takeoutOrder.getId())),
@@ -449,8 +444,8 @@ class OrderServiceTest {
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
 
             //주문 상태가 SERVED인 주문1,2 생성
-            Order servedOrder1 = orderRepository.save(createEatInOrder(List.of(orderLineItem), orderTable, OrderStatus.SERVED, LocalDateTime.now()));
-            Order servedOrder2 = orderRepository.save(createEatInOrder(List.of(orderLineItem), orderTable, OrderStatus.SERVED, LocalDateTime.now()));
+            Order servedOrder1 = orderRepository.save(OrderFixture.EatIn.createOrderByStatus(List.of(orderLineItem), orderTable, OrderStatus.SERVED, LocalDateTime.now()));
+            Order servedOrder2 = orderRepository.save(OrderFixture.EatIn.createOrderByStatus(List.of(orderLineItem), orderTable, OrderStatus.SERVED, LocalDateTime.now()));
 
             //when
             Order complete = orderService.complete(servedOrder1.getId());
@@ -470,8 +465,8 @@ class OrderServiceTest {
             OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(ORDER_TABLE_ID, "1번테이블", true, 4));
 
-            Order servedOrder1 = orderRepository.save(createEatInOrder(List.of(orderLineItem), orderTable, OrderStatus.SERVED, LocalDateTime.now()));
-            Order servedOrder2 = orderRepository.save(createEatInOrder(List.of(orderLineItem), orderTable, OrderStatus.SERVED, LocalDateTime.now()));
+            Order servedOrder1 = orderRepository.save(OrderFixture.EatIn.createOrderByStatus(List.of(orderLineItem), orderTable, OrderStatus.SERVED, LocalDateTime.now()));
+            Order servedOrder2 = orderRepository.save(OrderFixture.EatIn.createOrderByStatus(List.of(orderLineItem), orderTable, OrderStatus.SERVED, LocalDateTime.now()));
 
             //when
             Order complete1 = orderService.complete(servedOrder1.getId());
@@ -498,42 +493,14 @@ class OrderServiceTest {
         OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(DISPLAY_MENU_ID, new BigDecimal(25000), 1);
         OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOrderTable(UUID.randomUUID(), "1번테이블", true, 4));
 
-        Order takeOutRequest = createTakeOutOrder(List.of(orderLineItem), LocalDateTime.now());
-        Order deliveryRequest = createDeliveryOrder(List.of(orderLineItem), "경기도 고양시..XX동 XX호", LocalDateTime.now());
-        Order eatInOrderRequest = createEatInOrder(List.of(orderLineItem), orderTable, LocalDateTime.now());
-
-        Order takeOutOrder = orderService.create(takeOutRequest);
-        Order deliveryOrder = orderService.create(deliveryRequest);
-        Order eatInOrder = orderService.create(eatInOrderRequest);
+        orderRepository.save(OrderFixture.TakeOut.initializeOrder(List.of(orderLineItem), LocalDateTime.now()));
+        orderRepository.save(OrderFixture.Delivery.initializeOrder(List.of(orderLineItem), "경기도 고양시..XX동 XX호", LocalDateTime.now()));
+        orderRepository.save(OrderFixture.EatIn.initializeOrder(List.of(orderLineItem), orderTable, LocalDateTime.now()));
         //when
         List<Order> orders = orderService.findAll();
         //then
         assertThat(orders).hasSize(3);
     }
     //endregion
-
-    private Order createTakeOutOrder(List<OrderLineItem> orderLineItems, LocalDateTime orderDateTime) {
-        return createTakeOutOrder(orderLineItems, null, orderDateTime);
-    }
-
-    private Order createDeliveryOrder(List<OrderLineItem> orderLineItems, String deliveryAddress, LocalDateTime orderDateTime) {
-        return createDeliveryOrder(orderLineItems, deliveryAddress, null, orderDateTime);
-    }
-
-    private Order createEatInOrder(List<OrderLineItem> orderLineItems, OrderTable orderTable, LocalDateTime orderDateTime) {
-        return createEatInOrder(orderLineItems, orderTable, null, orderDateTime);
-    }
-
-    private Order createTakeOutOrder(List<OrderLineItem> orderLineItems, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        return OrderFixture.creatTakeOutOrder(orderLineItems, orderStatus, orderDateTime);
-    }
-
-    private Order createDeliveryOrder(List<OrderLineItem> orderLineItems, String deliveryAddress, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        return OrderFixture.createDeliveryOrder(orderLineItems, deliveryAddress, orderStatus, orderDateTime);
-    }
-
-    private Order createEatInOrder(List<OrderLineItem> orderLineItems, OrderTable orderTable, OrderStatus orderStatus, LocalDateTime orderDateTime) {
-        return OrderFixture.createEatInOrder(orderLineItems, orderTable, orderStatus, orderDateTime);
-    }
 
 }
