@@ -6,11 +6,17 @@ public class StringCalculator {
         if (text == null || text.isEmpty()) {
             return 0;
         }
+        return sum(parse(text));
+    }
 
-        String[] arr = text.split("[,:]");
+    private String[] parse(String text) {
+        return text.split("[,:]");
+    }
+
+    private int sum(String[] numbers) {
         int total = 0;
-        for (int i = 0; i < arr.length; i++) {
-            total += Integer.parseInt(arr[i]);
+        for (String number : numbers) {
+            total += Integer.parseInt(number);
         }
         return total;
     }
