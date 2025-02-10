@@ -4,9 +4,11 @@ import jakarta.transaction.Transactional;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -48,410 +50,193 @@ class MenuServiceTest {
         product.setName("후라이드");
         product.setPrice(BigDecimal.valueOf(16000));
         productRepository.save(product);
-
-    }
-    @DisplayName("메뉴를 생성 할 수 있다.")
-    @Test
-    void create() {
-        // given
-        MenuProduct menuProduct1 = new MenuProduct();
-        menuProduct1.setProductId(product.getId());
-        menuProduct1.setProduct(product);
-        menuProduct1.setQuantity(1);
-
-        List<MenuProduct> menuProducts = List.of(menuProduct1);
-
-        Menu request = new Menu();
-        request.setId(UUID.randomUUID());
-        request.setDisplayed(true);
-        request.setName("후라이드");
-        request.setPrice(BigDecimal.valueOf(16000));
-        request.setMenuGroupId(menuGroup.getId());
-        request.setMenuProducts(menuProducts);
-
-        //when
-        Menu result = menuService.create(request);
-
-        //then
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getId()).isNotNull();
-        Assertions.assertThat(result.getName()).isEqualTo("후라이드");
-        Assertions.assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(16000));
-        Assertions.assertThat(result.getMenuProducts()).hasSize(1);
-
     }
 
-    @DisplayName("메뉴 생성 시 메뉴 가격이 null 이면 IllegalArgumentException 예외 처리를 한다.")
-    @Test
-    void canNotCreateMenuIfMenuPriceIsNull() {
-        //given
-        Menu request = new Menu();
-        request.setPrice(null);
-
-        //when
-
-        //then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()->menuService.create(request));
+    private MenuProduct createMenuProduct(Product product, int quantity) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProductId(product.getId());
+        menuProduct.setProduct(product);
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
     }
 
-    @DisplayName("메뉴 생성 시 메뉴 가격이 0원 미만이면 IllegalArgumentException 예외 처리를 한다.")
-    @Test
-    void canNotCreateMenuIfMenuPriceIsUnderZero() {
-        //given
-        Menu request = new Menu();
-        request.setPrice(BigDecimal.valueOf(-1));
-
-        //when
-
-        //then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()->menuService.create(request));
-    }
-
-    @DisplayName("메뉴 생성 시 메뉴 그룹에 존재하지 않는다면, NoSuchElementException 예외 처리를 한다.")
-    @Test
-    void canNotCreateMenuIfMenuIsNotBelongToMenuGroup() {
-        //given
-        Menu request = new Menu();
-        request.setPrice(BigDecimal.valueOf(10000));
-        request.setMenuGroupId(UUID.randomUUID());
-
-        //when
-
-        //then
-        Assertions.assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(()->menuService.create(request));
-    }
-
-    @DisplayName("메뉴 생성 시 메뉴 상품이 존재하지 않으면, IllegalArgumentException 예외 처리를 한다.")
-    @Test
-    void canNotCreateMenuIfMenuProductIsNull() {
-        //given
-        Menu request = new Menu();
-        request.setId(UUID.randomUUID());
-        request.setName("세마리세트");
-        request.setPrice(BigDecimal.valueOf(25000));
-        request.setMenuGroupId(menuGroup.getId());
-        request.setMenuProducts(null);
-
-        //when
-
-        //then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()->menuService.create(request));
-    }
-
-
-    @DisplayName("메뉴 생성 시 메뉴 상품이 상품 내 존재하지 않는다면, IllegalArgumentException 예외 처리를 한다.")
-    @Test
-    void canNotCreateMenuIfProductIsMissing() {
-
-        // given
-        Product nonExistProduct = new Product();
-        nonExistProduct.setId(UUID.randomUUID());
-        nonExistProduct.setName("통구이");
-        nonExistProduct.setPrice(BigDecimal.valueOf(16000));
-
-        MenuProduct menuProduct1 = new MenuProduct();
-        menuProduct1.setProduct(nonExistProduct);
-        menuProduct1.setQuantity(1);
-
-        List<MenuProduct> menuProducts = List.of(menuProduct1);
-
-        Menu request = new Menu();
-        request.setId(UUID.randomUUID());
-        request.setPrice(BigDecimal.valueOf(16000));
-        request.setMenuGroupId(menuGroup.getId());
-        request.setMenuProducts(menuProducts);
-
-        //when
-
-        //then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()->menuService.create(request));
-    }
-
-    @DisplayName("메뉴 생성 시 메뉴 상품의 수량이 0보다 작으면, IllegalArgumentException 예외 처리를 한다.")
-    @Test
-    void canNotCreateMenuIfMenuProductQuantityIsUnderZero() {
-
-        // given
-        MenuProduct quantityIsUnderZeroMenuProduct = new MenuProduct();
-        quantityIsUnderZeroMenuProduct.setProductId(product.getId());
-        quantityIsUnderZeroMenuProduct.setQuantity(-1);
-
-        List<MenuProduct> menuProducts = List.of(quantityIsUnderZeroMenuProduct);
-
-        Menu request = new Menu();
-        request.setId(UUID.randomUUID());
-        request.setDisplayed(true);
-        request.setName("반반치킨");
-        request.setPrice(BigDecimal.valueOf(16000));
-        request.setMenuGroupId(menuGroup.getId());
-        request.setMenuProducts(menuProducts);
-
-        //when
-
-        //then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()->menuService.create(request));
-
-    }
-
-    @DisplayName("메뉴 생성 시 메뉴의 가격이 전체 메뉴 상품의 가격보다 크면, IllegalArgumentException 예외 처리를 한다.")
-    @Test
-    void canNotCreateMenuIfMenuProductIsNotBelongToProducts() {
-        // given
-        MenuProduct menuProduct1 = new MenuProduct();
-        menuProduct1.setProductId(product.getId());
-        menuProduct1.setProduct(product);
-        menuProduct1.setQuantity(1);
-
-        List<MenuProduct> menuProducts = List.of(menuProduct1);
-
-        Menu request = new Menu();
-        request.setId(UUID.randomUUID());
-        request.setDisplayed(true);
-        request.setName("후라이드");
-        request.setPrice(BigDecimal.valueOf(17000));
-        request.setMenuGroupId(menuGroup.getId());
-        request.setMenuProducts(menuProducts);
-
-        //when
-
-        //then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()->menuService.create(request));
-    }
-
-    @DisplayName("메뉴 가격 변경을 할 수 있다.")
-    @Test
-    void changePrice() {
-        //given
-        MenuProduct menuProduct1 = new MenuProduct();
-        menuProduct1.setProductId(product.getId());
-        menuProduct1.setProduct(product);
-        menuProduct1.setQuantity(1);
-
-        List<MenuProduct> menuProducts = List.of(menuProduct1);
-
+    private Menu createMenu(String name, BigDecimal price, List<MenuProduct> menuProducts, boolean displayed) {
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setName("후라이드치킨");
-        menu.setPrice(BigDecimal.valueOf(16000));
-        menu.setMenuProducts(menuProducts);
-        menu.setMenuGroupId(menuGroup.getId());
-        menu.setMenuGroup(menuGroup);
-        menuRepository.save(menu);
-
-        Menu request = new Menu();
-        request.setPrice(BigDecimal.valueOf(15000));
-
-        //when
-        Menu result = menuService.changePrice(menu.getId(),request);
-
-
-        //then
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(15000));
-    }
-
-    @DisplayName("메뉴 가격 변경시 가격이 존재하지 않으면 IllegalArgumentException 예외를 처리한다.")
-    @Test
-    void canNotChangePriceWithoutPrice() {
-        //given
-        Menu request = new Menu();
-        request.setId(UUID.randomUUID());
-        request.setDisplayed(true);
-        request.setName("후라이드치킨");
-        request.setPrice(null);
-        request.setMenuGroupId(menuGroup.getId());
-
-        //when
-
-
-        //then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()->menuService.create(request));
-    }
-
-
-    @DisplayName("메뉴 가격 변경시 가격이 0원보다 작다면 IllegalArgumentException 예외를 처리한다.")
-    @Test
-    void canNotChangePriceWithUnderZero() {
-        //given
-        Menu request = new Menu();
-        request.setId(UUID.randomUUID());
-        request.setDisplayed(true);
-        request.setName("후라이드치킨");
-        request.setPrice(BigDecimal.valueOf(-2000));
-        request.setMenuGroupId(menuGroup.getId());
-
-        //when
-
-
-        //then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()->menuService.create(request));
-    }
-
-    @DisplayName("메뉴 가격 변경시, 변경할 메뉴의 가격이 전체 메뉴의 상품 가격보다 크면 IllegalArgumentException 예외를 처리한다.")
-    @Test
-    void canNotChangePriceWithExpensivePriceThanOriginPrice() {
-        //given
-        Menu request = new Menu();
-        request.setId(UUID.randomUUID());
-        request.setDisplayed(true);
-        request.setName("후라이드치킨");
-        request.setPrice(BigDecimal.valueOf(50000));
-        request.setMenuGroupId(menuGroup.getId());
-
-        //when
-
-
-        //then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()->menuService.create(request));
-    }
-
-    @DisplayName("메뉴를 판매 가능 상태로 변경 할 수 있다.")
-    @Test
-    void display() {
-        //given
-        MenuProduct menuProduct1 = new MenuProduct();
-        menuProduct1.setProductId(product.getId());
-        menuProduct1.setProduct(product);
-        menuProduct1.setQuantity(1);
-
-        List<MenuProduct> menuProducts = List.of(menuProduct1);
-
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(false);
-        menu.setName("후라이드치킨");
-        menu.setPrice(BigDecimal.valueOf(16000));
+        menu.setName(name);
+        menu.setPrice(price);
         menu.setMenuProducts(menuProducts);
         menu.setMenuGroup(menuGroup);
         menu.setMenuGroupId(menuGroup.getId());
-        menuRepository.save(menu);
-
-        //when
-        Menu result = menuService.display(menu.getId());
-
-        //then
-        Assertions.assertThat(result.isDisplayed()).isTrue();
+        menu.setDisplayed(displayed);
+        return menuRepository.save(menu);
     }
 
-    @DisplayName("메뉴를 판매 가능 상태로 변경시, 존재하지 않은 메뉴를 선택하면 NoSuchElementException 예외 처리를 한다.")
-    @Test
-    void canNotDisplayWithDoseNotExistMenu() {
-        //given
-        UUID nonExistMenuId = UUID.randomUUID();
+    @Nested
+    @DisplayName("메뉴 생성")
+    class CreateMenuTest {
 
-        //when
+        @Test
+        @DisplayName("메뉴를 생성할 수 있다.")
+        void create() {
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu request = new Menu();
+            request.setId(UUID.randomUUID());
+            request.setDisplayed(true);
+            request.setName("후라이드");
+            request.setPrice(BigDecimal.valueOf(16000));
+            request.setMenuGroupId(menuGroup.getId());
+            request.setMenuProducts(List.of(menuProduct));
 
-        //then
-        Assertions.assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(()->menuService.display(nonExistMenuId));
+            Menu result = menuService.create(request);
+
+            Assertions.assertThat(result).isNotNull();
+            Assertions.assertThat(result.getId()).isNotNull();
+            Assertions.assertThat(result.getName()).isEqualTo("후라이드");
+            Assertions.assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(16000));
+            Assertions.assertThat(result.getMenuProducts()).hasSize(1);
+        }
+
+        @ParameterizedTest
+        @NullSource
+        @DisplayName("메뉴 가격이 null 또는 0원 미만이면 IllegalArgumentException 예외 발생")
+        void cannotCreateMenuWithNullPrice(BigDecimal invalidPrice) {
+            Menu request = new Menu();
+            request.setId(UUID.randomUUID());
+            request.setPrice(invalidPrice);
+
+            Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                    .isThrownBy(() -> menuService.create(request));
+        }
+
+        @ParameterizedTest
+        @ValueSource(longs = -1)
+        @DisplayName("메뉴 가격이 0원 미만이면 IllegalArgumentException 예외 발생")
+        void cannotCreateMenuWithInvalidPrice(Long invalidPrice) {
+            Menu request = new Menu();
+            request.setId(UUID.randomUUID());
+            request.setPrice(BigDecimal.valueOf(invalidPrice));
+
+            Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                    .isThrownBy(() -> menuService.create(request));
+        }
+
+        @Test
+        @DisplayName("메뉴 그룹에 속하지 않으면 NoSuchElementException 예외 발생")
+        void cannotCreateMenuWithoutMenuGroup() {
+            Menu request = new Menu();
+            request.setId(UUID.randomUUID());
+            request.setPrice(BigDecimal.valueOf(10000));
+            request.setMenuGroupId(UUID.randomUUID());
+
+            Assertions.assertThatExceptionOfType(NoSuchElementException.class)
+                    .isThrownBy(() -> menuService.create(request));
+        }
+
+        @Test
+        @DisplayName("메뉴 상품이 없으면 IllegalArgumentException 예외 발생")
+        void cannotCreateMenuWithoutMenuProduct() {
+            Menu request = new Menu();
+            request.setId(UUID.randomUUID());
+            request.setName("세마리세트");
+            request.setPrice(BigDecimal.valueOf(25000));
+            request.setMenuGroupId(menuGroup.getId());
+            request.setMenuProducts(null);
+
+            Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                    .isThrownBy(() -> menuService.create(request));
+        }
     }
 
-    @DisplayName("메뉴를 판매 가능 상태로 변경시, 변경할 가격이 전체 메뉴 상품의 가격보다 크면 IllegalStateException 예외 처리를 한다.")
-    @Test
-    void canNotDisplayWithExpensivePrice() {
-        //given
-        MenuProduct menuProduct1 = new MenuProduct();
-        menuProduct1.setProductId(product.getId());
-        menuProduct1.setProduct(product);
-        menuProduct1.setQuantity(1);
+    @Nested
+    @DisplayName("메뉴 가격 변경")
+    class ChangeMenuPriceTest {
 
-        List<MenuProduct> menuProducts = List.of(menuProduct1);
+        @Test
+        @DisplayName("메뉴 가격을 변경할 수 있다.")
+        void changePrice() {
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu menu = createMenu("후라이드치킨", BigDecimal.valueOf(16000), List.of(menuProduct), true);
 
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(false);
-        menu.setName("후라이드치킨");
-        menu.setPrice(BigDecimal.valueOf(17000));
-        menu.setMenuProducts(menuProducts);
-        menu.setMenuGroup(menuGroup);
-        menu.setMenuGroupId(menuGroup.getId());
-        menuRepository.save(menu);
+            Menu request = new Menu();
+            request.setPrice(BigDecimal.valueOf(15000));
 
-        //when
+            Menu result = menuService.changePrice(menu.getId(), request);
 
-        //then
-        Assertions.assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(()->menuService.display(menu.getId()));
+            Assertions.assertThat(result).isNotNull();
+            Assertions.assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(15000));
+        }
+
+        @ParameterizedTest
+        @NullSource
+        @DisplayName("변경할 가격이 null 또는 0원 미만이면 IllegalArgumentException 예외 발생")
+        void cannotChangePriceWithNullPrice(BigDecimal invalidPrice) {
+            Menu request = new Menu();
+            request.setId(UUID.randomUUID());
+            request.setPrice(invalidPrice);
+            request.setMenuGroupId(menuGroup.getId());
+
+            Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                    .isThrownBy(() -> menuService.create(request));
+        }
+
+        @ParameterizedTest
+        @ValueSource(longs = -1)
+        @DisplayName("변경할 가격이  0원 미만이면 IllegalArgumentException 예외 발생")
+        void cannotChangePriceWithInvalidPrice(Long invalidPrice) {
+            Menu request = new Menu();
+            request.setId(UUID.randomUUID());
+            request.setPrice(BigDecimal.valueOf(invalidPrice));
+            request.setMenuGroupId(menuGroup.getId());
+
+            Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                    .isThrownBy(() -> menuService.create(request));
+        }
     }
 
-    @DisplayName("메뉴를 판매 불가능 상태로 변경 할 수 있다.")
-    @Test
-    void hide() {
-        //given
-        MenuProduct menuProduct1 = new MenuProduct();
-        menuProduct1.setProductId(product.getId());
-        menuProduct1.setProduct(product);
-        menuProduct1.setQuantity(1);
+    @Nested
+    @DisplayName("메뉴 상태 변경")
+    class ChangeMenuStatusTest {
 
-        List<MenuProduct> menuProducts = List.of(menuProduct1);
+        @Test
+        @DisplayName("메뉴를 판매 가능 상태로 변경할 수 있다.")
+        void display() {
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu menu = createMenu("후라이드치킨", BigDecimal.valueOf(16000), List.of(menuProduct), false);
 
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setName("후라이드치킨");
-        menu.setPrice(BigDecimal.valueOf(16000));
-        menu.setMenuProducts(menuProducts);
-        menu.setMenuGroup(menuGroup);
-        menu.setMenuGroupId(menuGroup.getId());
-        menuRepository.save(menu);
+            Menu result = menuService.display(menu.getId());
 
-        //when
-        Menu result = menuService.hide(menu.getId());
+            Assertions.assertThat(result.isDisplayed()).isTrue();
+        }
 
-        //then
-        Assertions.assertThat(result.isDisplayed()).isFalse();
+        @Test
+        @DisplayName("메뉴를 판매 불가능 상태로 변경할 수 있다.")
+        void hide() {
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu menu = createMenu("후라이드치킨", BigDecimal.valueOf(16000), List.of(menuProduct), true);
+
+            Menu result = menuService.hide(menu.getId());
+
+            Assertions.assertThat(result.isDisplayed()).isFalse();
+        }
     }
 
-    @DisplayName("메뉴를 판매 불가능 상태로 변경시, 존재하지 않은 메뉴를 선택하면 NoSuchElementException 예외 처리를 한다.")
-    @Test
-    void canNotHideWithDoseNotExistMenu() {
-        //given
-        UUID nonExistMenuId = UUID.randomUUID();
+    @Nested
+    @DisplayName("메뉴 조회")
+    class FindMenuTest {
 
-        //when
+        @Test
+        @DisplayName("모든 메뉴를 조회할 수 있다.")
+        void findAll() {
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu menu = createMenu("후라이드치킨", BigDecimal.valueOf(16000), List.of(menuProduct), false);
 
-        //then
-        Assertions.assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(()->menuService.hide(nonExistMenuId));
-    }
+            List<Menu> result = menuService.findAll();
 
-    @DisplayName("모든 메뉴를 조회 할 수 있다.")
-    @Test
-    void findAll() {
-        //given
-        MenuProduct menuProduct1 = new MenuProduct();
-        menuProduct1.setProductId(product.getId());
-        menuProduct1.setProduct(product);
-        menuProduct1.setQuantity(1);
-
-        List<MenuProduct> menuProducts = List.of(menuProduct1);
-
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(false);
-        menu.setName("후라이드치킨");
-        menu.setPrice(BigDecimal.valueOf(16000));
-        menu.setMenuProducts(menuProducts);
-        menu.setMenuGroup(menuGroup);
-        menu.setMenuGroupId(menuGroup.getId());
-        menuRepository.save(menu);
-        //when
-        List<Menu> result = menuService.findAll();
-
-        //then
-        Assertions.assertThat(result).hasSize(1);
-        Assertions.assertThat(result).extracting(Menu::getId).containsExactly(menu.getId());
-
+            Assertions.assertThat(result).hasSize(1);
+            Assertions.assertThat(result)
+                    .extracting(Menu::getId)
+                    .containsExactly(menu.getId());
+        }
     }
 }

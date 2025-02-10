@@ -2,17 +2,19 @@ package kitchenpos.application;
 
 import jakarta.transaction.Transactional;
 import kitchenpos.domain.MenuGroup;
-import org.assertj.core.api.Assertions;
 import kitchenpos.domain.MenuGroupRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest
+@Transactional
 class MenuGroupServiceTest {
 
     @Autowired
@@ -26,76 +28,60 @@ class MenuGroupServiceTest {
         menuGroupRepository.deleteAll();
     }
 
-    @DisplayName(value = "메뉴 그룹을 생성 할 수 있다.")
-    @Test
-    @Transactional
-    void create() {
-        //given
-        String name = "한마리메뉴";
-        MenuGroup request = new MenuGroup();
-        request.setName(name);
-
-        //when
-        MenuGroup result = menuGroupService.create(request);
-
-        //then
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getId()).isNotNull();
-        Assertions.assertThat(result.getName()).isEqualTo(name);
-
+    private MenuGroup createMenuGroup(String name) {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(UUID.randomUUID());
+        menuGroup.setName(name);
+        return menuGroupRepository.save(menuGroup);
     }
 
-    @DisplayName(value = "메뉴 그룹 생성 시 그룹 명이 null일 경우 IllegalArgumentException 예외 처리를 한다.")
-    @Test
-    @Transactional
-    void createMenuGroupWithNullName() {
-        //given
-        MenuGroup request = new MenuGroup();
-        request.setName(null);
+    @Nested
+    @DisplayName("메뉴 그룹 생성")
+    class CreateMenuGroupTest {
 
-        //when
+        @Test
+        @DisplayName("메뉴 그룹을 생성할 수 있다.")
+        void create() {
+            MenuGroup request = new MenuGroup();
+            request.setId(UUID.randomUUID());
+            request.setName("한마리메뉴");
 
-        //then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuGroupService.create(request));
+            MenuGroup result = menuGroupService.create(request);
+
+            Assertions.assertThat(result).isNotNull();
+            Assertions.assertThat(result.getId()).isNotNull();
+            Assertions.assertThat(result.getName()).isEqualTo("한마리메뉴");
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @DisplayName("메뉴 그룹 생성 시 그룹명이 null 또는 빈 값이면 IllegalArgumentException 예외 발생")
+        void cannotCreateMenuGroupWithInvalidName(String invalidName) {
+            MenuGroup request = new MenuGroup();
+            request.setId(UUID.randomUUID());
+            request.setName(invalidName);
+
+            Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                    .isThrownBy(() -> menuGroupService.create(request));
+        }
     }
 
-    @DisplayName(value = "메뉴 그룹 생성 시 그룹 명이 빈 값일 경우 IllegalArgumentException 예외 처리를 한다.")
-    @Test
-    @Transactional
-    void createMenuGroupWithEmptyName() {
-        //given
-        MenuGroup request = new MenuGroup();
-        request.setName("");
+    @Nested
+    @DisplayName("메뉴 그룹 조회")
+    class FindMenuGroupTest {
 
-        //when
+        @Test
+        @DisplayName("모든 메뉴 그룹을 조회할 수 있다.")
+        void findAll() {
+            MenuGroup firstGroup = createMenuGroup("한마리메뉴");
+            MenuGroup secondGroup = createMenuGroup("두마리메뉴");
 
-        //then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuGroupService.create(request));
-    }
+            List<MenuGroup> result = menuGroupService.findAll();
 
-    @DisplayName(value = "모든 메뉴 그룹을 조회 할 수 있다.")
-    @Test
-    @Transactional
-    void findAll() {
-        //given
-        String firstName = "한마리메뉴";
-        MenuGroup firstRequest = new MenuGroup();
-        firstRequest.setName(firstName);
-
-        String secondName = "두마리메뉴";
-        MenuGroup secondRequest = new MenuGroup();
-        secondRequest.setName(secondName);
-
-        MenuGroup firstGroup = menuGroupService.create(firstRequest);
-        MenuGroup secondGroup = menuGroupService.create(secondRequest);
-
-        //when
-        List<MenuGroup> result = menuGroupService.findAll();
-
-        //then
-        Assertions.assertThat(result).hasSize(2);
-        Assertions.assertThat(result).extracting(MenuGroup::getName).containsExactly("한마리메뉴", "두마리메뉴");
+            Assertions.assertThat(result).hasSize(2);
+            Assertions.assertThat(result)
+                    .extracting(MenuGroup::getName)
+                    .containsExactly("한마리메뉴", "두마리메뉴");
+        }
     }
 }

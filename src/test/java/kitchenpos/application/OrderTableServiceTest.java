@@ -1,23 +1,15 @@
 package kitchenpos.application;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 import jakarta.transaction.Transactional;
 import kitchenpos.domain.*;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.domain.Order;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -34,222 +26,189 @@ class OrderTableServiceTest {
     @Autowired
     private OrderTableService orderTableService;
 
-    @DisplayName("주문 테이블을 생성 할 수 있다.")
-    @Test
-    void create() {
-        //given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setName("1번");
-
-        //when
-        OrderTable result = orderTableService.create(orderTable);
-
-        //then
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getName()).isEqualTo("1번");
-        Assertions.assertThat(result.isOccupied()).isFalse();
-        Assertions.assertThat(result.getNumberOfGuests()).isZero();
-    }
-
-    @DisplayName("주문 테이블 생성시, 테이블 명이 null 이면 IllegalArgumentException 예외를 발생한다.")
-    @Test
-    void canNotCreateOrderTableWithNullName() {
-        //given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setName(null);
-
-        //when
-
-        //then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()->orderTableService.create(orderTable));
-    }
-
-    @DisplayName("주문 테이블 생성시, 테이블 명이 비어있으면 IllegalArgumentException 예외를 발생한다.")
-    @Test
-    void canNotCreateOrderTableWithEmptyName() {
-        //given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setName("");
-
-        //when
-
-        //then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()->orderTableService.create(orderTable));
-    }
-
-    @DisplayName("주문 테이블에 앉을 수 있다.")
-    @Test
-    void sit() {
-        //given
+    private OrderTable createOrderTable(String name, boolean occupied, int numberOfGuests) {
         OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
-        orderTableRepository.save(orderTable);
-
-        //when
-        OrderTable result = orderTableService.sit(orderTable.getId());
-
-        //then
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.isOccupied()).isTrue();
-
+        orderTable.setName(name);
+        orderTable.setOccupied(occupied);
+        orderTable.setNumberOfGuests(numberOfGuests);
+        return orderTableRepository.save(orderTable);
     }
 
-    @DisplayName("주문 테이블에 앉을 때, 테이블 아이디가 존재 하지 앟는다면 NoSuchElementException 예외를 발생한다.")
-    @Test
-    void canNotSitIfOrderTableIdIsNotExist() {
-        //given
-        UUID nonExistId = UUID.randomUUID();
-
-        //when
-
-        //then
-        Assertions.assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(()->orderTableService.sit(nonExistId));
-    }
-
-    @DisplayName("주문 테이블을 정리할 수 있다.")
-    @Test
-    void clear() {
-    }
-
-    @DisplayName("주문 테이블을 정리할 때, 테이블 아이디가 존재 하지 앟는다면 NoSuchElementException 예외를 발생한다")
-    @Test
-    void canNotClearIfOrderTableIdIsNotExist() {
-        //given
-        UUID nonExistId = UUID.randomUUID();
-
-        //when
-
-        //then
-        Assertions.assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(()->orderTableService.clear(nonExistId));
-    }
-
-    @DisplayName("주문 테이블을 정리할 때, 완료되지 않은 주문이 존재하면 테이블을 정리할 수 없다.")
-    @Test
-    void cannotClearTableIfOrderIsNotCompleted() {
-        // given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName("1번");
-        orderTable.setOccupied(true);
-        orderTableRepository.save(orderTable);
-
+    private Order createOrder(OrderTable orderTable, OrderStatus status) {
         Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setOrderTable(orderTable);
-        order.setStatus(OrderStatus.WAITING);
+        order.setOrderTableId(orderTable.getId());
+        order.setStatus(status);
         order.setOrderDateTime(LocalDateTime.now());
-        order.setType(OrderType.EAT_IN);
-        orderRepository.save(order);
-
-        // when
-
-        // then
-        Assertions.assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> orderTableService.clear(orderTable.getId()));
+        return orderRepository.save(order);
     }
 
+    @Nested
+    @DisplayName("주문 테이블 생성")
+    class CreateOrderTableTest {
 
-    @DisplayName("테이블 인원 수를 변경 할 수 있다.")
-    @Test
-    void changeNumberOfGuests() {
-        // given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setOccupied(true);
-        orderTable.setNumberOfGuests(3);
-        orderTableRepository.save(orderTable);
+        @Test
+        @DisplayName("주문 테이블을 생성할 수 있다.")
+        void create() {
+            OrderTable orderTable = new OrderTable();
+            orderTable.setId(UUID.randomUUID());
+            orderTable.setName("1번");
 
-        OrderTable changedTable = new OrderTable();
-        changedTable.setNumberOfGuests(4);
+            OrderTable result = orderTableService.create(orderTable);
 
-        // when
-        OrderTable result = orderTableService.changeNumberOfGuests(orderTable.getId(), changedTable);
+            Assertions.assertThat(result).isNotNull();
+            Assertions.assertThat(result.getName()).isEqualTo("1번");
+            Assertions.assertThat(result.isOccupied()).isFalse();
+            Assertions.assertThat(result.getNumberOfGuests()).isZero();
+        }
 
-        // then
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getNumberOfGuests()).isEqualTo(4);
+        @ParameterizedTest
+        @NullAndEmptySource
+        @DisplayName("주문 테이블 생성 시, 테이블 명이 없으면 IllegalArgumentException 예외 발생")
+        void cannotCreateOrderTableWithInvalidName(String invalidName) {
+            OrderTable orderTable = new OrderTable();
+            orderTable.setId(UUID.randomUUID());
+            orderTable.setName(invalidName);
+
+            Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                    .isThrownBy(() -> orderTableService.create(orderTable));
+        }
     }
 
+    @Nested
+    @DisplayName("주문 테이블 상태 변경")
+    class ChangeOrderTableStatusTest {
 
-    @DisplayName("테이블 인원 수 변경 시, 인원 수가 0 미만이면 IllegalArgumentException 예외가 발생한다.")
-    @Test
-    void canNotChangeNumberOfGuestsToNegative() {
-        // given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setNumberOfGuests(-1);
+        @Test
+        @DisplayName("주문 테이블에 앉을 수 있다.")
+        void sit() {
+            OrderTable orderTable = createOrderTable("1번", false, 0);
 
-        // when
+            OrderTable result = orderTableService.sit(orderTable.getId());
 
-        // then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable)); // ✅ 예외 발생 검증
+            Assertions.assertThat(result).isNotNull();
+            Assertions.assertThat(result.isOccupied()).isTrue();
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 테이블에 앉으려 하면 NoSuchElementException 예외 발생")
+        void cannotSitIfTableDoesNotExist() {
+            UUID nonExistId = UUID.randomUUID();
+
+            Assertions.assertThatExceptionOfType(NoSuchElementException.class)
+                    .isThrownBy(() -> orderTableService.sit(nonExistId));
+        }
+
+        @Test
+        @DisplayName("주문 테이블을 정리할 수 있다.")
+        void clear() {
+            OrderTable orderTable = createOrderTable("1번", true, 4);
+
+            orderTableService.clear(orderTable.getId());
+
+            OrderTable result = orderTableRepository.findById(orderTable.getId()).orElseThrow();
+            Assertions.assertThat(result.isOccupied()).isFalse();
+            Assertions.assertThat(result.getNumberOfGuests()).isZero();
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 테이블을 정리하려 하면 NoSuchElementException 예외 발생")
+        void cannotClearIfTableDoesNotExist() {
+            UUID nonExistId = UUID.randomUUID();
+
+            Assertions.assertThatExceptionOfType(NoSuchElementException.class)
+                    .isThrownBy(() -> orderTableService.clear(nonExistId));
+        }
+
+        @Test
+        @DisplayName("완료되지 않은 주문이 있으면 테이블을 정리할 수 없다.")
+        void cannotClearTableIfOrderIsNotCompleted() {
+            OrderTable orderTable = createOrderTable("1번", true, 4);
+            Order order = new Order();
+            order.setId(UUID.randomUUID());
+            order.setOrderTable(orderTable);
+            order.setOrderTableId(orderTable.getId());
+            order.setStatus(OrderStatus.WAITING);
+            order.setType(OrderType.EAT_IN);
+            order.setOrderDateTime(LocalDateTime.now());
+            orderRepository.save(order);
+
+            Assertions.assertThatExceptionOfType(IllegalStateException.class)
+                    .isThrownBy(() -> orderTableService.clear(orderTable.getId()));
+        }
+
     }
 
-    @DisplayName("테이블 인원 수 변경 시, 존재하지 않는 테이블의 인원 수를 변경하면 NoSuchElementException 예외가 발생한다.")
-    @Test
-    void canNotChangeGuestsIfNonExistOrderTable() {
-        // given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setNumberOfGuests(3);
+    @Nested
+    @DisplayName("주문 테이블 인원 변경")
+    class ChangeNumberOfGuestsTest {
 
-        // when
+        @Test
+        @DisplayName("테이블 인원 수를 변경할 수 있다.")
+        void changeNumberOfGuests() {
+            OrderTable orderTable = createOrderTable("1번", true, 3);
 
-        // then
-        Assertions.assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), orderTable));
+            OrderTable changedTable = new OrderTable();
+            changedTable.setNumberOfGuests(4);
+
+            OrderTable result = orderTableService.changeNumberOfGuests(orderTable.getId(), changedTable);
+
+            Assertions.assertThat(result).isNotNull();
+            Assertions.assertThat(result.getNumberOfGuests()).isEqualTo(4);
+        }
+
+        @Test
+        @DisplayName("인원 수가 0 미만이면 IllegalArgumentException 예외 발생")
+        void cannotChangeNumberOfGuestsToNegative() {
+            OrderTable orderTable = createOrderTable("1번", true, 3);
+
+            OrderTable changedTable = new OrderTable();
+            changedTable.setNumberOfGuests(-1);
+
+            Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                    .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), changedTable));
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 테이블의 인원 수를 변경하면 NoSuchElementException 예외 발생")
+        void cannotChangeGuestsIfTableDoesNotExist() {
+            OrderTable changedTable = new OrderTable();
+            changedTable.setNumberOfGuests(3);
+
+            Assertions.assertThatExceptionOfType(NoSuchElementException.class)
+                    .isThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), changedTable));
+        }
+
+        @Test
+        @DisplayName("사용 중이지 않은 테이블의 인원 수를 변경하면 IllegalStateException 예외 발생")
+        void cannotChangeGuestsIfTableIsNotOccupied() {
+            OrderTable orderTable = createOrderTable("1번", false, 3);
+
+            OrderTable changedTable = new OrderTable();
+            changedTable.setNumberOfGuests(2);
+
+            Assertions.assertThatExceptionOfType(IllegalStateException.class)
+                    .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), changedTable));
+        }
     }
 
-    @DisplayName("테이블 인원 수 변경 시, 사용 중이지 않은 테이블의 인원 수를 변경하면 NoSuchElementException 예외가 발생한다.")
-    @Test
-    void canNotChangeGuestsIfTableIsNotOccupied() {
-        // given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setOccupied(false);
-        orderTable.setNumberOfGuests(3);
-        orderTableRepository.save(orderTable);
+    @Nested
+    @DisplayName("주문 테이블 조회")
+    class FindOrderTableTest {
 
-        OrderTable changedTable = new OrderTable();
-        changedTable.setNumberOfGuests(2);
+        @Test
+        @DisplayName("모든 주문 테이블을 조회할 수 있다.")
+        void findAll() {
+            OrderTable orderTable1 = createOrderTable("1번", true, 4);
+            OrderTable orderTable2 = createOrderTable("2번", true, 2);
 
-        // when
+            List<OrderTable> result = orderTableService.findAll();
 
-        // then
-        Assertions.assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), changedTable));
-    }
-
-
-
-    @DisplayName("모든 주문 테이블을 조회 할 수 있다.")
-    @Test
-    void findAll() {
-        // given
-        OrderTable orderTable1 = new OrderTable();
-        orderTable1.setId(UUID.randomUUID());
-        orderTable1.setName("1번");
-        orderTable1.setOccupied(true);
-        orderTableRepository.save(orderTable1);
-
-        OrderTable orderTable2 = new OrderTable();
-        orderTable2.setId(UUID.randomUUID());
-        orderTable2.setName("2번");
-        orderTable2.setOccupied(true);
-        orderTableRepository.save(orderTable2);
-
-        //when
-        List<OrderTable> result = orderTableService.findAll();
-
-        //then
-        Assertions.assertThat(result).hasSize(2);
-        Assertions.assertThat(result)
-                .extracting(OrderTable::getName)
-                .containsExactlyInAnyOrder("1번", "2번");
+            Assertions.assertThat(result).hasSize(2);
+            Assertions.assertThat(result).extracting(OrderTable::getName)
+                    .containsExactlyInAnyOrder("1번", "2번");
+        }
     }
 }
