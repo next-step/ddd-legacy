@@ -1,8 +1,16 @@
 package kitchenpos.domain;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public interface OrderTableRepository extends JpaRepository<OrderTable, UUID> {
+@Repository
+public interface OrderTableRepository {
+    Optional<OrderTable> findById(UUID orderTableId);
+
+    OrderTable save(OrderTable orderTable);
+
+    List<OrderTable> findAll();
 }
