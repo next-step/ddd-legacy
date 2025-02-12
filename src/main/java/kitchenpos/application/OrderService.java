@@ -37,11 +37,11 @@ public class OrderService {
     public Order create(final Order request) {
         final OrderType type = request.getType();
         if (Objects.isNull(type)) {
-            throw new IllegalArgumentException();
+            throw new OrderTypeNotSelectedException();
         }
         final List<OrderLineItem> orderLineItemRequests = request.getOrderLineItems();
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new OrderLineItemNotSelectedException();
         }
         final List<Menu> menus = menuRepository.findAllByIdIn(
             orderLineItemRequests.stream()
@@ -49,14 +49,14 @@ public class OrderService {
                 .toList()
         );
         if (menus.size() != orderLineItemRequests.size()) {
-            throw new IllegalArgumentException();
+            throw new OrderLineItemNotMatchedMenuException();
         }
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (final OrderLineItem orderLineItemRequest : orderLineItemRequests) {
             final long quantity = orderLineItemRequest.getQuantity();
             if (type != OrderType.EAT_IN) {
                 if (quantity < 0) {
-                    throw new IllegalArgumentException();
+                    throw new OrderLineQuantityNegativeException();
                 }
             }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())

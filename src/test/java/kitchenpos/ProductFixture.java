@@ -11,7 +11,6 @@ public class ProductFixture {
 
     private static final IdGenerator productIdGenerator = UUID::randomUUID;
 
-
     public static Product 후라이드_치킨_상품_Request(){
         Product product = new Product();
         product.setName("후라이드 치킨");

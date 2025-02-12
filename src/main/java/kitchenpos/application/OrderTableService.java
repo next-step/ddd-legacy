@@ -47,9 +47,9 @@ public class OrderTableService {
     @Transactional
     public OrderTable clear(final UUID orderTableId) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(OrderTableNotFoundException::new);
         if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
-            throw new IllegalStateException();
+            throw new OrderNotCompletedException();
         }
         orderTable.setNumberOfGuests(0);
         orderTable.setOccupied(false);
@@ -60,12 +60,12 @@ public class OrderTableService {
     public OrderTable changeNumberOfGuests(final UUID orderTableId, final OrderTable request) {
         final int numberOfGuests = request.getNumberOfGuests();
         if (numberOfGuests < 0) {
-            throw new IllegalArgumentException();
+            throw new OrderTableGuestNegativeException();
         }
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(OrderTableNotFoundException::new);
         if (!orderTable.isOccupied()) {
-            throw new IllegalStateException();
+            throw new OrderTableNotOccupiedException();
         }
         orderTable.setNumberOfGuests(numberOfGuests);
         return orderTable;
