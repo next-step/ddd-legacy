@@ -10,7 +10,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -30,9 +29,9 @@ public class Menu {
 
     @ManyToOne(optional = false)
     @JoinColumn(
-        name = "menu_group_id",
-        columnDefinition = "binary(16)",
-        foreignKey = @ForeignKey(name = "fk_menu_to_menu_group")
+            name = "menu_group_id",
+            columnDefinition = "binary(16)",
+            foreignKey = @ForeignKey(name = "fk_menu_to_menu_group")
     )
     private MenuGroup menuGroup;
 
@@ -41,10 +40,10 @@ public class Menu {
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(
-        name = "menu_id",
-        nullable = false,
-        columnDefinition = "binary(16)",
-        foreignKey = @ForeignKey(name = "fk_menu_product_to_menu")
+            name = "menu_id",
+            nullable = false,
+            columnDefinition = "binary(16)",
+            foreignKey = @ForeignKey(name = "fk_menu_product_to_menu")
     )
     private List<MenuProduct> menuProducts;
 
@@ -52,6 +51,23 @@ public class Menu {
     private UUID menuGroupId;
 
     public Menu() {
+    }
+
+    public Menu(UUID id, String name, BigDecimal price, boolean displayed, List<MenuProduct> menuProducts,
+                MenuGroup menuGroup,
+                UUID menuGroupId) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.displayed = displayed;
+        this.menuProducts = menuProducts;
+        this.menuGroup = menuGroup;
+        this.menuGroupId = menuGroupId;
+    }
+
+    public Menu(String name, BigDecimal price, boolean displayed, List<MenuProduct> menuProducts, MenuGroup menuGroup,
+                UUID menuGroupId) {
+        this(UUID.randomUUID(), name, price, displayed, menuProducts, menuGroup, menuGroupId);
     }
 
     public UUID getId() {
@@ -103,7 +119,7 @@ public class Menu {
     }
 
     public UUID getMenuGroupId() {
-        return menuGroupId;
+        return menuGroup != null ? menuGroup.getId() : null;
     }
 
     public void setMenuGroupId(final UUID menuGroupId) {

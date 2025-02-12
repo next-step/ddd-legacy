@@ -32,27 +32,27 @@ public class OrderRestController {
     }
 
     @PutMapping("/{orderId}/accept")
-    public ResponseEntity<Order> accept(@PathVariable final UUID orderId) {
+    public ResponseEntity<Order> accept(@PathVariable("orderId") final UUID orderId) {
         return ResponseEntity.ok(orderService.accept(orderId));
     }
 
     @PutMapping("/{orderId}/serve")
-    public ResponseEntity<Order> serve(@PathVariable final UUID orderId) {
+    public ResponseEntity<Order> serve(@PathVariable("orderId") final UUID orderId) {
         return ResponseEntity.ok(orderService.serve(orderId));
     }
 
     @PutMapping("/{orderId}/start-delivery")
-    public ResponseEntity<Order> startDelivery(@PathVariable final UUID orderId) {
+    public ResponseEntity<Order> startDelivery(@PathVariable("orderId") final UUID orderId) {
         return ResponseEntity.ok(orderService.startDelivery(orderId));
     }
 
     @PutMapping("/{orderId}/complete-delivery")
-    public ResponseEntity<Order> completeDelivery(@PathVariable final UUID orderId) {
+    public ResponseEntity<Order> completeDelivery(@PathVariable("orderId") final UUID orderId) {
         return ResponseEntity.ok(orderService.completeDelivery(orderId));
     }
 
     @PutMapping("/{orderId}/complete")
-    public ResponseEntity<Order> complete(@PathVariable final UUID orderId) {
+    public ResponseEntity<Order> complete(@PathVariable("orderId") final UUID orderId) {
         return ResponseEntity.ok(orderService.complete(orderId));
     }
 
