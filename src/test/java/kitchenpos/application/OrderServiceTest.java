@@ -13,7 +13,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,6 +43,7 @@ class OrderServiceTest {
         @DisplayName("성공: 고객은 메뉴를 선택해 주문할 수 있다.")
         void createOrder_success() {
             // given
+
         }
 
         @Test
@@ -100,33 +100,77 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 메뉴 상태가 표시중인 메뉴만 주문할 수 있다.")
+        @DisplayName("실패: 메뉴 상태가 표시중이지 않은 메뉴가 포함되어 있으면 MenuNotDisplayedException이 발생한다.")
         void createOrder_fail_whenMenuNotDisplayed() {
+            // given
+            Menu 비표시_메뉴 = menuRepository.save(MenuFixture.후라이드_치킨_메뉴_Request());
+            비표시_메뉴.setDisplayed(false);
 
+            // 주문 항목에 해당 메뉴를 포함시킴
+            List<OrderLineItem> 주문메뉴 = List.of(
+                    OrderFixture.주문상품_Request(비표시_메뉴, 1L)
+            );
+            Order request = OrderFixture.주문_Request(OrderType.EAT_IN, 주문메뉴);
+
+            // when & then: 주문 생성 시 MenuNotDisplayedException 예외가 발생하는지 확인
+            assertThrows(MenuNotDisplayedException.class, () -> sut.create(request));
         }
 
         @Test
-        @DisplayName("실패: 주문 항목 각각의 가격은 시스템에 등록된 메뉴와 동일해야 한다.")
+        @DisplayName("실패: 주문 항목 각각의 가격이 시스템에 등록된 메뉴와 동일하지 않으면 OrderLineItemPriceMismatchException 발생한다.")
         void createOrder_fail_whenPriceMismatch() {
-            throw new UnsupportedOperationException("Not Implemented");
+            // given
+            Menu 후라이드_치킨_메뉴 = menuRepository.save(MenuFixture.후라이드_치킨_메뉴_Request());
+
+            OrderLineItem 주문상품 = OrderFixture.주문상품_Request(후라이드_치킨_메뉴, 1L);
+            주문상품.setPrice(후라이드_치킨_메뉴.getPrice().add(new BigDecimal("1000"))); // 가격 불일치 발생
+
+            Order request = OrderFixture.주문_Request(OrderType.EAT_IN, List.of(주문상품));
+
+            // when & then
+            assertThrows(OrderLineItemPriceMismatchException.class, () -> sut.create(request));
         }
 
         @Test
         @DisplayName("성공: 주문 최초 생성시 상태는 대기여야 한다.")
         void createOrder_success_withWaitingStatus() {
-            throw new UnsupportedOperationException("Not Implemented");
-        }
+            // given: 시스템에 등록된 메뉴 생성 (표시 중인 메뉴)
+            Menu 후라이드치킨메뉴 = menuRepository.save(MenuFixture.후라이드_치킨_메뉴_Request());
+            OrderLineItem 주문상품 = OrderFixture.주문상품_Request(후라이드치킨메뉴, 1L);
+            OrderTable 주문테이블 = orderTableRepository.save(OrderTableFixture.주문테이블_사용중_Request());
+            Order request = OrderFixture.주문_Request(주문테이블, OrderType.EAT_IN, List.of(주문상품));
 
+            // when: 주문 생성 호출
+            Order createdOrder = sut.create(request);
+
+            // then: 생성된 주문의 상태가 대기(WAITING) 상태인지 검증
+            assertEquals(OrderStatus.WAITING, createdOrder.getStatus());
+        }
         @Test
-        @DisplayName("실패: 배달 주문이면 배달 주소를 입력해야 한다.")
+        @DisplayName("실패: 배달 주문일 때, 배달 주소가 입력되지 않으면 OrderDeliveryAddressNotEnteredException이 발생한다.")
         void createOrder_fail_whenDeliveryOrderWithoutAddress() {
-            throw new UnsupportedOperationException("Not Implemented");
+            // given
+            Menu 후라이드치킨메뉴 = menuRepository.save(MenuFixture.후라이드_치킨_메뉴_Request());
+            OrderTable 주문테이블 = orderTableRepository.save(OrderTableFixture.주문테이블_사용중_Request());
+            OrderLineItem 주문상품 = OrderFixture.주문상품_Request(후라이드치킨메뉴, 1L);
+            Order request = OrderFixture.주문_Request(주문테이블, OrderType.DELIVERY, List.of(주문상품));
+            request.setDeliveryAddress(null);
+
+            // when & then
+            assertThrows(OrderDeliveryAddressNotEnteredException.class, () -> sut.create(request));
         }
 
         @Test
-        @DisplayName("실패: 매장 주문이면 미사용 상태인 매장 테이블을 선택해야 한다.")
+        @DisplayName("실패: 매장 주문일 때, 사용중이 아닌 테이블에 주문을 생성하면 OrderTableNotOccupiedException이 발생한다.")
         void createOrder_fail_whenDineInWithoutAvailableTable() {
-            throw new UnsupportedOperationException("Not Implemented");
+            // given
+            Menu 후라이드치킨메뉴 = menuRepository.save(MenuFixture.후라이드_치킨_메뉴_Request());
+            OrderTable 주문테이블 = orderTableRepository.save(OrderTableFixture.주문테이블_생성_Request());
+            OrderLineItem 주문상품 = OrderFixture.주문상품_Request(후라이드치킨메뉴, 1L);
+            Order request = OrderFixture.주문_Request(주문테이블, OrderType.EAT_IN, List.of(주문상품));
+
+            // when & then
+            assertThrows(OrderTableNotOccupiedException.class, () -> sut.create(request));
         }
     }
 

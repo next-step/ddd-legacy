@@ -29,6 +29,7 @@ public class MenuFixture {
         Menu menu = new Menu();
         menu.setName("후라이드 치킨 메뉴");
         menu.setPrice(priceGenerator.of(16000));
+        menu.setDisplayed(true);
         return menu;
     }
 
@@ -79,6 +80,7 @@ public class MenuFixture {
                 .map(p -> p.getPrice().multiply(BigDecimal.valueOf(1L)))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         menu.setPrice(sum);
+        menu.setDisplayed(true);
         return menu;
     }
 
@@ -88,6 +90,7 @@ public class MenuFixture {
                 .map(p -> p.getPrice().multiply(BigDecimal.valueOf(1L)))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         menu.setPrice(sum.add(BigDecimal.valueOf(1000)));
+        menu.setDisplayed(true);
         return menu;
     }
 

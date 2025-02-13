@@ -22,6 +22,13 @@ public class OrderFixture {
         order.setOrderLineItems(lineItems);
         return order;
     }
+    public static Order 주문_Request(OrderTable table, OrderType type, List<OrderLineItem> lineItems){
+        Order order = new Order();
+        order.setOrderTableId(table.getId());
+        order.setType(type);
+        order.setOrderLineItems(lineItems);
+        return order;
+    }
 
     public static Order 주문_Request(OrderTable table, OrderStatus status){
         Order order = new Order();
@@ -51,6 +58,7 @@ public class OrderFixture {
         orderLineItem.setMenu(menu);
         orderLineItem.setMenuId(menu.getId());
         orderLineItem.setQuantity(quantity);
+        orderLineItem.setPrice(menu.getPrice());
 
         return orderLineItem;
     }

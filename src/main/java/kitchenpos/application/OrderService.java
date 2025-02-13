@@ -33,68 +33,68 @@ public class OrderService {
         this.kitchenridersClient = kitchenridersClient;
     }
 
-    @Transactional
-    public Order create(final Order request) {
-        final OrderType type = request.getType();
-        if (Objects.isNull(type)) {
-            throw new OrderTypeNotSelectedException();
-        }
-        final List<OrderLineItem> orderLineItemRequests = request.getOrderLineItems();
-        if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
-            throw new OrderLineItemNotSelectedException();
-        }
-        final List<Menu> menus = menuRepository.findAllByIdIn(
-            orderLineItemRequests.stream()
-                .map(OrderLineItem::getMenuId)
-                .toList()
-        );
-        if (menus.size() != orderLineItemRequests.size()) {
-            throw new OrderLineItemNotMatchedMenuException();
-        }
-        final List<OrderLineItem> orderLineItems = new ArrayList<>();
-        for (final OrderLineItem orderLineItemRequest : orderLineItemRequests) {
-            final long quantity = orderLineItemRequest.getQuantity();
-            if (type != OrderType.EAT_IN) {
-                if (quantity < 0) {
-                    throw new OrderLineQuantityNegativeException();
+        @Transactional
+        public Order create(final Order request) {
+            final OrderType type = request.getType();
+            if (Objects.isNull(type)) {
+                throw new OrderTypeNotSelectedException();
+            }
+            final List<OrderLineItem> orderLineItemRequests = request.getOrderLineItems();
+            if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
+                throw new OrderLineItemNotSelectedException();
+            }
+            final List<Menu> menus = menuRepository.findAllByIdIn(
+                orderLineItemRequests.stream()
+                    .map(OrderLineItem::getMenuId)
+                    .toList()
+            );
+            if (menus.size() != orderLineItemRequests.size()) {
+                throw new OrderLineItemNotMatchedMenuException();
+            }
+            final List<OrderLineItem> orderLineItems = new ArrayList<>();
+            for (final OrderLineItem orderLineItemRequest : orderLineItemRequests) {
+                final long quantity = orderLineItemRequest.getQuantity();
+                if (type != OrderType.EAT_IN) {
+                    if (quantity < 0) {
+                        throw new OrderLineQuantityNegativeException();
+                    }
                 }
+                final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
+                    .orElseThrow(NoSuchElementException::new);
+                if (!menu.isDisplayed()) {
+                    throw new MenuNotDisplayedException();
+                }
+                if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
+                    throw new OrderLineItemPriceMismatchException();
+                }
+                final OrderLineItem orderLineItem = new OrderLineItem();
+                orderLineItem.setMenu(menu);
+                orderLineItem.setQuantity(quantity);
+                orderLineItems.add(orderLineItem);
             }
-            final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
-                .orElseThrow(NoSuchElementException::new);
-            if (!menu.isDisplayed()) {
-                throw new IllegalStateException();
+            Order order = new Order();
+            order.setId(UUID.randomUUID());
+            order.setType(type);
+            order.setStatus(OrderStatus.WAITING);
+            order.setOrderDateTime(LocalDateTime.now());
+            order.setOrderLineItems(orderLineItems);
+            if (type == OrderType.DELIVERY) {
+                final String deliveryAddress = request.getDeliveryAddress();
+                if (Objects.isNull(deliveryAddress) || deliveryAddress.isEmpty()) {
+                    throw new OrderDeliveryAddressNotEnteredException();
+                }
+                order.setDeliveryAddress(deliveryAddress);
             }
-            if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
-                throw new IllegalArgumentException();
+            if (type == OrderType.EAT_IN) {
+                final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
+                    .orElseThrow(NoSuchElementException::new);
+                if (!orderTable.isOccupied()) {
+                    throw new OrderTableNotOccupiedException();
+                }
+                order.setOrderTable(orderTable);
             }
-            final OrderLineItem orderLineItem = new OrderLineItem();
-            orderLineItem.setMenu(menu);
-            orderLineItem.setQuantity(quantity);
-            orderLineItems.add(orderLineItem);
+            return orderRepository.save(order);
         }
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(type);
-        order.setStatus(OrderStatus.WAITING);
-        order.setOrderDateTime(LocalDateTime.now());
-        order.setOrderLineItems(orderLineItems);
-        if (type == OrderType.DELIVERY) {
-            final String deliveryAddress = request.getDeliveryAddress();
-            if (Objects.isNull(deliveryAddress) || deliveryAddress.isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-            order.setDeliveryAddress(deliveryAddress);
-        }
-        if (type == OrderType.EAT_IN) {
-            final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
-                .orElseThrow(NoSuchElementException::new);
-            if (!orderTable.isOccupied()) {
-                throw new IllegalStateException();
-            }
-            order.setOrderTable(orderTable);
-        }
-        return orderRepository.save(order);
-    }
 
     @Transactional
     public Order accept(final UUID orderId) {
