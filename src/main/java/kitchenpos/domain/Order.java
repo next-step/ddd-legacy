@@ -116,7 +116,9 @@ public class Order {
 
     public void setOrderTable(final OrderTable orderTable) {
         this.orderTable = orderTable;
-        setOrderTableId(Optional.ofNullable(orderTable).map(OrderTable::getId).orElse(null));
+        setOrderTableId(Optional.ofNullable(orderTable)
+                .map(OrderTable::getId)
+                .orElse(null));
     }
 
     public UUID getOrderTableId() {

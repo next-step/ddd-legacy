@@ -48,7 +48,9 @@ public class OrderLineItem {
 
     public void setMenu(final Menu menu) {
         this.menu = menu;
-        setMenuId(Optional.ofNullable(menu).map(Menu::getId).orElse(null));
+        setMenuId(Optional.ofNullable(menu)
+                .map(Menu::getId)
+                .orElseThrow(() -> new IllegalArgumentException("메뉴가 존재하지 않습니다.")));
     }
 
     public long getQuantity() {

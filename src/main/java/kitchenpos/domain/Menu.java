@@ -85,7 +85,9 @@ public class Menu {
 
     public void setMenuGroup(final MenuGroup menuGroup) {
         this.menuGroup = menuGroup;
-        setMenuGroupId(Optional.ofNullable(menuGroup).map(MenuGroup::getId).orElse(null));
+        setMenuGroupId(Optional.ofNullable(menuGroup)
+                .map(MenuGroup::getId)
+                .orElseThrow(() -> new IllegalArgumentException("메뉴 그룹이 존재하지 않습니다.")));
     }
 
     public boolean isDisplayed() {
