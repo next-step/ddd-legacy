@@ -31,7 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @DisplayName("포장 주문 서비스 통합 테스트")
 class TakeOutOrderServiceUnitTest {
@@ -51,10 +52,9 @@ class TakeOutOrderServiceUnitTest {
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
 
-    @DisplayName("포장 주문이 생성되지 않았다면")
+    @DisplayName("포장 주문 생성")
     @Nested
-    class OrderIsNotCreated {
-
+    class Create {
         private Menu menu;
         private OrderLineItem orderLineItem;
 
@@ -67,27 +67,7 @@ class TakeOutOrderServiceUnitTest {
             this.orderLineItem = orderLineItem(null, menu);
         }
 
-        @DisplayName("대기 상태의 포장 주문을 생성할 수 있습니다.")
-        @Test
-        void createTakeoutOrder() {
-            final Order takeOutOrder = takeoutOrder(null, null, WAITING, List.of(orderLineItem));
-
-            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
-            when(menuRepository.findById(menu.getId())).thenReturn(Optional.ofNullable(menu));
-            when(orderRepository.save(any(Order.class))).then(returnsFirstArg());
-
-            final Order actual = orderService.create(takeOutOrder);
-            assertAll(
-                    () -> assertThat(actual.getId()).isNotNull(),
-                    () -> assertThat(actual.getOrderDateTime()).isBeforeOrEqualTo(LocalDateTime.now()),
-                    () -> assertThat(actual.getDeliveryAddress()).isNull(),
-                    () -> assertThat(actual.getStatus()).isEqualTo(WAITING),
-                    () -> assertThat(actual.getType()).isEqualTo(TAKEOUT),
-                    () -> assertThat(actual.getOrderTable()).isNull()
-            );
-        }
-
-        @DisplayName("주문 형식이 없으면 예외가 발생합니다")
+        @DisplayName("주문 형식이 없으면 포장 주문을 생성할 수 없다.")
         @Test
         void createOrderWithoutType() {
             assertThatThrownBy(() -> orderService.create(
@@ -102,7 +82,7 @@ class TakeOutOrderServiceUnitTest {
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 항목이 없거나 비어있으면 예외가 발생합니다")
+        @DisplayName("주문 항목이 없거나 비어있으면 포장 주문을 생성할 수 없다.")
         @ParameterizedTest(name = "주문 항목: {0}")
         @NullAndEmptySource
         void createOrderWithoutOrderLineItems(final List<OrderLineItem> orderLineItems) {
@@ -116,7 +96,7 @@ class TakeOutOrderServiceUnitTest {
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴의 개수와 주문 항목의 개수가 다르면 예외가 발생합니다")
+        @DisplayName("메뉴의 개수와 주문 항목의 개수가 다르면 포장 주문을 생성할 수 없다.")
         @Test
         void createOrderWithDifferentMenuCount() {
             final Menu otherMenu = menu(menuGroup(), List.of(menuProduct(product())));
@@ -135,7 +115,7 @@ class TakeOutOrderServiceUnitTest {
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 항목 중 하나라도 수량이 0보다 작으면 예외가 발생합니다")
+        @DisplayName("주문 항목 중 하나라도 수량이 0보다 작으면 포장 주문을 생성할 수 없다.")
         @ParameterizedTest(name = "수량 : {0}")
         @ValueSource(longs = {-1L, -10L, -100L})
         void createOrderWithNegativeQuantity(final long negativeQuantity) {
@@ -148,7 +128,7 @@ class TakeOutOrderServiceUnitTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 항목의 메뉴가 존재하지 않으면 예외가 발생합니다")
+        @DisplayName("주문 항목의 메뉴가 존재하지 않으면 포장 주문을 생성할 수 없다.")
         @Test
         void createOrderWithoutMenus() {
             final Order takeoutOrder = takeoutOrder(null, null, WAITING, List.of(orderLineItem));
@@ -159,7 +139,7 @@ class TakeOutOrderServiceUnitTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 항목의 메뉴의 가격이 일치하지 않으면 예외가 발생합니다")
+        @DisplayName("주문 항목의 메뉴의 가격이 일치하지 않으면 포장 주문을 생성할 수 없다.")
         @Test
         void createOrderWithDifferentMenuPrice() {
             final BigDecimal differentPrice = BigDecimal.ONE.add(menu.getPrice());
@@ -173,7 +153,7 @@ class TakeOutOrderServiceUnitTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴가 미노출 상태이면 예외가 발생합니다")
+        @DisplayName("메뉴가 숨김 상태이면 포장 주문을 생성할 수 없다.")
         @Test
         void createOrderWithNonDisplayedMenu() {
             final Menu nonDisplayedMenu = menu(menu.getId(), menu.getName(), menu.getPrice(), menu.getMenuGroup(), menu.getMenuProducts(), false);
@@ -185,11 +165,31 @@ class TakeOutOrderServiceUnitTest {
             assertThatThrownBy(() -> orderService.create(takeoutOrder))
                     .isInstanceOf(IllegalStateException.class);
         }
+
+        @DisplayName("대기 상태의 포장 주문을 생성한다.")
+        @Test
+        void createTakeoutOrder() {
+            final Order takeOutOrder = takeoutOrder(null, null, WAITING, List.of(orderLineItem));
+
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+            when(menuRepository.findById(menu.getId())).thenReturn(Optional.ofNullable(menu));
+            when(orderRepository.save(any(Order.class))).then(returnsFirstArg());
+
+            final Order actual = orderService.create(takeOutOrder);
+            assertAll(
+                    () -> assertThat(actual.getId()).isNotNull(),
+                    () -> assertThat(actual.getOrderDateTime()).isBeforeOrEqualTo(LocalDateTime.now()),
+                    () -> assertThat(actual.getDeliveryAddress()).isNull(),
+                    () -> assertThat(actual.getStatus()).isEqualTo(WAITING),
+                    () -> assertThat(actual.getType()).isEqualTo(TAKEOUT),
+                    () -> assertThat(actual.getOrderTable()).isNull()
+            );
+        }
     }
 
-    @DisplayName("포장 주문이 대기 상태라면")
+    @DisplayName("포장 주문 수락")
     @Nested
-    class OrderStatusIsWaiting {
+    class Accept {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order takeOutOrder;
@@ -204,22 +204,7 @@ class TakeOutOrderServiceUnitTest {
             this.takeOutOrder = takeoutOrder(createOrderId(), createOrderDateTime(), WAITING, List.of(orderLineItem));
         }
 
-        @DisplayName("포장 주문을 수락할 수 있습니다.")
-        @Test
-        void acceptTakeOutOrder() {
-            when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.ofNullable(takeOutOrder));
-            doNothing().when(kitchenridersClient).requestDelivery(any(), any(), any());
-
-            final Order actual = orderService.accept(takeOutOrder.getId());
-
-            assertAll(
-                    () -> assertThat(actual.getId()).isEqualTo(takeOutOrder.getId()),
-                    () -> assertThat(actual.getType()).isEqualTo(takeOutOrder.getType()),
-                    () -> assertThat(actual.getStatus()).isEqualTo(ACCEPTED)
-            );
-        }
-
-        @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
+        @DisplayName("주문이 존재하지 않으면 포장 주문을 수락할 수 없다.")
         @Test
         void acceptNonExistentOrder() {
             when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.empty());
@@ -227,7 +212,7 @@ class TakeOutOrderServiceUnitTest {
             assertThatThrownBy(() -> orderService.accept(takeOutOrder.getId())).isInstanceOf(NoSuchElementException.class);
         }
 
-        @DisplayName("대기 상태가 아닌 주문을 수락하려고 하면 예외가 발생합니다")
+        @DisplayName("대기 상태가 아니면 포장 주문을 수락할 수 없다.")
         @ParameterizedTest(name = "주문 상태: {0}")
         @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "COMPLETED"})
         void acceptNonWaitingOrder(final OrderStatus orderStatus) {
@@ -238,11 +223,25 @@ class TakeOutOrderServiceUnitTest {
 
             assertThatThrownBy(() -> orderService.accept(nonWaitingOrder.getId())).isInstanceOf(IllegalStateException.class);
         }
+
+        @DisplayName("포장 주문을 수락한다.")
+        @Test
+        void acceptTakeOutOrder() {
+            when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.ofNullable(takeOutOrder));
+
+            final Order actual = orderService.accept(takeOutOrder.getId());
+
+            assertAll(
+                    () -> assertThat(actual.getId()).isEqualTo(takeOutOrder.getId()),
+                    () -> assertThat(actual.getType()).isEqualTo(takeOutOrder.getType()),
+                    () -> assertThat(actual.getStatus()).isEqualTo(ACCEPTED)
+            );
+        }
     }
 
-    @DisplayName("포장 주문아 수락 상태라면")
+    @DisplayName("포장 주문 서빙")
     @Nested
-    class OrderStatusIsAccepted {
+    class Server {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order takeOutOrder;
@@ -257,7 +256,27 @@ class TakeOutOrderServiceUnitTest {
             this.takeOutOrder = takeoutOrder(createOrderId(), createOrderDateTime(), ACCEPTED, List.of(orderLineItem));
         }
 
-        @DisplayName("포장 주문을 서빙할 수 있습니다.")
+        @DisplayName("주문이 존재하지 않으면 포장 주문을 서빙할 수 없다.")
+        @Test
+        void serveNonExistentOrder() {
+            when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.serve(takeOutOrder.getId())).isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("수락 상태가 아니면 포장 주문을 서빙할 수 없다.")
+        @ParameterizedTest(name = "주문 상태: {0}")
+        @EnumSource(value = OrderStatus.class, names = {"WAITING", "SERVED", "COMPLETED"})
+        void serveNonAcceptedOrder(final OrderStatus orderStatus) {
+            final Order nonAcceptedOrder = takeoutOrder(
+                    takeOutOrder.getId(), takeOutOrder.getOrderDateTime(), orderStatus, takeOutOrder.getOrderLineItems()
+            );
+            when(orderRepository.findById(nonAcceptedOrder.getId())).thenReturn(Optional.ofNullable(nonAcceptedOrder));
+
+            assertThatThrownBy(() -> orderService.serve(nonAcceptedOrder.getId())).isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("포장 주문을 서빙한다.")
         @Test
         void serveTakeOutOrder() {
             when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.ofNullable(takeOutOrder));
@@ -270,31 +289,11 @@ class TakeOutOrderServiceUnitTest {
                     () -> assertThat(actual.getStatus()).isEqualTo(SERVED)
             );
         }
-
-        @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
-        @Test
-        void serveNonExistentOrder() {
-            when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> orderService.serve(takeOutOrder.getId())).isInstanceOf(NoSuchElementException.class);
-        }
-
-        @DisplayName("수락 상태가 아닌 주문을 서빙하려고 하면 예외가 발생합니다")
-        @ParameterizedTest(name = "주문 상태: {0}")
-        @EnumSource(value = OrderStatus.class, names = {"WAITING", "SERVED", "COMPLETED"})
-        void serveNonAcceptedOrder(final OrderStatus orderStatus) {
-            final Order nonAcceptedOrder = takeoutOrder(
-                    takeOutOrder.getId(), takeOutOrder.getOrderDateTime(), orderStatus, takeOutOrder.getOrderLineItems()
-            );
-            when(orderRepository.findById(nonAcceptedOrder.getId())).thenReturn(Optional.ofNullable(nonAcceptedOrder));
-
-            assertThatThrownBy(() -> orderService.serve(nonAcceptedOrder.getId())).isInstanceOf(IllegalStateException.class);
-        }
     }
 
-    @DisplayName("포장 주문이 서빙된 상태라면")
+    @DisplayName("포장 주문 완료")
     @Nested
-    class OrderStatusIsServed {
+    class Complete {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order takeOutOrder;
@@ -309,21 +308,7 @@ class TakeOutOrderServiceUnitTest {
             this.takeOutOrder = takeoutOrder(createOrderId(), createOrderDateTime(), SERVED, List.of(orderLineItem));
         }
 
-        @DisplayName("포장 주문을 완료할 수 있습니다.")
-        @Test
-        void completeDeliveryOrder() {
-            when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.ofNullable(takeOutOrder));
-
-            final Order actual = orderService.complete(takeOutOrder.getId());
-
-            assertAll(
-                    () -> assertThat(actual.getId()).isEqualTo(takeOutOrder.getId()),
-                    () -> assertThat(actual.getType()).isEqualTo(takeOutOrder.getType()),
-                    () -> assertThat(actual.getStatus()).isEqualTo(COMPLETED)
-            );
-        }
-
-        @DisplayName("서빙 상태가 아닌 주문을 완료하려고 하면 예외가 발생합니다")
+        @DisplayName("서빙 상태가 아니면 포장 주문을 완료할 수 없다.")
         @ParameterizedTest(name = "주문 상태: {0}")
         @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "COMPLETED"})
         void completeNonServedOrder(final OrderStatus orderStatus) {
@@ -335,12 +320,26 @@ class TakeOutOrderServiceUnitTest {
             assertThatThrownBy(() -> orderService.complete(nonServedOrder.getId())).isInstanceOf(IllegalStateException.class);
         }
 
-        @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
+        @DisplayName("주문이 존재하지 않으면 포장 주문을 완료할 수 없다.")
         @Test
         void completeNonExistentOrder() {
             when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> orderService.complete(takeOutOrder.getId())).isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("포장 주문을 완료한다.")
+        @Test
+        void completeTakeOutOrder() {
+            when(orderRepository.findById(takeOutOrder.getId())).thenReturn(Optional.ofNullable(takeOutOrder));
+
+            final Order actual = orderService.complete(takeOutOrder.getId());
+
+            assertAll(
+                    () -> assertThat(actual.getId()).isEqualTo(takeOutOrder.getId()),
+                    () -> assertThat(actual.getType()).isEqualTo(takeOutOrder.getType()),
+                    () -> assertThat(actual.getStatus()).isEqualTo(COMPLETED)
+            );
         }
     }
 }

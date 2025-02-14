@@ -49,7 +49,7 @@ class MenuServiceUnitTest {
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
     }
 
-    @DisplayName("메뉴를 등록 할 때")
+    @DisplayName("메뉴 등록")
     @Nested
     class Create {
         private String menuName;
@@ -71,7 +71,129 @@ class MenuServiceUnitTest {
             this.secondMenuProduct = menuProduct(null, SINGLE_QUANTITY, secondProduct);
         }
 
-        @DisplayName("메뉴를 등록할 수 있습니다.")
+        @DisplayName("메뉴 가격은 0원 이상이어한다.")
+        @ParameterizedTest(name = "메뉴 가격 : `{0}`")
+        @ValueSource(strings = {"-1", "-1000", "-100000"})
+        void createWithNegativePrice(String price) {
+            final Menu menu = menu(
+                    null, menuName, new BigDecimal(price), menuGroup,
+                    List.of(firstMenuProduct, secondMenuProduct), true
+            );
+            assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴 그룹이 존재하지 않으면 메뉴를 등록할 수 없다.")
+        @Test
+        void createWithNotExistsMenuGroup() {
+            final Menu menu = menu(
+                    null, menuName, price,
+                    null, List.of(firstMenuProduct, secondMenuProduct), true
+            );
+            when(menuGroupRepository.findById(menu.getMenuGroupId()))
+                    .thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("메뉴 상품이 없거나 비어있으면 메뉴를 등록할 수 없다.")
+        @ParameterizedTest(name = "메뉴 상품 목록 : `{0}`")
+        @NullAndEmptySource
+        void createWithEmptyMenuProducts(final List<MenuProduct> menuProducts) {
+            final Menu menu = menu(
+                    null, menuName, price,
+                    menuGroup, menuProducts, true
+            );
+            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+
+            assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴 상품의 갯수와 상품의 갯수가 다르면 메뉴를 등록할 수 없다.")
+        @Test
+        void createWithDifferentMenuProductSize() {
+            final Menu menu = menu(null, menuName, price,
+                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+            );
+            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+            when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of());
+
+            assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴 상품의 수량이 0보다 작으면 메뉴를 등록할 수 없다.")
+        @ParameterizedTest(name = "수량 : `{0}`")
+        @CsvSource(value = {"1:-1", "-1:1"}, delimiter = ':')
+        void createWithNegativeMenuProductQuantity(final long firstQuantity, final long secondQuantity) {
+            final Menu menu = menu(null, menuName, price,
+                    menuGroup, List.of(
+                            menuProduct(null, firstQuantity, firstProduct),
+                            menuProduct(null, secondQuantity, secondProduct)
+                    ), true
+            );
+            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+            when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
+            when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
+            when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
+
+            assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴의 가격이 메뉴 상품의 가격 합보다 크면 메뉴를 등록할 수 없다.")
+        @ParameterizedTest(name = "메뉴 가격 : `{0}`")
+        @ValueSource(strings = {"32010", "33000", "34000"})
+        void createWithPriceLessThanSumOfMenuProductPrice(final String price) {
+            final Menu menu = menu(null, menuName, new BigDecimal(price),
+                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+            );
+            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+            when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
+            when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
+            when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
+
+            assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴명이 없거나 비어있으면 메뉴를 등록할 수 없다.")
+        @ParameterizedTest(name = "메뉴명 : `{0}`")
+        @NullAndEmptySource
+        void createWithEmptyOrBlankMenuName(final String name) {
+            final Menu menu = menu(null, name, price,
+                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+            );
+            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+            when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
+            when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
+            when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
+
+            assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴명이 욕설이 포함되어 있으면 메뉴를 등록할 수 없다.")
+        @ParameterizedTest(name = "메뉴명 : `{0}`")
+        @ValueSource(strings = {"비속어", "욕설", "그XX"})
+        void createWithEmptyOrProfanityMenuName(final String name) {
+            final Menu menu = menu(null, name, price,
+                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
+            );
+            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
+            when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
+            when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
+            when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
+            when(purgomalumClient.containsProfanity(name)).thenReturn(true);
+
+            assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴를 등록한다.")
         @Test
         void crate() {
             final Menu menu = menu(
@@ -97,137 +219,11 @@ class MenuServiceUnitTest {
                     () -> assertThat(actual.isDisplayed()).isTrue()
             );
         }
-
-        @DisplayName("메뉴 가격은 0원 이상이어야 합니다.")
-        @ParameterizedTest(name = "메뉴 가격 : `{0}`")
-        @ValueSource(strings = {"-1", "-1000", "-100000"})
-        void createWithNegativePrice(String price) {
-            final Menu menu = menu(
-                    null, menuName, new BigDecimal(price), menuGroup,
-                    List.of(firstMenuProduct, secondMenuProduct), true
-            );
-            assertThatThrownBy(() -> menuService.create(menu))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("메뉴 그룹이 존재하지 않으면 메뉴를 등록할 수 없습니다.")
-        @Test
-        void createWithNotExistsMenuGroup() {
-            final Menu menu = menu(
-                    null, menuName, price,
-                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
-            );
-            when(menuGroupRepository.findById(menu.getMenuGroupId()))
-                    .thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> menuService.create(menu))
-                    .isInstanceOf(NoSuchElementException.class);
-        }
-
-        @DisplayName("메뉴 상품이 없거나 비어있으면 메뉴를 등록할 수 없습니다.")
-        @ParameterizedTest(name = "메뉴 상품 목록 : `{0}`")
-        @NullAndEmptySource
-        void createWithEmptyMenuProducts(final List<MenuProduct> menuProducts) {
-            final Menu menu = menu(
-                    null, menuName, price,
-                    menuGroup, menuProducts, true
-            );
-            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
-
-            assertThatThrownBy(() -> menuService.create(menu))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("메뉴 상품의 갯수와 상품의 갯수가 다르면 메뉴를 등록할 수 없습니다.")
-        @Test
-        void createWithDifferentMenuProductSize() {
-            final Menu menu = menu(null, menuName, price,
-                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
-            );
-            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
-            when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of());
-
-            assertThatThrownBy(() -> menuService.create(menu))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("메뉴 상품의 수량이 0보다 작으면 메뉴를 등록할 수 없습니다.")
-        @ParameterizedTest(name = "수량 : `{0}`")
-        @CsvSource(value = {"1:-1", "-1:1"}, delimiter = ':')
-        void createWithNegativeMenuProductQuantity(final long firstQuantity, final long secondQuantity) {
-            final Menu menu = menu(null, menuName, price,
-                    menuGroup, List.of(
-                            menuProduct(null, firstQuantity, firstProduct),
-                            menuProduct(null, secondQuantity, secondProduct)
-                    ), true
-            );
-            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
-            when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
-            if (firstQuantity >= 0) {
-                when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
-            }
-            if (secondQuantity >= 0) {
-                when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
-            }
-            assertThatThrownBy(() -> menuService.create(menu))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("메뉴의 가격이 메뉴 상품의 가격 합보다 크면 메뉴를 등록할 수 없습니다.")
-        @ParameterizedTest(name = "메뉴 가격 : `{0}`")
-        @ValueSource(strings = {"32010", "33000", "34000"})
-        void createWithPriceLessThanSumOfMenuProductPrice(final String price) {
-            final Menu menu = menu(null, menuName, new BigDecimal(price),
-                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
-            );
-            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
-            when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
-            when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
-            when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
-
-            assertThatThrownBy(() -> menuService.create(menu))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("메뉴명이 없거나 비어있으면 메뉴를 등록할 수 없습니다.")
-        @ParameterizedTest(name = "메뉴명 : `{0}`")
-        @NullAndEmptySource
-        void createWithEmptyOrBlankMenuName(final String name) {
-            final Menu menu = menu(null, name, price,
-                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
-            );
-            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
-            when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
-            when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
-            when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
-
-            assertThatThrownBy(() -> menuService.create(menu))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("메뉴명이 욕설이 포함되어 있으면 메뉴를 등록할 수 없습니다.")
-        @ParameterizedTest(name = "메뉴명 : `{0}`")
-        @ValueSource(strings = {"비속어", "욕설", "그XX"})
-        void createWithEmptyOrProfanityMenuName(final String name) {
-            final Menu menu = menu(null, name, price,
-                    menuGroup, List.of(firstMenuProduct, secondMenuProduct), true
-            );
-            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
-            when(menuGroupRepository.findById(menu.getMenuGroupId())).thenReturn(Optional.of(menuGroup));
-            when(productRepository.findAllByIdIn(anyList())).thenReturn(List.of(firstProduct, secondProduct));
-            when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
-            when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
-            when(purgomalumClient.containsProfanity(name)).thenReturn(true);
-
-            assertThatThrownBy(() -> menuService.create(menu))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
     }
 
-    @DisplayName("메뉴 가격을 수정할 때")
+    @DisplayName("메뉴 가격 수정")
     @Nested
     class ChangePrice {
-
         private Menu menu;
 
         @BeforeEach
@@ -238,7 +234,52 @@ class MenuServiceUnitTest {
             );
         }
 
-        @DisplayName("메뉴 가격을 수정할 수 있습니다.")
+        @DisplayName("메뉴 가격이 0원 미만이면 메뉴 가격을 수정할 수 없다.")
+        @ParameterizedTest(name = "메뉴 가격 : `{0}`")
+        @ValueSource(strings = {"-1", "-1000", "-10000"})
+        void changePriceWithNegativePrice(final String price) {
+            final BigDecimal negativePrice = new BigDecimal(price);
+            final Menu changedMenu = menu(menu.getId(), menu.getName(), negativePrice,
+                    menu.getMenuGroup(), menu.getMenuProducts(), menu.isDisplayed()
+            );
+            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), changedMenu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴 가격이 없으면 메뉴 가격을 수정할 수 없다.")
+        @ParameterizedTest(name = "메뉴 가격 : `{0}`")
+        @NullSource
+        void changePriceWithNullPrice(final BigDecimal nullPrice) {
+            final Menu changedMenu = menu(menu.getId(), menu.getName(), nullPrice,
+                    menu.getMenuGroup(), menu.getMenuProducts(), true
+            );
+            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), changedMenu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴가 존재하지 않으면 메뉴 가격을 수정할 수 없다.")
+        @Test
+        void changePriceWithNotExistsMenu() {
+            when(menuRepository.findById(menu.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("메뉴의 가격이 메뉴 상품의 가격 합보다 크면 메뉴 가격을 수정할 수 없다.")
+        @ParameterizedTest(name = "메뉴 가격 : `{0}`")
+        @ValueSource(strings = {"32010", "33000", "34000"})
+        void changePriceWithPriceLessThanSumOfMenuProductPrice(final String price) {
+            final Menu changedMenu = menu(menu.getId(), menu.getName(), new BigDecimal(price),
+                    menu.getMenuGroup(), menu.getMenuProducts(), true
+            );
+            when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
+
+            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), changedMenu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴 가격을 수정한다.")
         @ParameterizedTest(name = "메뉴 가격 : `{0}`")
         @ValueSource(strings = {"31990", "31000", "32000"})
         void changePrice(final String price) {
@@ -254,57 +295,11 @@ class MenuServiceUnitTest {
                     () -> assertThat(actual.getPrice()).isEqualByComparingTo(changedPrice)
             );
         }
-
-        @DisplayName("메뉴 가격이 0원 미만이면 메뉴 가격을 수정할 수 없습니다.")
-        @ParameterizedTest(name = "메뉴 가격 : `{0}`")
-        @ValueSource(strings = {"-1", "-1000", "-10000"})
-        void changePriceWithNegativePrice(final String price) {
-            final BigDecimal negativePrice = new BigDecimal(price);
-            final Menu changedMenu = menu(menu.getId(), menu.getName(), negativePrice,
-                    menu.getMenuGroup(), menu.getMenuProducts(), menu.isDisplayed()
-            );
-            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), changedMenu))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("메뉴 가격이 없으면 메뉴 가격을 수정할 수 없습니다.")
-        @ParameterizedTest(name = "메뉴 가격 : `{0}`")
-        @NullSource
-        void changePriceWithNullPrice(final BigDecimal nullPrice) {
-            final Menu changedMenu = menu(menu.getId(), menu.getName(), nullPrice,
-                    menu.getMenuGroup(), menu.getMenuProducts(), true
-            );
-            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), changedMenu))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("메뉴가 존재하지 않으면 메뉴 가격을 수정할 수 없습니다.")
-        @Test
-        void changePriceWithNotExistsMenu() {
-            when(menuRepository.findById(menu.getId())).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu))
-                    .isInstanceOf(NoSuchElementException.class);
-        }
-
-        @DisplayName("메뉴의 가격이 메뉴 상품의 가격 합보다 크면 메뉴 가격을 수정할 수 없습니다.")
-        @ParameterizedTest(name = "메뉴 가격 : `{0}`")
-        @ValueSource(strings = {"32010", "33000", "34000"})
-        void changePriceWithPriceLessThanSumOfMenuProductPrice(final String price) {
-            final Menu changedMenu = menu(menu.getId(), menu.getName(), new BigDecimal(price),
-                    menu.getMenuGroup(), menu.getMenuProducts(), true
-            );
-            when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
-
-            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), changedMenu))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
     }
 
-    @DisplayName("메뉴를 노출시킬 때")
+    @DisplayName("메뉴 노출")
     @Nested
     class Display {
-
         private Menu menu;
 
         @BeforeEach
@@ -316,20 +311,7 @@ class MenuServiceUnitTest {
             );
         }
 
-        @DisplayName("메뉴를 노출할 수 있습니다.")
-        @Test
-        void display() {
-            when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
-
-            final Menu actual = menuService.display(menu.getId());
-            assertAll(
-                    () -> assertThat(actual).isNotNull(),
-                    () -> assertThat(actual.getId()).isEqualTo(menu.getId()),
-                    () -> assertThat(actual.isDisplayed()).isTrue()
-            );
-        }
-
-        @DisplayName("메뉴의 가격이 메뉴 상품의 가격 합보다 크면 메뉴를 노출할 수 없습니다.")
+        @DisplayName("메뉴의 가격이 메뉴 상품의 가격 합보다 크면 메뉴를 노출할 수 없다.")
         @ParameterizedTest(name = "메뉴 가격 : `{0}`")
         @ValueSource(strings = {"32010", "33000", "34000"})
         void displayWithPriceLessThanSumOfMenuProductPrice(final String price) {
@@ -342,7 +324,7 @@ class MenuServiceUnitTest {
                     .isInstanceOf(IllegalStateException.class);
         }
 
-        @DisplayName("메뉴가 존재하지 않으면 메뉴를 노출할 수 없습니다.")
+        @DisplayName("메뉴가 존재하지 않으면 메뉴를 노출할 수 없다.")
         @Test
         void displayWithNotExistsMenu() {
             when(menuRepository.findById(menu.getId())).thenReturn(Optional.empty());
@@ -350,12 +332,24 @@ class MenuServiceUnitTest {
             assertThatThrownBy(() -> menuService.display(menu.getId()))
                     .isInstanceOf(NoSuchElementException.class);
         }
+
+        @DisplayName("메뉴를 노출한다.")
+        @Test
+        void display() {
+            when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
+
+            final Menu actual = menuService.display(menu.getId());
+            assertAll(
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(actual.getId()).isEqualTo(menu.getId()),
+                    () -> assertThat(actual.isDisplayed()).isTrue()
+            );
+        }
     }
 
-    @DisplayName("메뉴가 노출 되고 있을 때")
+    @DisplayName("메뉴 숨김")
     @Nested
     class Hide {
-
         private Menu menu;
 
         @BeforeEach
@@ -363,10 +357,19 @@ class MenuServiceUnitTest {
             this.menu = menu(menuGroup(), List.of(
                     menuProduct(product(FRIED_CHICKEN, FRIED_CHICKEN_PRICE)),
                     menuProduct(product(SEASONED_CHICKEN, SEASONED_CHICKEN_PRICE))
-            ));
+            ), true);
         }
 
-        @DisplayName("메뉴를 숨길 수 있습니다.")
+        @DisplayName("메뉴가 존재하지 않으면 메뉴를 숨길 수 없다.")
+        @Test
+        void hideWithNotExistsMenu() {
+            when(menuRepository.findById(menu.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> menuService.hide(menu.getId()))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("노출 상태인 메뉴를 숨긴다.")
         @Test
         void hide() {
             when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
@@ -377,15 +380,6 @@ class MenuServiceUnitTest {
                     () -> assertThat(actual.getId()).isEqualTo(menu.getId()),
                     () -> assertThat(actual.isDisplayed()).isFalse()
             );
-        }
-
-        @DisplayName("메뉴가 존재하지 않으면 메뉴를 숨길 수 없습니다.")
-        @Test
-        void hideWithNotExistsMenu() {
-            when(menuRepository.findById(menu.getId())).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> menuService.hide(menu.getId()))
-                    .isInstanceOf(NoSuchElementException.class);
         }
     }
 }

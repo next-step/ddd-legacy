@@ -53,9 +53,9 @@ class DeliveryOrderServiceUnitTest {
         this.orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
 
-    @DisplayName("배달 주문이 생성되지 않았다면")
+    @DisplayName("배달 주문 생성")
     @Nested
-    class OrderIsNotCreated {
+    class Create {
         private Menu menu;
         private OrderLineItem orderLineItem;
 
@@ -68,26 +68,7 @@ class DeliveryOrderServiceUnitTest {
             this.orderLineItem = orderLineItem(null, menu);
         }
 
-        @DisplayName("대기 상태의 배달 주문을 생성할 수 있습니다.")
-        @Test
-        void createDeliveryOrder() {
-            final Order deliveryOrder = deliveryOrder(null, null, DELIVERY_ADDRESS, WAITING, List.of(orderLineItem));
-
-            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
-            when(menuRepository.findById(menu.getId())).thenReturn(Optional.ofNullable(menu));
-            when(orderRepository.save(any(Order.class))).then(returnsFirstArg());
-
-            final Order actual = orderService.create(deliveryOrder);
-            assertAll(
-                    () -> assertThat(actual.getId()).isNotNull(),
-                    () -> assertThat(actual.getOrderDateTime()).isBeforeOrEqualTo(LocalDateTime.now()),
-                    () -> assertThat(actual.getDeliveryAddress()).isEqualTo(DELIVERY_ADDRESS),
-                    () -> assertThat(actual.getStatus()).isEqualTo(WAITING),
-                    () -> assertThat(actual.getType()).isEqualTo(DELIVERY)
-            );
-        }
-
-        @DisplayName("주문 형식이 없으면 예외가 발생합니다")
+        @DisplayName("주문 형식이 없으면 배달 주문을 생성할 수 없다.")
         @Test
         void createOrderWithoutType() {
             assertThatThrownBy(() -> orderService.create(
@@ -101,7 +82,7 @@ class DeliveryOrderServiceUnitTest {
             )).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 항목이 없거나 비어있으면 예외가 발생합니다")
+        @DisplayName("주문 항목이 없거나 비어있으면 배달 주문을 생성할 수 없다.")
         @ParameterizedTest(name = "주문 항목: {0}")
         @NullAndEmptySource
         void createOrderWithoutOrderLineItems(final List<OrderLineItem> orderLineItems) {
@@ -117,7 +98,7 @@ class DeliveryOrderServiceUnitTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴의 개수와 주문 항목의 개수가 다르면 예외가 발생합니다")
+        @DisplayName("메뉴의 개수와 주문 항목의 개수가 다르면 배달 주문을 생성할 수 없다.")
         @Test
         void createOrderWithDifferentMenuCount() {
             final Menu otherMenu = menu(menuGroup(), List.of(menuProduct(product())));
@@ -136,7 +117,7 @@ class DeliveryOrderServiceUnitTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 항목 중 하나라도 수량이 0보다 작으면 예외가 발생합니다")
+        @DisplayName("주문 항목 중 하나라도 수량이 0보다 작으면 배달 주문을 생성할 수 없다.")
         @ParameterizedTest(name = "수량: {0}")
         @ValueSource(longs = {-1L, -10L, -100L})
         void createOrderWithNegativeQuantity(final long negativeQuantity) {
@@ -149,7 +130,7 @@ class DeliveryOrderServiceUnitTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 항목의 메뉴가 존재하지 않으면 예외가 발생합니다")
+        @DisplayName("주문 항목의 메뉴가 존재하지 않으면 배달 주문을 생성할 수 없다.")
         @Test
         void createOrderWithoutMenus() {
             final Order deliveryOrder = deliveryOrder(null, null, DELIVERY_ADDRESS, WAITING, List.of(orderLineItem));
@@ -160,7 +141,7 @@ class DeliveryOrderServiceUnitTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 항목의 메뉴의 가격이 일치하지 않으면 예외가 발생합니다")
+        @DisplayName("주문 항목의 메뉴의 가격이 일치하지 않으면 배달 주문을 생성할 수 없다.")
         @Test
         void createOrderWithDifferentMenuPrice() {
             final BigDecimal differentPrice = menu.getPrice().add(BigDecimal.ONE);
@@ -174,7 +155,7 @@ class DeliveryOrderServiceUnitTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴가 미노출 상태이면 예외가 발생합니다")
+        @DisplayName("메뉴가 숨김 상태이면 배달 주문을 생성할 수 없다.")
         @Test
         void createOrderWithNonDisplayedMenu() {
             final Menu nonDisplayedMenu = menu(menu.getId(), menu.getName(), menu.getPrice(), menu.getMenuGroup(), menu.getMenuProducts(), false);
@@ -187,7 +168,7 @@ class DeliveryOrderServiceUnitTest {
                     .isInstanceOf(IllegalStateException.class);
         }
 
-        @DisplayName("배달 주소가 없으면 예외가 발생합니다")
+        @DisplayName("배달 주소가 없으면 배달 주문을 생성할 수 없다.")
         @ParameterizedTest(name = "배달 주소: {0}")
         @NullAndEmptySource
         void createOrderWithoutDeliveryAddress(final String deliveryAddress) {
@@ -199,11 +180,30 @@ class DeliveryOrderServiceUnitTest {
             assertThatThrownBy(() -> orderService.create(deliveryOrder))
                     .isInstanceOf(IllegalArgumentException.class);
         }
+
+        @DisplayName("배달 주문을 생성한다.")
+        @Test
+        void createDeliveryOrder() {
+            final Order deliveryOrder = deliveryOrder(null, null, DELIVERY_ADDRESS, WAITING, List.of(orderLineItem));
+
+            when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(menu));
+            when(menuRepository.findById(menu.getId())).thenReturn(Optional.ofNullable(menu));
+            when(orderRepository.save(any(Order.class))).then(returnsFirstArg());
+
+            final Order actual = orderService.create(deliveryOrder);
+            assertAll(
+                    () -> assertThat(actual.getId()).isNotNull(),
+                    () -> assertThat(actual.getOrderDateTime()).isBeforeOrEqualTo(LocalDateTime.now()),
+                    () -> assertThat(actual.getDeliveryAddress()).isEqualTo(DELIVERY_ADDRESS),
+                    () -> assertThat(actual.getStatus()).isEqualTo(WAITING),
+                    () -> assertThat(actual.getType()).isEqualTo(DELIVERY)
+            );
+        }
     }
 
-    @DisplayName("배달 주문이 대기 상태라면")
+    @DisplayName("배달 주문 수락")
     @Nested
-    class OrderStatusIsWaited {
+    class Accept {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order deliveryOrder;
@@ -218,7 +218,31 @@ class DeliveryOrderServiceUnitTest {
             this.deliveryOrder = deliveryOrder(createOrderId(), createOrderDateTime(), DELIVERY_ADDRESS, WAITING, List.of(orderLineItem));
         }
 
-        @DisplayName("배달 주문을 수락할 수 있습니다.")
+        @DisplayName("대기 상태가 아니라면 배달 주문을 수락할 수 없다.")
+        @ParameterizedTest(name = "주문 상태: {0}")
+        @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "COMPLETED"})
+        void acceptNonWaitingDeliveryOrder(final OrderStatus orderStatus) {
+            final Order nonWaitingOrder = deliveryOrder(
+                    deliveryOrder.getId(), deliveryOrder.getOrderDateTime(), deliveryOrder.getDeliveryAddress(), orderStatus, deliveryOrder.getOrderLineItems()
+            );
+            when(orderRepository.findById(nonWaitingOrder.getId())).thenReturn(Optional.ofNullable(nonWaitingOrder));
+
+            assertThatThrownBy(() -> orderService.accept(nonWaitingOrder.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("배달 서비스 요청 중 오류가 발생하면 배달 주문을 수락할 수 없다.")
+        @Test
+        void acceptDeliveryOrderWithDeliveryServiceError() {
+            final Class<ConnectionPendingException> exception = ConnectionPendingException.class;
+            when(orderRepository.findById(deliveryOrder.getId())).thenReturn(Optional.ofNullable(deliveryOrder));
+            doThrow(exception).when(kitchenridersClient).requestDelivery(any(), any(), any());
+
+            assertThatThrownBy(() -> orderService.accept(deliveryOrder.getId()))
+                    .isInstanceOf(exception);
+        }
+
+        @DisplayName("배달 주문을 수락한다.")
         @Test
         void acceptDeliveryOrder() {
             when(orderRepository.findById(deliveryOrder.getId())).thenReturn(Optional.ofNullable(deliveryOrder));
@@ -233,35 +257,11 @@ class DeliveryOrderServiceUnitTest {
                     () -> assertThat(actual.getStatus()).isEqualTo(ACCEPTED)
             );
         }
-
-        @DisplayName("대기 상태가 아닌 주문을 수락하려고 하면 예외가 발생합니다")
-        @ParameterizedTest(name = "주문 상태: {0}")
-        @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "COMPLETED"})
-        void acceptNonWaitingOrder(final OrderStatus orderStatus) {
-            final Order nonWaitingOrder = deliveryOrder(
-                    deliveryOrder.getId(), deliveryOrder.getOrderDateTime(), deliveryOrder.getDeliveryAddress(), orderStatus, deliveryOrder.getOrderLineItems()
-            );
-            when(orderRepository.findById(nonWaitingOrder.getId())).thenReturn(Optional.ofNullable(nonWaitingOrder));
-
-            assertThatThrownBy(() -> orderService.accept(nonWaitingOrder.getId()))
-                    .isInstanceOf(IllegalStateException.class);
-        }
-
-        @DisplayName("배달 서비스 요청 중 오류가 발생하면 예외가 발생합니다")
-        @Test
-        void acceptOrderWithDeliveryServiceError() {
-            final Class<ConnectionPendingException> exception = ConnectionPendingException.class;
-            when(orderRepository.findById(deliveryOrder.getId())).thenReturn(Optional.ofNullable(deliveryOrder));
-            doThrow(exception).when(kitchenridersClient).requestDelivery(any(), any(), any());
-
-            assertThatThrownBy(() -> orderService.accept(deliveryOrder.getId()))
-                    .isInstanceOf(exception);
-        }
     }
 
-    @DisplayName("배달 주문이 수락 상태라면")
+    @DisplayName("배달 주문 서빙")
     @Nested
-    class OrderStatusIsAccepted {
+    class Serve {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order deliveryOrder;
@@ -276,7 +276,20 @@ class DeliveryOrderServiceUnitTest {
             this.deliveryOrder = deliveryOrder(createOrderId(), createOrderDateTime(), DELIVERY_ADDRESS, ACCEPTED, List.of(orderLineItem));
         }
 
-        @DisplayName("배달 주문을 서빙할 수 있습니다.")
+        @DisplayName("수락 상태가 아니라면 배달 주문을 서빙할 수 없다.")
+        @Test
+        void serveNonAcceptedDeliveryOrder() {
+            final Order nonAcceptedOrder = deliveryOrder(
+                    deliveryOrder.getId(), deliveryOrder.getOrderDateTime(), deliveryOrder.getDeliveryAddress(), WAITING, deliveryOrder.getOrderLineItems()
+            );
+
+            when(orderRepository.findById(nonAcceptedOrder.getId())).thenReturn(Optional.ofNullable(nonAcceptedOrder));
+
+            assertThatThrownBy(() -> orderService.serve(nonAcceptedOrder.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("배달 주문을 서빙한다.")
         @Test
         void serveDeliveryOrder() {
             when(orderRepository.findById(deliveryOrder.getId())).thenReturn(Optional.ofNullable(deliveryOrder));
@@ -290,24 +303,11 @@ class DeliveryOrderServiceUnitTest {
                     () -> assertThat(actual.getStatus()).isEqualTo(SERVED)
             );
         }
-
-        @DisplayName("수락 상태가 아닌 주문을 서빙하려고 하면 예외가 발생합니다")
-        @Test
-        void serveNonAcceptedOrder() {
-            final Order nonAcceptedOrder = deliveryOrder(
-                    deliveryOrder.getId(), deliveryOrder.getOrderDateTime(), deliveryOrder.getDeliveryAddress(), WAITING, deliveryOrder.getOrderLineItems()
-            );
-
-            when(orderRepository.findById(nonAcceptedOrder.getId())).thenReturn(Optional.ofNullable(nonAcceptedOrder));
-
-            assertThatThrownBy(() -> orderService.serve(nonAcceptedOrder.getId()))
-                    .isInstanceOf(IllegalStateException.class);
-        }
     }
 
-    @DisplayName("배달 주문이 서빙된 상태라면")
+    @DisplayName("배달 주문 배달 시작")
     @Nested
-    class OrderStatusIsServed {
+    class StartDelivery {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order deliveryOrder;
@@ -322,24 +322,9 @@ class DeliveryOrderServiceUnitTest {
             this.deliveryOrder = deliveryOrder(createOrderId(), createOrderDateTime(), DELIVERY_ADDRESS, SERVED, List.of(orderLineItem));
         }
 
-        @DisplayName("배달 주문을 배달 시작할 수 있습니다.")
+        @DisplayName("배달 주문이 존재하지 않으면 배달을 시작할 수 없다.")
         @Test
-        void startDeliveryOrder() {
-            when(orderRepository.findById(deliveryOrder.getId())).thenReturn(Optional.ofNullable(deliveryOrder));
-
-            final Order actual = orderService.startDelivery(deliveryOrder.getId());
-
-            assertAll(
-                    () -> assertThat(actual.getId()).isEqualTo(deliveryOrder.getId()),
-                    () -> assertThat(actual.getDeliveryAddress()).isEqualTo(deliveryOrder.getDeliveryAddress()),
-                    () -> assertThat(actual.getType()).isEqualTo(deliveryOrder.getType()),
-                    () -> assertThat(actual.getStatus()).isEqualTo(DELIVERING)
-            );
-        }
-
-        @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
-        @Test
-        void startDeliveryNonExistentOrder() {
+        void startDeliveryInNonExistentDeliveryOrder() {
             final UUID nonExistentOrderId = createOrderId();
             when(orderRepository.findById(nonExistentOrderId)).thenReturn(Optional.empty());
 
@@ -347,10 +332,10 @@ class DeliveryOrderServiceUnitTest {
                     .isInstanceOf(NoSuchElementException.class);
         }
 
-        @DisplayName("서빙 상태가 아닌 주문을 배달 시작하려고 하면 예외가 발생합니다")
+        @DisplayName("서빙 상태가 아니라면, 배달을 시작할 수 없다.")
         @ParameterizedTest(name = "주문 상태: {0}")
         @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERED", "DELIVERING", "COMPLETED"})
-        void startDeliveryNonServedOrder(final OrderStatus orderStatus) {
+        void startDeliveryInNonServedDeliveryOrder(final OrderStatus orderStatus) {
             final Order nonServedOrder = deliveryOrder(deliveryOrder.getId(), deliveryOrder.getOrderDateTime(), deliveryOrder.getDeliveryAddress(), orderStatus, deliveryOrder.getOrderLineItems());
 
             when(orderRepository.findById(nonServedOrder.getId())).thenReturn(Optional.ofNullable(nonServedOrder));
@@ -359,10 +344,10 @@ class DeliveryOrderServiceUnitTest {
                     .isInstanceOf(IllegalStateException.class);
         }
 
-        @DisplayName("배달 주문이 아닌 주문을 배달 시작하려고 하면 예외가 발생합니다")
+        @DisplayName("배달 주문이 아닌 경우, 배달을 시작할 수 없다.")
         @ParameterizedTest(name = "주문 형식: {0}")
         @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
-        void startDeliveryNonDeliveryOrder(final OrderType orderType) {
+        void startDeliveryInNonDeliveryTypeOrder(final OrderType orderType) {
             final Order nonDeliveryOrder = order(
                     deliveryOrder.getId(),
                     deliveryOrder.getOrderDateTime(),
@@ -377,11 +362,26 @@ class DeliveryOrderServiceUnitTest {
             assertThatThrownBy(() -> orderService.startDelivery(nonDeliveryOrder.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
+
+        @DisplayName("배달을 시작한다.")
+        @Test
+        void startDeliveryInDeliveryOrder() {
+            when(orderRepository.findById(deliveryOrder.getId())).thenReturn(Optional.ofNullable(deliveryOrder));
+
+            final Order actual = orderService.startDelivery(deliveryOrder.getId());
+
+            assertAll(
+                    () -> assertThat(actual.getId()).isEqualTo(deliveryOrder.getId()),
+                    () -> assertThat(actual.getDeliveryAddress()).isEqualTo(deliveryOrder.getDeliveryAddress()),
+                    () -> assertThat(actual.getType()).isEqualTo(deliveryOrder.getType()),
+                    () -> assertThat(actual.getStatus()).isEqualTo(DELIVERING)
+            );
+        }
     }
 
-    @DisplayName("배달 주문이 배달중 상태라면")
+    @DisplayName("배달 주문의 배달 완료")
     @Nested
-    class OrderStatusIsDelivering {
+    class Delivered {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order deliveryOrder;
@@ -396,7 +396,30 @@ class DeliveryOrderServiceUnitTest {
             this.deliveryOrder = deliveryOrder(createOrderId(), createOrderDateTime(), DELIVERY_ADDRESS, DELIVERING, List.of(orderLineItem));
         }
 
-        @DisplayName("배달 주문을 배달 완료할 수 있습니다.")
+        @DisplayName("주문이 존재하지 않으면 배달을 완료할 수 없다.")
+        @Test
+        void completeDeliveryNonExistentOrder() {
+            final UUID nonExistentOrderId = createOrderId();
+            when(orderRepository.findById(nonExistentOrderId)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.completeDelivery(nonExistentOrderId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("배달중 상태가 아니라면 배달을 완료할 수 없다.")
+        @Test
+        void completeDeliveryNonDeliveringOrder() {
+            final Order nonDeliveringOrder = deliveryOrder(
+                    deliveryOrder.getId(), deliveryOrder.getOrderDateTime(), deliveryOrder.getDeliveryAddress(), SERVED, deliveryOrder.getOrderLineItems()
+            );
+
+            when(orderRepository.findById(nonDeliveringOrder.getId())).thenReturn(Optional.ofNullable(nonDeliveringOrder));
+
+            assertThatThrownBy(() -> orderService.completeDelivery(nonDeliveringOrder.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("배달 주문의 배달을 완료한다.")
         @Test
         void completeDeliveryOrder() {
             when(orderRepository.findById(deliveryOrder.getId())).thenReturn(Optional.ofNullable(deliveryOrder));
@@ -410,34 +433,11 @@ class DeliveryOrderServiceUnitTest {
                     () -> assertThat(actual.getStatus()).isEqualTo(DELIVERED)
             );
         }
-
-        @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
-        @Test
-        void completeDeliveryNonExistentOrder() {
-            final UUID nonExistentOrderId = createOrderId();
-            when(orderRepository.findById(nonExistentOrderId)).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> orderService.completeDelivery(nonExistentOrderId))
-                    .isInstanceOf(NoSuchElementException.class);
-        }
-
-        @DisplayName("배달 중이 아닌 주문을 배달 완료하려고 하면 예외가 발생합니다")
-        @Test
-        void completeDeliveryNonDeliveringOrder() {
-            final Order nonDeliveringOrder = deliveryOrder(
-                    deliveryOrder.getId(), deliveryOrder.getOrderDateTime(), deliveryOrder.getDeliveryAddress(), SERVED, deliveryOrder.getOrderLineItems()
-            );
-
-            when(orderRepository.findById(nonDeliveringOrder.getId())).thenReturn(Optional.ofNullable(nonDeliveringOrder));
-
-            assertThatThrownBy(() -> orderService.completeDelivery(nonDeliveringOrder.getId()))
-                    .isInstanceOf(IllegalStateException.class);
-        }
     }
 
-    @DisplayName("배달 주문이 배달 완료 상태라면")
+    @DisplayName("배달 주문 완료")
     @Nested
-    class OrderStatusIsDelivered {
+    class Complete {
         private Menu menu;
         private OrderLineItem orderLineItem;
         private Order deliveryOrder;
@@ -452,9 +452,32 @@ class DeliveryOrderServiceUnitTest {
             this.deliveryOrder = deliveryOrder(createOrderId(), createOrderDateTime(), DELIVERY_ADDRESS, DELIVERED, List.of(orderLineItem));
         }
 
-        @DisplayName("배달 주문을 완료할 수 있습니다.")
+        @DisplayName("주문이 존재하지 않으면 배달 주문을 완료할 수 없다.")
         @Test
-        void completeDeliveryOrder() {
+        void completeNonExistentOrder() {
+            final UUID nonExistentOrderId = createOrderId();
+
+            when(orderRepository.findById(nonExistentOrderId)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> orderService.complete(nonExistentOrderId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("배달 완료 상태가 아니라면 배달 주문을 완료할 수 없다.")
+        @Test
+        void completeNonDeliveredOrder() {
+            final Order nonDeliveredOrder = deliveryOrder(
+                    deliveryOrder.getId(), deliveryOrder.getOrderDateTime(), deliveryOrder.getDeliveryAddress(), DELIVERING, deliveryOrder.getOrderLineItems()
+            );
+            when(orderRepository.findById(nonDeliveredOrder.getId())).thenReturn(Optional.ofNullable(nonDeliveredOrder));
+
+            assertThatThrownBy(() -> orderService.complete(nonDeliveredOrder.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("배달 주문을 완료한다.")
+        @Test
+        void completeOrder() {
             when(orderRepository.findById(deliveryOrder.getId())).thenReturn(Optional.ofNullable(deliveryOrder));
 
             final Order completedOrder = orderService.complete(deliveryOrder.getId());
@@ -466,29 +489,5 @@ class DeliveryOrderServiceUnitTest {
                     () -> assertThat(completedOrder.getStatus()).isEqualTo(COMPLETED)
             );
         }
-
-        @DisplayName("주문이 존재하지 않으면 예외가 발생합니다")
-        @Test
-        void completeNonExistentOrder() {
-            final UUID nonExistentOrderId = createOrderId();
-
-            when(orderRepository.findById(nonExistentOrderId)).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> orderService.complete(nonExistentOrderId))
-                    .isInstanceOf(NoSuchElementException.class);
-        }
-
-        @DisplayName("배달 주문이 완료되지 않은 상태에서 완료하려고 하면 예외가 발생합니다")
-        @Test
-        void completeNonDeliveredOrder() {
-            final Order nonDeliveredOrder = deliveryOrder(
-                    deliveryOrder.getId(), deliveryOrder.getOrderDateTime(), deliveryOrder.getDeliveryAddress(), DELIVERING, deliveryOrder.getOrderLineItems()
-            );
-            when(orderRepository.findById(nonDeliveredOrder.getId())).thenReturn(Optional.ofNullable(nonDeliveredOrder));
-
-            assertThatThrownBy(() -> orderService.complete(nonDeliveredOrder.getId()))
-                    .isInstanceOf(IllegalStateException.class);
-        }
     }
 }
-
