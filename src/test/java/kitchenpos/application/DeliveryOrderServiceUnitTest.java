@@ -249,6 +249,7 @@ class DeliveryOrderServiceUnitTest {
             doNothing().when(kitchenridersClient).requestDelivery(any(), any(), any());
 
             final Order actual = orderService.accept(deliveryOrder.getId());
+            verify(kitchenridersClient, times(1)).requestDelivery(any(), any(), any());
 
             assertAll(
                     () -> assertThat(actual.getId()).isEqualTo(deliveryOrder.getId()),
