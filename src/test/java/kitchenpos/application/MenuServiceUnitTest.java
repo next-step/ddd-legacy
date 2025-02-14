@@ -86,15 +86,12 @@ class MenuServiceUnitTest {
         @DisplayName("메뉴 그룹이 존재하지 않으면 메뉴를 등록할 수 없다.")
         @Test
         void createWithNotExistsMenuGroup() {
-            final Menu menu = menu(
-                    null, menuName, price,
-                    null, List.of(firstMenuProduct, secondMenuProduct), true
-            );
-            when(menuGroupRepository.findById(menu.getMenuGroupId()))
-                    .thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> menuService.create(menu))
-                    .isInstanceOf(NoSuchElementException.class);
+            assertThatThrownBy(() ->
+                    menu(
+                            null, menuName, price, null,
+                            List.of(firstMenuProduct, secondMenuProduct), true
+                    )
+            ).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("메뉴 상품이 없거나 비어있으면 메뉴를 등록할 수 없다.")
