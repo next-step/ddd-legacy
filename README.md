@@ -110,29 +110,47 @@ docker compose -p kitchenpos up -d
 
 ## 모델링
 
-### 주문 상태
+### 주문 상태 (포장)
 ```mermaid
-flowchart TD
+flowchart LR
   A[주문 대기] --> B[주문 승인]
-  B[주문 승인] --> C[배달 중]
-  B[주문 승인] --> E[서빙]
-  subgraph DeliveryDraw[배달]
-    C[배달 중] --> D[배달 완료]
+  B[주문 승인] --> C[서빙]
+  subgraph TakoutEatinDraw[포장]
+    C[서빙] --> F[서빙 완료]
   end
-  subgraph TakoutEatinDraw[포장/매장이용]
-    E[서빙] --> F[서빙 완료]
-  end
-  D[배달 완료] --> G[주문 완료]
   F[서빙 완료] --> G[주문 완료]
+```
+
+### 주문 상태 (매장 이용)
+```mermaid
+flowchart LR
+  A[주문 대기] --> B[주문 승인]
+  B[주문 승인] --> C[서빙]
+  subgraph TakoutEatinDraw[매장이용]
+    C[서빙] --> F[서빙 완료]
+  end
+  F[서빙 완료] --> G[주문 완료]
+```
+
+### 주문 상태 (배달)
+```mermaid
+flowchart LR
+  A[주문 대기] --> B[주문 승인]
+  B[주문 승인] --> C[서빙]
+  subgraph DeliveryDraw[배달]
+    C[서빙] --> D[배달 중]
+    D[배달 중] --> E[배달 완료]
+  end
+  E[배달 완료] --> G[주문 완료]
 ```
 
 ### 치킨포스
 ```mermaid
 erDiagram
-  Order ||--o{ OrderLineItem : order
-  Order ||--|| OrderTable : order
+  Order ||--|{ OrderLineItem : order
+  Order o{--|| OrderTable : order
   OrderLineItem ||--|| Menu : menu
   Menu ||--|| MenuGroup : contains
-  Menu ||--o{ MenuProduct : contains
+  Menu ||--|{ MenuProduct : contains
   MenuProduct ||--|| Product : product
 ```
