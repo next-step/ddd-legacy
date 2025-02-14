@@ -3,64 +3,81 @@ package kitchenpos;
 import kitchenpos.domain.*;
 import org.junit.jupiter.params.provider.Arguments;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public class OrderFixture {
 
-    public static Order 주문_Request(OrderType type) {
-        Order order = new Order();
-        order.setType(type);
-        return order;
+    public static final UUID ORDER_ID = UUID.randomUUID();
+
+    public static Order.Builder anOrderRequest() {
+        return Order.builder()
+                .type(OrderType.EAT_IN)
+                .status(OrderStatus.WAITING)
+                .orderDateTime(LocalDateTime.now());
     }
 
-    public static Order 주문_Request(OrderType type, List<OrderLineItem> lineItems) {
-        Order order = new Order();
-        order.setType(type);
-        order.setOrderLineItems(lineItems);
-        return order;
-    }
-    public static Order 주문_Request(OrderTable table, OrderType type, List<OrderLineItem> lineItems){
-        Order order = new Order();
-        order.setOrderTableId(table.getId());
-        order.setType(type);
-        order.setOrderLineItems(lineItems);
-        return order;
+    public static OrderLineItem.Builder anOrderLineItemRequest(Menu menu) {
+        return OrderLineItem.builder()
+                .menu(menu)
+                .menuId(menu.getId())
+                .quantity(1L)
+                .price(menu.getPrice());
     }
 
-    public static Order 주문_Request(OrderTable table, OrderStatus status){
-        Order order = new Order();
-        order.setStatus(status);
-        order.setOrderTable(table);
-        return order;
-    }
-
+    // 파라미터라이즈드 테스트용: 완료 상태를 제외한 주문 상태 Stream
     public static Stream<Arguments> orderStatusNotCompleted() {
-        return Arrays.stream(OrderStatus.values())
-                .filter(status -> status != OrderStatus.COMPLETED) // 완료된 상태 제외
-                .map(Arguments::of)
-                .collect(Collectors.toList())
-                .stream();
+        return Stream.of(OrderStatus.values())
+                .filter(status -> status != OrderStatus.COMPLETED)
+                .map(Arguments::of);
     }
 
+    // 파라미터라이즈드 테스트용: 대기 상태를 제외한 주문 상태 Stream
+    public static Stream<Arguments> orderStatusNotWaiting() {
+        return Stream.of(OrderStatus.values())
+                .filter(status -> status != OrderStatus.WAITING)
+                .map(Arguments::of);
+    }
+
+    // 파라미터라이즈드 테스트용: 매장 주문(EAT_IN)이 아닌 주문 타입 Stream
     public static Stream<Arguments> orderTypeNotEatIn() {
-        return Arrays.stream(OrderType.values())
-                .filter(type -> type != OrderType.EAT_IN) // 매장 주문 제외
-                .map(Arguments::of)
-                .collect(Collectors.toList())
-                .stream();
+        return Stream.of(OrderType.values())
+                .filter(type -> type != OrderType.EAT_IN)
+                .map(Arguments::of);
     }
 
-    public static OrderLineItem 주문상품_Request(Menu menu, long quantity) {
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenu(menu);
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setQuantity(quantity);
-        orderLineItem.setPrice(menu.getPrice());
-
-        return orderLineItem;
+    public static Stream<Arguments> orderStatusNotAccepted() {
+        return Stream.of(OrderStatus.values())
+                .filter(status -> status != OrderStatus.ACCEPTED)
+                .map(Arguments::of);
     }
+
+    public static Stream<Arguments> orderTypeNotDelivery() {
+        return Stream.of(OrderType.values())
+                .filter(type -> type != OrderType.DELIVERY)
+                .map(Arguments::of);
+    }
+
+    public static Stream<Arguments> orderStatusNotDelivering() {
+        return Stream.of(OrderStatus.values())
+                .filter(status -> status != OrderStatus.DELIVERING)
+                .map(Arguments::of);
+    }
+
+    public static Stream<Arguments> orderStatusNotDelivered() {
+        return Stream.of(OrderStatus.values())
+                .filter(status -> status != OrderStatus.DELIVERED)
+                .map(Arguments::of);
+    }
+
+    public static Stream<Arguments> orderStatusNotServed() {
+        return Stream.of(OrderStatus.values())
+                .filter(status -> status != OrderStatus.SERVED)
+                .map(Arguments::of);
+    }
+
+
+
 
 }

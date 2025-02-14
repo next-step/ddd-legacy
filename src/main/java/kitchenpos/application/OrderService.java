@@ -87,7 +87,7 @@ public class OrderService {
             }
             if (type == OrderType.EAT_IN) {
                 final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
-                    .orElseThrow(NoSuchElementException::new);
+                    .orElseThrow(OrderTableNotFoundException::new);
                 if (!orderTable.isOccupied()) {
                     throw new OrderTableNotOccupiedException();
                 }
@@ -99,9 +99,9 @@ public class OrderService {
     @Transactional
     public Order accept(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(OrderNotFoundException::new);
         if (order.getStatus() != OrderStatus.WAITING) {
-            throw new IllegalStateException();
+            throw new OrderStatusNotWaitingException();
         }
         if (order.getType() == OrderType.DELIVERY) {
             BigDecimal sum = BigDecimal.ZERO;
@@ -119,9 +119,9 @@ public class OrderService {
     @Transactional
     public Order serve(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(OrderNotFoundException::new);
         if (order.getStatus() != OrderStatus.ACCEPTED) {
-            throw new IllegalStateException();
+            throw new OrderStatusNotAcceptedException();
         }
         order.setStatus(OrderStatus.SERVED);
         return order;
@@ -130,9 +130,9 @@ public class OrderService {
     @Transactional
     public Order startDelivery(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(OrderNotFoundException::new);
         if (order.getType() != OrderType.DELIVERY) {
-            throw new IllegalStateException();
+            throw new OrderTypeNotDeliveryException();
         }
         if (order.getStatus() != OrderStatus.SERVED) {
             throw new IllegalStateException();
@@ -144,9 +144,9 @@ public class OrderService {
     @Transactional
     public Order completeDelivery(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(OrderNotFoundException::new);
         if (order.getStatus() != OrderStatus.DELIVERING) {
-            throw new IllegalStateException();
+            throw new OrderStatusNotDeliveringException();
         }
         order.setStatus(OrderStatus.DELIVERED);
         return order;
@@ -160,12 +160,12 @@ public class OrderService {
         final OrderStatus status = order.getStatus();
         if (type == OrderType.DELIVERY) {
             if (status != OrderStatus.DELIVERED) {
-                throw new IllegalStateException();
+                throw new OrderStatusNotDeliveredException();
             }
         }
         if (type == OrderType.TAKEOUT || type == OrderType.EAT_IN) {
             if (status != OrderStatus.SERVED) {
-                throw new IllegalStateException();
+                throw new OrderStatusNotServedException();
             }
         }
         order.setStatus(OrderStatus.COMPLETED);

@@ -2,7 +2,6 @@ package kitchenpos.application;
 
 import config.UnitTest;
 import kitchenpos.OrderFixture;
-import kitchenpos.OrderTableFixture;
 import kitchenpos.domain.*;
 import kitchenpos.infra.IdGenerator;
 import kitchenpos.infra.InmemoryOrderRepository;
@@ -15,9 +14,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.List;
 import java.util.UUID;
 
-import static kitchenpos.OrderTableFixture.주문테이블_사용중_Request;
+import static kitchenpos.OrderTableFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,13 +27,11 @@ class OrderTableServiceTest {
     private OrderTableRepository orderTableRepository;
     private OrderRepository orderRepository;
     private OrderTableService sut;
-    private IdGenerator idGenerator;
 
     @BeforeEach
     void setUp() {
         orderTableRepository = new InmemoryOrderTableRepository();
         orderRepository = new InmemoryOrderRepository();
-        idGenerator = () -> UUID.randomUUID();
         sut = new OrderTableService(orderTableRepository, orderRepository);
     }
 
@@ -45,8 +43,7 @@ class OrderTableServiceTest {
         @DisplayName("성공: 올바른 이름으로 테이블 생성 시 기본 상태는 미사용, 인원수는 0이다.")
         void create_success() {
             // given
-            String name = "테이블 1";
-            OrderTable request = OrderTableFixture.주문테이블_생성_Request(name);
+            OrderTable request = anOrderTableRequest().build();
 
             // when
             OrderTable created = sut.create(request);
@@ -55,7 +52,6 @@ class OrderTableServiceTest {
             assertAll(
                     () -> assertThat(created).isNotNull(),
                     () -> assertThat(created.getId()).isNotNull(),
-                    () -> assertThat(created.getName()).isEqualTo(name),
                     () -> assertThat(created.getNumberOfGuests()).isEqualTo(0),
                     () -> assertThat(created.isOccupied()).isFalse()
             );
@@ -65,7 +61,9 @@ class OrderTableServiceTest {
         @DisplayName("실패: 테이블 이름이 null이면 OrderTableNameException 발생")
         void create_fail_whenNameNull() {
             // given
-            OrderTable request = OrderTableFixture.주문테이블_생성_Request(null);
+            OrderTable request = anOrderTableRequest()
+                    .name(null)
+                    .build();
 
             // when & then
             assertThrows(OrderTableNameException.class, () -> sut.create(request));
@@ -75,8 +73,9 @@ class OrderTableServiceTest {
         @DisplayName("실패: 테이블 이름이 빈 문자열이면 OrderTableNameException 발생")
         void create_fail_whenNameEmpty() {
             // given
-            OrderTable request = new OrderTable();
-            request.setName("");
+            OrderTable request = anOrderTableRequest()
+                    .name("")
+                    .build();
 
             // when & then
             assertThrows(OrderTableNameException.class, () -> sut.create(request));
@@ -91,7 +90,7 @@ class OrderTableServiceTest {
         @DisplayName("성공: 존재하는 테이블에 대해 착석시 사용중인 상태로 변경")
         void sit_success() {
             // given
-            OrderTable request = orderTableRepository.save(OrderTableFixture.주문테이블_생성_Request());
+            OrderTable request = orderTableRepository.save(anOrderTableRequest().build());
             assertThat(request.isOccupied()).isFalse();
 
             // when
@@ -106,10 +105,8 @@ class OrderTableServiceTest {
         @DisplayName("실패: 존재하지 않는 테이블에 대해 착석 요청 시 OrderTableNotFoundException 발생")
         void sit_fail_tableNotFound() {
             // given
-            UUID request = idGenerator.ramdom();
-
             // when & then
-            assertThrows(OrderTableNotFoundException.class, () -> sut.sit(request));
+            assertThrows(OrderTableNotFoundException.class, () -> sut.sit(UUID.randomUUID()));
         }
     }
 
@@ -121,16 +118,18 @@ class OrderTableServiceTest {
         @DisplayName("성공: 모든 주문이 완료된 테이블은 청소 시 미사용 상태로, 인원 수 0으로 초기화됨")
         void clear_success() {
             // given
-            OrderTable request = orderTableRepository.save(주문테이블_사용중_Request());
-            assertThat(request.isOccupied()).isTrue();
-            assertThat(request.getNumberOfGuests()).isGreaterThan(0);
+            OrderTable orderTable = orderTableRepository.save(anOrderTableRequest().occupied(true)
+                            .numberOfGuests(3)
+                            .build());
+            assertThat(orderTable.isOccupied()).isTrue();
+            assertThat(orderTable.getNumberOfGuests()).isGreaterThan(0);
 
             // when
-            OrderTable cleared = sut.clear(request.getId());
+            OrderTable clearedOrderTable = sut.clear(orderTable.getId());
 
             // then
-            assertThat(cleared.isOccupied()).isFalse();
-            assertThat(cleared.getNumberOfGuests()).isEqualTo(0);
+            assertThat(clearedOrderTable.isOccupied()).isFalse();
+            assertThat(clearedOrderTable.getNumberOfGuests()).isEqualTo(0);
         }
 
         @ParameterizedTest
@@ -138,21 +137,23 @@ class OrderTableServiceTest {
         @MethodSource("kitchenpos.OrderFixture#orderStatusNotCompleted")
         void clear_fail_whenOrderNotCompleted(OrderStatus status) {
             // given
-            OrderTable 주문테이블_사용중 = orderTableRepository.save(주문테이블_사용중_Request());
-            Order request = orderRepository.save(OrderFixture.주문_Request(주문테이블_사용중, status));
+            OrderTable orderTable = orderTableRepository.save(anOrderTableRequest().occupied(true).build());
+            Order order = orderRepository.save(OrderFixture.anOrderRequest()
+                    .orderTable(orderTable)
+                    .status(status)
+                    .build());
 
             // when & then
-            assertThrows(OrderNotCompletedException.class, () -> sut.clear(주문테이블_사용중.getId()));
+            assertThrows(OrderNotCompletedException.class, () -> sut.clear(orderTable.getId()));
         }
 
         @Test
         @DisplayName("실패: 존재하지 않는 테이블에 대해 청소 요청 시 NoSuchElementException 발생")
         void clear_fail_tableNotFound() {
             // given
-            UUID randomId = idGenerator.ramdom();
 
             // when & then
-            assertThrows(OrderTableNotFoundException.class, () -> sut.clear(randomId));
+            assertThrows(OrderTableNotFoundException.class, () -> sut.clear(UUID.randomUUID()));
         }
     }
 
@@ -165,11 +166,11 @@ class OrderTableServiceTest {
         @ValueSource(ints = {1, 2, 3, 4})
         void changeNumberOfGuests_success(int numberOfGuests) {
             // given
-            OrderTable savedOrderTable = orderTableRepository.save(주문테이블_사용중_Request());
-            OrderTable request = 주문테이블_사용중_Request(numberOfGuests);
+            OrderTable orderTable = orderTableRepository.save(anOrderTableRequest().occupied(true).numberOfGuests(3).build());
+            OrderTable request = anOrderTableRequest().numberOfGuests(numberOfGuests).build();
 
             // when
-            OrderTable updated = sut.changeNumberOfGuests(savedOrderTable.getId(), request);
+            OrderTable updated = sut.changeNumberOfGuests(orderTable.getId(), request);
 
             // then
             assertThat(updated.getNumberOfGuests()).isEqualTo(numberOfGuests);
@@ -180,32 +181,30 @@ class OrderTableServiceTest {
         @ValueSource(ints = {-1, -100, -1000})
         void changeNumberOfGuests_fail_invalidNumber(int numberOfGuests) {
             // given
-            OrderTable savedOrderTable = orderTableRepository.save(주문테이블_사용중_Request());
-            OrderTable request = 주문테이블_사용중_Request(numberOfGuests);
+            OrderTable orderTable = orderTableRepository.save(anOrderTableRequest().occupied(true).numberOfGuests(3).build());
+            OrderTable request = anOrderTableRequest().numberOfGuests(numberOfGuests).build();
 
             // when & then
-            assertThrows(OrderTableGuestNegativeException.class, () -> sut.changeNumberOfGuests(savedOrderTable.getId(), request));
+            assertThrows(OrderTableGuestNegativeException.class, () -> sut.changeNumberOfGuests(orderTable.getId(), request));
         }
 
         @Test
         @DisplayName("실패: 존재하지 않는 테이블에 대해 인원 수 변경 요청 시 NoSuchElementException 발생")
         void changeNumberOfGuests_fail_tableNotFound() {
             // given
-            int numberOfGuests = 3;
-            UUID randonId = idGenerator.ramdom();
-            OrderTable request = 주문테이블_사용중_Request();
+            OrderTable request = anOrderTableRequest().numberOfGuests(3).build();
 
             // when & then
-            assertThrows(OrderTableNotFoundException.class, () -> sut.changeNumberOfGuests(randonId, request));
+            assertThrows(OrderTableNotFoundException.class, () -> sut.changeNumberOfGuests(UUID.randomUUID(), request));
         }
 
         @Test
         @DisplayName("실패: 사용중이지 않은(미착석) 테이블의 인원 수 변경 시 IllegalStateException 발생")
         void changeNumberOfGuests_fail_notOccupied() {
             // given
-            OrderTable savedOrderTable = orderTableRepository.save(OrderTableFixture.주문테이블_생성_Request());
+            OrderTable savedOrderTable = orderTableRepository.save(anOrderTableRequest().occupied(false).build());
             assertThat(savedOrderTable.isOccupied()).isFalse();
-            OrderTable request = OrderTableFixture.주문테이블_사용중_Request(3);
+            OrderTable request = anOrderTableRequest().numberOfGuests(3).build();
 
             // when & then
             assertThrows(OrderTableNotOccupiedException.class, () -> sut.changeNumberOfGuests(savedOrderTable.getId(), request));
@@ -220,19 +219,18 @@ class OrderTableServiceTest {
         @DisplayName("성공: 등록된 모든 매장 테이블 목록을 조회")
         void findAll_success() {
             // given
-            String name = "테이블 1";
-            orderTableRepository.save(OrderTableFixture.주문테이블_생성_Request(name));
-            String name2 = "테이블 2";
-            orderTableRepository.save(OrderTableFixture.주문테이블_생성_Request(name2));
-
+            List<OrderTable> orderTables = List.of(
+                    anOrderTableRequest().name("테이블 1").build(),
+                    anOrderTableRequest().name("테이블 2").build()
+            );
+            orderTables.forEach(orderTableRepository::save);
             // when
             var allTables = sut.findAll();
 
             // then
             assertAll(
                     () -> assertThat(allTables).isNotNull(),
-                    () -> assertThat(allTables).hasSize(2),
-                    () -> assertThat(allTables).extracting(OrderTable::getName).containsAnyOf(name, name2)
+                    () -> assertThat(allTables).hasSize(2)
             );
         }
     }

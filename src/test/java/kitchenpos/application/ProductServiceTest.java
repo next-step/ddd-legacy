@@ -2,14 +2,8 @@ package kitchenpos.application;
 
 import config.UnitTest;
 import helper.PriceGenerator;
-import kitchenpos.MenuFixture;
-import kitchenpos.MenuGroupFixture;
-import kitchenpos.ProductFixture;
 import kitchenpos.domain.*;
-import kitchenpos.infra.FakePurgomalumClient;
-import kitchenpos.infra.InmemoryMenuRepository;
-import kitchenpos.infra.InmemoryProductRepository;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.infra.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,7 +11,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+import static kitchenpos.MenuFixture.*;
+import static kitchenpos.MenuGroupFixture.*;
+import static kitchenpos.ProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,7 +46,8 @@ class ProductServiceTest {
         @DisplayName("성공: 유효한 상품이 생성된다.")
         void createProductSuccess() {
             // given
-            Product request = ProductFixture.후라이드_치킨_상품_Request();
+            Product request = aProductRequest()
+                    .build();
 
             // when
             Product result = sut.create(request);
@@ -67,28 +66,35 @@ class ProductServiceTest {
         @ValueSource(longs = {-1, -1000, -10000})
         void createProductFailWhenPriceIsNegative(long price) {
             // given
-            Product request = ProductFixture.후라이드_치킨_상품_Request(PriceGenerator.of(price));
+            Product request = aProductRequest()
+                    .price(PriceGenerator.of(price))
+                    .build();
 
             // when & then
             assertThrows(ProductPriceException.class, () -> sut.create(request));
         }
+
 
         @Test
         @DisplayName("실패: 가격이 null이면 ProductPriceException 발생")
         void createProductFailWhenPriceIsNull() {
             // given
-            Product request = ProductFixture.후라이드_치킨_상품_Request(null);
+            Product request = aProductRequest()
+                    .price(null)
+                    .build();
 
             // when & then
             assertThrows(ProductPriceException.class, () -> sut.create(request));
         }
 
+
         @Test
         @DisplayName("실패: 상품명이 null이면 ProductNameException 발생")
         void createProductFailWhenNameIsNull() {
             // given
-            Product request = ProductFixture.후라이드_치킨_상품_Request();
-            request.setName(null);
+            Product request = aProductRequest()
+                    .name(null)
+                    .build();
 
             // when & then
             assertThrows(ProductNameException.class, () -> sut.create(request));
@@ -99,12 +105,14 @@ class ProductServiceTest {
         @ValueSource(strings = {"욕설1", "욕설2", "비속어1", "비속어2"})
         void createProductFailWhenNameContainsProfanity(String profanity) {
             // given
-            Product request = ProductFixture.후라이드_치킨_상품_Request();
-            request.setName(profanity);
+            Product request = aProductRequest()
+                    .name(profanity)
+                    .build();
 
             // when & then
             assertThrows(ProductNameException.class, () -> sut.create(request));
         }
+
     }
 
     @Nested
@@ -117,16 +125,19 @@ class ProductServiceTest {
         void changePriceSuccess(long price) {
             // given
             BigDecimal changedPrice = PriceGenerator.of(price);
-            Product saved = productRepository.save(ProductFixture.후라이드_치킨_상품_Request());
-            Product request = ProductFixture.가격만_변경된_상품(saved, changedPrice);
+            Product savedProduct = productRepository.save(aProductRequest().build());
+            Product request = aProductRequest()
+                    .id(savedProduct.getId())
+                    .price(changedPrice)
+                    .build();
 
             // when
-            Product result = sut.changePrice(saved.getId(), request);
+            Product result = sut.changePrice(savedProduct.getId(), request);
 
             // then
             assertAll(
                     () -> assertThat(result).isNotNull(),
-                    () -> assertThat(result.getId()).isEqualTo(saved.getId()),
+                    () -> assertThat(result.getId()).isEqualTo(savedProduct.getId()),
                     () -> assertThat(result.getPrice()).isEqualTo(changedPrice)
             );
         }
@@ -136,29 +147,36 @@ class ProductServiceTest {
         @ValueSource(longs = {-1, -1000, -10000})
         void changePriceFailWhenNegative(long price) {
             // given
-            Product saved = productRepository.save(ProductFixture.후라이드_치킨_상품_Request());
-            Product request = ProductFixture.후라이드_치킨_상품_Request(PriceGenerator.of(price));
+            BigDecimal changedPrice = PriceGenerator.of(price);
+            Product savedProduct = productRepository.save(aProductRequest().build());
+            Product request = aProductRequest()
+                    .id(savedProduct.getId())
+                    .price(changedPrice)
+                    .build();
 
             // when & then
-            assertThrows(ProductPriceException.class, () -> sut.changePrice(saved.getId(), request));
+            assertThrows(ProductPriceException.class, () -> sut.changePrice(savedProduct.getId(), request));
         }
 
         @Test
         @DisplayName("실패: 변경 가격이 null이면 ProductPriceException 발생")
         void changePriceFailWhenNull() {
             // given
-            Product saved = productRepository.save(ProductFixture.후라이드_치킨_상품_Request());
-            Product request = ProductFixture.후라이드_치킨_상품_Request(null);
+            Product savedProduct = productRepository.save(aProductRequest().build());
+            Product request = aProductRequest()
+                    .id(savedProduct.getId())
+                    .price(null)
+                    .build();
 
             // when & then
-            assertThrows(ProductPriceException.class, () -> sut.changePrice(saved.getId(), request));
+            assertThrows(ProductPriceException.class, () -> sut.changePrice(savedProduct.getId(), request));
         }
 
         @Test
         @DisplayName("실패: 존재하지 않는 상품 ID일 경우 ProductNotFoundException 발생")
         void changePriceFailWhenProductNotFound() {
             // given
-            Product request = ProductFixture.후라이드_치킨_상품_Request();
+            Product request = aProductRequest().build();
 
 
             // when & then
@@ -169,31 +187,38 @@ class ProductServiceTest {
         @DisplayName("특수 케이스: 가격 변경 후 메뉴 가격이 더 크면 메뉴가 숨김 처리된다.")
         void changePriceHidesMenuWhenInvalid() {
             // given
-            long price = 10000;
-            BigDecimal lowerPrice = PriceGenerator.smallerThan(price);
-            BigDecimal higherPrice = PriceGenerator.biggerThan(price);
+            long basePrice = 10000;
+            BigDecimal lowerPrice = PriceGenerator.smallerThan(basePrice);
+            BigDecimal higherPrice = PriceGenerator.biggerThan(basePrice);
 
-            MenuGroup recommendedMenuGroup = MenuGroupFixture.추천_메뉴그룹_Request();
-            Product savedProduct = productRepository.save(ProductFixture.후라이드_치킨_상품_Request());
-            Product requestProduct = ProductFixture.가격만_변경된_상품(savedProduct, lowerPrice);
+            // Menu보다
+            Product savedProduct = productRepository.save(aProductRequest().build());
+            Product requestProduct = aProductRequest()
+                    .id(savedProduct.getId())
+                    .price(lowerPrice)
+                    .build();
 
-            Menu menuBeforePriceChange = MenuFixture.후라이드_치킨_메뉴_Request(recommendedMenuGroup, savedProduct);
-            menuBeforePriceChange.setPrice(higherPrice); // 메뉴 가격이 상품 가격 합보다 높게 설정됨
-            menuBeforePriceChange.setDisplayed(true);
-            Menu savedMenu = menuRepository.save(menuBeforePriceChange);
+            // 기존 메뉴 생성: 추천 메뉴그룹에 속한 메뉴로, 메뉴 가격이 상품 가격 합보다 높게 설정됨
+            MenuGroup menuGroup = aMenuGroupRequest().build();
+            Menu menu = menuRepository.save(aMenuRequest()
+                    .menuGroup(menuGroup)
+                    .price(higherPrice)
+                    .menuProducts(List.of(aMenuProductRequest(savedProduct).build()))
+                    .displayed(true)
+                    .build());
 
-            assertThat(savedMenu.isDisplayed()).isTrue(); // 변경 전, 메뉴는 노출 상태여야 함
+            assertThat(menu.isDisplayed()).isTrue(); // 변경 전 메뉴는 노출 상태
 
             // when
             sut.changePrice(savedProduct.getId(), requestProduct);
 
             // then
-            Menu updatedMenu = menuRepository.findById(savedMenu.getId()).orElseThrow();
+            Menu updatedMenu = menuRepository.findById(menu.getId()).orElseThrow();
             Product updatedProduct = productRepository.findById(savedProduct.getId()).orElseThrow();
 
             assertAll(
-                    () -> assertThat(updatedProduct.getPrice()).isEqualTo(lowerPrice), //상품 가격이 변경됨
-                    () -> assertThat(updatedMenu.isDisplayed()).isFalse() //메뉴가 숨김 처리됨
+                    () -> assertThat(updatedProduct.getPrice()).isEqualTo(lowerPrice), // 상품 가격 변경 확인
+                    () -> assertThat(updatedMenu.isDisplayed()).isFalse() // 메뉴 숨김 처리 확인
             );
         }
     }

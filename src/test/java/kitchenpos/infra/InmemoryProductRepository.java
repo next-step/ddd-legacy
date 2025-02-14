@@ -15,7 +15,7 @@ public class InmemoryProductRepository implements ProductRepository {
 
     @Override
     public Product save(Product product) {
-        UUID id = idGenerator.ramdom();
+        UUID id = idGenerator.random();
         product.setId(id);
         store.put(id, product);
         return product;

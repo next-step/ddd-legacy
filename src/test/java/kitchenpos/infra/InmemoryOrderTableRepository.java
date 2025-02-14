@@ -1,6 +1,5 @@
 package kitchenpos.infra;
 
-import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 
@@ -15,7 +14,7 @@ public class InmemoryOrderTableRepository implements OrderTableRepository {
     @Override
     public OrderTable save(OrderTable orderTable) {
         if (orderTable.getId() == null) {
-            orderTable.setId(idGenerator.ramdom());
+            orderTable.setId(idGenerator.random());
         }
         store.put(orderTable.getId(), orderTable);
         return orderTable;

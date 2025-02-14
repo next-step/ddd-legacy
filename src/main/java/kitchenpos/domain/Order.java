@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -123,5 +124,70 @@ public class Order {
 
     public void setOrderTableId(final UUID orderTableId) {
         this.orderTableId = orderTableId;
+    }
+
+    // Builder 생성 메서드
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    // Getter/Setter 생략 (생성 시 필요에 따라 추가)
+
+    public static class Builder {
+        private final Order order;
+
+        public Builder() {
+            order = new Order();
+            order.id = UUID.randomUUID();
+            order.orderLineItems = new ArrayList<>();
+            order.orderDateTime = LocalDateTime.now(); // 기본값은 현재 시간
+        }
+
+        public Builder id(UUID id) {
+            order.id = id;
+            return this;
+        }
+
+        public Builder type(OrderType type) {
+            order.type = type;
+            return this;
+        }
+
+        public Builder status(OrderStatus status) {
+            order.status = status;
+            return this;
+        }
+
+        public Builder orderDateTime(LocalDateTime orderDateTime) {
+            order.orderDateTime = orderDateTime;
+            return this;
+        }
+
+
+        public Builder orderLineItems(List<OrderLineItem> items) {
+            order.orderLineItems = items;
+            return this;
+        }
+
+        public Builder deliveryAddress(String deliveryAddress) {
+            order.deliveryAddress = deliveryAddress;
+            return this;
+        }
+
+        public Builder orderTable(OrderTable orderTable) {
+            order.orderTable = orderTable;
+            order.orderTableId = orderTable.getId();
+            return this;
+        }
+
+        public Builder orderTableId(UUID orderTableId) {
+            order.orderTableId = orderTableId;
+            return this;
+        }
+
+        public Order build() {
+            // 필요한 유효성 검증 로직 추가 가능
+            return order;
+        }
     }
 }

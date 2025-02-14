@@ -23,7 +23,7 @@ public class InmemoryOrderRepository implements OrderRepository {
     @Override
     public Order save(Order order) {
         if (order.getId() == null) {
-            order.setId(idGenerator.ramdom());
+            order.setId(idGenerator.random());
         }
         store.put(order.getId(), order);
         return order;

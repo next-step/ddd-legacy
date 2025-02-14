@@ -12,7 +12,7 @@ public class InmemoryMenuGroupRepository implements MenuGroupRepository {
 
     @Override
     public MenuGroup save(MenuGroup menuGroup) {
-        UUID id = idGenerator.ramdom();
+        UUID id = idGenerator.random();
         menuGroup.setId(id);
         storage.put(id, menuGroup);
         return menuGroup;

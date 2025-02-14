@@ -15,7 +15,7 @@ public class InmemoryMenuRepository implements MenuRepository {
 
     @Override
     public Menu save(Menu menu) {
-        UUID id = idGenerator.ramdom();
+        UUID id = idGenerator.random();
         menu.setId(id);
         store.put(id, menu);
         return menu;
