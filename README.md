@@ -92,21 +92,65 @@ docker compose -p kitchenpos up -d
 | 메뉴 그룹  | Menu Group   | 메뉴가 포함된 그룹    |
 | 메뉴 상품  | Menu Product | 메뉴에 포함된 상품    |
 | 가격     | Price        | 메뉴의 가격        |
+| 게시     | Display      | 메뉴 게시 여부 - 게시 |
+| 숨김     | Hide         | 메뉴 게시 여부 - 숨김 |
+| 비속어    | Profanity    | 비속어           |
 | 상품     | Product      | 상품            |
 | 주문     | Order        | 주문            |
 | 주문서    | Order Line   | 주문서           |
 | 주문 테이블 | Order Table  | 주문 테이블        |
+| 손님 수   | NumberOfGuests | 손님의 인원 수      |
+| 채움 여부  | Occupied    | 주문 테이블의 상태 (채움/비움) |
 | 배달     | DELIVERY     | 주문 타입 - 배달    |
 | 포장     | TAKEOUT      | 주문 타입 - 포장    |
 | 매장 이용  | EAT_IN       | 주문 타입 - 매장 이용 |
-| 대기     | WAITING      | 주문 상태 - 대기    |
-| 승인     | ACCEPTED     | 주문 상태 - 승인    |
-| 서빙     | SERVED       | 주문 상태 - 서빙    |
-| 배달 중   | DELIVERING   | 주문 상태 - 배달 중  |
-| 배달 완료  | DELIVERED    | 주문 상태 - 배달 완료 |
-| 주문 완료  | COMPLETED    | 주문 상태 - 주문 완료 |
+
 
 ---
 
 ## 모델링
-![ddd-kitchenpos_domain.png](src/main/resources/static/ddd-kitchenpos_domain.png)
+
+### 주문 상태 (포장)
+```mermaid
+flowchart LR
+  A[주문 대기] --> B[주문 승인]
+  B[주문 승인] --> C[서빙]
+  subgraph TakoutEatinDraw[포장]
+    C[서빙] --> F[서빙 완료]
+  end
+  F[서빙 완료] --> G[주문 완료]
+```
+
+### 주문 상태 (매장 이용)
+```mermaid
+flowchart LR
+  A[주문 대기] --> B[주문 승인]
+  B[주문 승인] --> C[서빙]
+  subgraph TakoutEatinDraw[매장이용]
+    C[서빙] --> F[서빙 완료]
+  end
+  F[서빙 완료] --> G[주문 완료]
+```
+
+### 주문 상태 (배달)
+```mermaid
+flowchart LR
+  A[주문 대기] --> B[주문 승인]
+  B[주문 승인] --> C[서빙]
+  subgraph DeliveryDraw[배달]
+    C[서빙] --> D[배달 중]
+    D[배달 중] --> E[배달 완료]
+  end
+  E[배달 완료] --> G[주문 완료]
+```
+
+### 치킨포스
+```mermaid
+erDiagram
+  Order ||--|{ OrderLineItem : order
+  Order o{--|| OrderTable : order
+  OrderLineItem ||--|| Menu : menu
+  Menu ||--|| MenuGroup : contains
+  Menu ||--|{ MenuProduct : contains
+  MenuProduct ||--|| Product : product
+```
