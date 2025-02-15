@@ -13,6 +13,7 @@ import jakarta.persistence.Transient;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Table(name = "menu")
@@ -84,6 +85,9 @@ public class Menu {
 
     public void setMenuGroup(final MenuGroup menuGroup) {
         this.menuGroup = menuGroup;
+        setMenuGroupId(Optional.ofNullable(menuGroup)
+                .map(MenuGroup::getId)
+                .orElseThrow(() -> new IllegalArgumentException("메뉴 그룹이 존재하지 않습니다.")));
     }
 
     public boolean isDisplayed() {
