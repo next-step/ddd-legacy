@@ -16,10 +16,12 @@ public class Delimiters {
         delimiters.add(delimiter);
     }
 
-    public String[] split(String text) {
+    public String[] split(final String text) {
+        String modifiedText = text;
         for (String delimiter : delimiters) {
-            text = text.replace(delimiter, " ");
+            modifiedText = modifiedText.replace(delimiter, " ");
         }
-        return text.split(" ");
+        return modifiedText.split(" ");
     }
+
 }
