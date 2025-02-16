@@ -1,5 +1,7 @@
 package stringcalculator;
 
+import java.util.Arrays;
+
 public class StringCalculator {
     private final Delimiters delimiters;
 
@@ -30,12 +32,9 @@ public class StringCalculator {
     }
 
     private int sumTokens(String[] tokens) {
-        int sum = 0;
-        for (String token : tokens) {
-            if (!token.isEmpty()) {
-                sum += NumberParser.parse(token);
-            }
-        }
-        return sum;
+        return Arrays.stream(tokens)
+                .filter(token -> !token.isEmpty()) // 빈 문자열 필터링
+                .mapToInt(NumberParser::parse) // 변환 및 합산
+                .sum();
     }
 }
