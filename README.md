@@ -76,9 +76,9 @@ docker compose -p kitchenpos up -d
 
 ### 주문(Order)
 
-> 주문 상태는 `배달`(DELIVERY), `테이크아웃`(TAKEOUT), `매장 내 식사`(EAT_IN) 가 있다.
+> 주문 유형은 `배달`(DELIVERY), `테이크아웃`(TAKEOUT), `매장 내 식사`(EAT_IN) 가 있다.
 >
-> 주문 유형은 `대기`(WAITING), `승인됨`(ACCEPTED), `서빙됨`(SERVED), `배달중`(DELIVERING), `배달됨`(DELIVERED), `완료`(COMPLETED) 가 있다.
+> 주문 상태는 `대기`(WAITING), `승인됨`(ACCEPTED), `서빙됨`(SERVED), `배달중`(DELIVERING), `배달됨`(DELIVERED), `완료`(COMPLETED) 가 있다.
 
 - **주문을 등록할 수 있다.**
     - [ ] 주문 유형이 존재해야 한다.
