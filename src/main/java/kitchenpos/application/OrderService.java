@@ -44,11 +44,11 @@ public class OrderService {
     public Order create(final Order request) {
         final OrderType type = request.getType();
         if (Objects.isNull(type)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("주문 유형이 필요 합니다.");
         }
         final List<OrderLineItem> orderLineItemRequests = request.getOrderLineItems();
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("1개 이상의 주문 항목이 필요합니다.");
         }
         final List<Menu> menus = menuRepository.findAllByIdIn(
             orderLineItemRequests.stream()
@@ -56,23 +56,23 @@ public class OrderService {
                 .toList()
         );
         if (menus.size() != orderLineItemRequests.size()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("찾을 수 없는 주문 메뉴가 있습니다.");
         }
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (final OrderLineItem orderLineItemRequest : orderLineItemRequests) {
             final long quantity = orderLineItemRequest.getQuantity();
             if (type != OrderType.EAT_IN) {
                 if (quantity < 0) {
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException("주문 수량은 0 보다 작을 수 없습니다.");
                 }
             }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                 .orElseThrow(NoSuchElementException::new);
             if (!menu.isDisplayed()) {
-                throw new IllegalStateException();
+                throw new IllegalStateException("주문 가능 한 메뉴가 아닙니다.");
             }
             if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("메뉴 가격이 주문 가격과 다릅니다.");
             }
             final OrderLineItem orderLineItem = new OrderLineItem();
             orderLineItem.setMenu(menu);
@@ -88,7 +88,7 @@ public class OrderService {
         if (type == OrderType.DELIVERY) {
             final String deliveryAddress = request.getDeliveryAddress();
             if (Objects.isNull(deliveryAddress) || deliveryAddress.isEmpty()) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("배달 주소가 필요합니다.");
             }
             order.setDeliveryAddress(deliveryAddress);
         }
@@ -96,7 +96,7 @@ public class OrderService {
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
                 .orElseThrow(NoSuchElementException::new);
             if (!orderTable.isOccupied()) {
-                throw new IllegalStateException();
+                throw new IllegalStateException("테이블 이용 전 입니다.");
             }
             order.setOrderTable(orderTable);
         }
@@ -139,10 +139,10 @@ public class OrderService {
         final Order order = orderRepository.findById(orderId)
             .orElseThrow(NoSuchElementException::new);
         if (order.getType() != OrderType.DELIVERY) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("배송 유형 주문만 배송 시작이 가능 합니다.");
         }
         if (order.getStatus() != OrderStatus.SERVED) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("배송 가능한 상태가 아닙니다.");
         }
         order.setStatus(OrderStatus.DELIVERING);
         return order;
@@ -167,12 +167,12 @@ public class OrderService {
         final OrderStatus status = order.getStatus();
         if (type == OrderType.DELIVERY) {
             if (status != OrderStatus.DELIVERED) {
-                throw new IllegalStateException();
+                throw new IllegalStateException("배송 완료 전 까지는 주문 완료를 할 수 없습니다.");
             }
         }
         if (type == OrderType.TAKEOUT || type == OrderType.EAT_IN) {
             if (status != OrderStatus.SERVED) {
-                throw new IllegalStateException();
+                throw new IllegalStateException("음식 제공 전 까지는 주문 완료를 할 수 없습니다.");
             }
         }
         order.setStatus(OrderStatus.COMPLETED);
