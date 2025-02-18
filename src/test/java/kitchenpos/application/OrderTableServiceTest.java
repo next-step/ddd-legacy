@@ -16,7 +16,6 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @SpringBootTest
-@Transactional
 class OrderTableServiceTest {
     @Autowired
     private OrderTableRepository orderTableRepository;

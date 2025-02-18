@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.UUID;
 
 @SpringBootTest
-@Transactional
 class MenuGroupServiceTest {
 
     @Autowired

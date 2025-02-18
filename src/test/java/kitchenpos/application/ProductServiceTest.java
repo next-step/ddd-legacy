@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @SpringBootTest
-@Transactional
 class ProductServiceTest {
 
     private final MenuGroupRepository menuGroupRepository;

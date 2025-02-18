@@ -18,7 +18,6 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @SpringBootTest
-@Transactional
 class MenuServiceTest {
     @Autowired
     private MenuService menuService;
