@@ -3,9 +3,12 @@ package kitchenpos.fixtures;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
+import static kitchenpos.fixtures.ProductFixtures.product;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 public class MenuFixtures {
@@ -15,6 +18,10 @@ public class MenuFixtures {
         menuProduct.setProductId(productId);
         menuProduct.setQuantity(quantity);
         return menuProduct;
+    }
+
+    public static MenuGroup menuGroup() {
+        return createMenuGroup("메인메뉴");
     }
 
     public static MenuGroup createMenuGroup(final String name) {
@@ -57,5 +64,30 @@ public class MenuFixtures {
         menu.setDisplayed(displayed);
         menu.setMenuProducts(menuProducts);
         return menu;
+    }
+
+    /**
+     * OrderServiceTest
+     */
+    public static Menu menu() {
+        return menu(19_000L, true, menuProduct());
+    }
+    public static Menu menu(final long price, final boolean displayed, final MenuProduct... menuProducts) {
+        final Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
+        menu.setName("후라이드치킨+양념치킨");
+        menu.setPrice(BigDecimal.valueOf(price));
+        menu.setMenuGroup(menuGroup());
+        menu.setDisplayed(displayed);
+        menu.setMenuProducts(Arrays.asList(menuProducts));
+        return menu;
+    }
+
+    public static MenuProduct menuProduct() {
+        final MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setSeq(new Random().nextLong());
+        menuProduct.setProduct(product());
+        menuProduct.setQuantity(2L);
+        return menuProduct;
     }
 }

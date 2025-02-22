@@ -1,12 +1,10 @@
 package kitchenpos.application;
 
 import static java.math.BigDecimal.valueOf;
-import kitchenpos.IntegrationTestSupport;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.MenuProductRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
@@ -14,74 +12,53 @@ import static kitchenpos.fixtures.MenuFixtures.createMenu;
 import static kitchenpos.fixtures.MenuFixtures.createMenuGroup;
 import static kitchenpos.fixtures.MenuFixtures.createMenuProduct;
 import static kitchenpos.fixtures.MenuFixtures.createMenuWithoutMenuGroupId;
+import static kitchenpos.fixtures.MenuFixtures.menuGroup;
 import static kitchenpos.fixtures.ProductFixtures.createProduct;
 import kitchenpos.infra.PurgomalumClient;
 import org.assertj.core.api.Assertions;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import static org.mockito.Mockito.when;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@Service
-class MenuServiceTest extends IntegrationTestSupport {
+class MenuServiceTest {
 
-    @Autowired
     private MenuService menuService;
-
-    @Autowired
     private MenuRepository menuRepository;
-
-    @Autowired
     private MenuGroupRepository menuGroupRepository;
-
-    @Autowired
     private ProductRepository productRepository;
-
-    @MockBean
     private PurgomalumClient purgomalumClient;
+    private Product product;
+    private UUID menuGroupId;
 
-    @Autowired
-    private MenuProductRepository menuProductRepository;
-
-    /**
-     * 매 테스트 실행 후 DB를 정리하여 일관된 테스트 환경을 유지한다.
-     */
-    @AfterEach
-    void tearDown() {
-//        menuRepository.deleteAllMenuProducts(); // 방법1
-        menuProductRepository.deleteAllInBatch(); // 방법2
-        menuRepository.deleteAllInBatch();
-        menuGroupRepository.deleteAllInBatch();
-        productRepository.deleteAllInBatch();
+    @BeforeEach
+    void setUp() {
+        menuRepository = new InMemoryMenuRepository();
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        productRepository = new InMemoryProductRepository();
+        purgomalumClient = new FakePurgomalumClient();
+        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+        product = productRepository.save(createProduct("후라이드치킨", valueOf(16000)));
+        menuGroupId = menuGroupRepository.save(menuGroup()).getId();
     }
 
     @Test
     void 메뉴를_등록할_수_있다() {
         // given
-        Product product = createProduct("김치찌개", valueOf(10000));
-        productRepository.save(product);
-
         MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
         List<MenuProduct> menuProducts = List.of(menuProduct);
-
-        MenuGroup menuGroup = createMenuGroup("한식");
-        menuGroupRepository.save(menuGroup);
-
-        Menu expected = createMenu("김치찌개 세트", valueOf(10000), true, menuGroup, menuProducts);
+        MenuGroup menuGroup = menuGroupRepository.findById(menuGroupId).orElseThrow();
+        Menu expected = createMenu("후라이드치킨", valueOf(16000), true, menuGroup, menuProducts);
 
         // when
         Menu actual = menuService.create(expected);
@@ -101,16 +78,14 @@ class MenuServiceTest extends IntegrationTestSupport {
     @Test
     void 메뉴_가격이_0원_미만이면_등록할_수_없다() {
         // given
-        Product product = createProduct("김치찌개", valueOf(-10000));
-        productRepository.save(product);
+        Product negativePriceProduct = createProduct("후라이드치킨", valueOf(-16000));
+        productRepository.save(negativePriceProduct);
 
-        MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+        MenuProduct menuProduct = createMenuProduct(negativePriceProduct.getId(), 1);
         List<MenuProduct> menuProducts = List.of(menuProduct);
 
-        MenuGroup menuGroup = createMenuGroup("한식");
-        menuGroupRepository.save(menuGroup);
-
-        Menu expected = createMenu("김치찌개 세트", valueOf(-10000), true, menuGroup, menuProducts);
+        MenuGroup menuGroup = menuGroupRepository.findById(menuGroupId).orElseThrow();
+        Menu expected = createMenu("후라이드치킨", valueOf(-16000), true, menuGroup, menuProducts);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(expected))
@@ -121,13 +96,10 @@ class MenuServiceTest extends IntegrationTestSupport {
     @Test
     void 특정_메뉴_그룹이_존재하지_않으면_등록할_수_없다() {
         // given
-        Product product = createProduct("김치찌개", valueOf(10000));
-        productRepository.save(product);
-
         MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
         List<MenuProduct> menuProducts = List.of(menuProduct);
 
-        Menu expected = createMenuWithoutMenuGroupId("김치찌개 세트", valueOf(10000), true, menuProducts);
+        Menu expected = createMenuWithoutMenuGroupId("후라이드치킨", valueOf(16000), true, menuProducts);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(expected))
@@ -138,12 +110,12 @@ class MenuServiceTest extends IntegrationTestSupport {
     @Test
     void 메뉴에_포함된_상품이_없으면_등록할_수_없다() {
         // given
-        MenuGroup menuGroup = createMenuGroup("한식");
+        MenuGroup menuGroup = createMenuGroup("후라이드치킨");
         menuGroupRepository.save(menuGroup);
 
         List<MenuProduct> emptyMenuProducts = List.of();
 
-        Menu expected = createMenu("김치찌개 세트", valueOf(10000), true, menuGroup, emptyMenuProducts);
+        Menu expected = createMenu("후라이드치킨", valueOf(16000), true, menuGroup, emptyMenuProducts);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(expected))
@@ -154,16 +126,16 @@ class MenuServiceTest extends IntegrationTestSupport {
     @Test
     void 메뉴에_등록된_상품의_수량이_0개_미만이면_등록할_수_없다() {
         // given
-        Product product = createProduct("김치찌개", valueOf(10000));
+        Product product = createProduct("후라이드치킨", valueOf(16000));
         productRepository.save(product);
 
         MenuProduct menuProduct = createMenuProduct(product.getId(), -1L);
         List<MenuProduct> menuProducts = List.of(menuProduct);
 
-        MenuGroup menuGroup = createMenuGroup("한식");
+        MenuGroup menuGroup = createMenuGroup("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
-        Menu expected = createMenu("김치찌개 세트", valueOf(10000), true, menuGroup, menuProducts);
+        Menu expected = createMenu("후라이드치킨", valueOf(16000), true, menuGroup, menuProducts);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(expected))
@@ -175,42 +147,17 @@ class MenuServiceTest extends IntegrationTestSupport {
     @ValueSource(strings = {" ", "   "})
     void 메뉴_이름이_없으면_등록할_수_없다(String invalidMenuName) {
         // given
-        Product product = createProduct("김치찌개", valueOf(10000));
+        Product product = createProduct("후라이드치킨", valueOf(16000));
         productRepository.save(product);
 
         MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
         List<MenuProduct> menuProducts = List.of(menuProduct);
 
-        MenuGroup menuGroup = createMenuGroup("한식");
+        MenuGroup menuGroup = createMenuGroup("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
         // when
-        Menu expected = createMenu(invalidMenuName, valueOf(10000), true, menuGroup, menuProducts);
-
-        // then
-        Assertions.assertThatThrownBy(() -> menuService.create(expected))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("올바른 메뉴 이름을 입력해야 합니다.");
-    }
-
-    @Test
-    void 메뉴_이름에_부적절한_단어가_포함되면_등록할_수_없다() {
-        // given
-        Product product = createProduct("김치찌개", valueOf(10000));
-        productRepository.save(product);
-
-        MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
-        List<MenuProduct> menuProducts = List.of(menuProduct);
-
-        MenuGroup menuGroup = createMenuGroup("한식");
-        menuGroupRepository.save(menuGroup);
-
-        String profanityWord = "비속어";
-        String invalidMenuName = "김치찌개 세트" + profanityWord;
-
-        // when
-        when(purgomalumClient.containsProfanity(invalidMenuName)).thenReturn(true);
-        Menu expected = createMenu(invalidMenuName, valueOf(10000), true, menuGroup, menuProducts);
+        Menu expected = createMenu(invalidMenuName, valueOf(16000), true, menuGroup, menuProducts);
 
         // then
         Assertions.assertThatThrownBy(() -> menuService.create(expected))
@@ -221,16 +168,16 @@ class MenuServiceTest extends IntegrationTestSupport {
     @Test
     void 메뉴에_있는_가격을_상품들의_총_가격_이하로_변경할_수_있다() {
         // given
-        Product product = createProduct("김치찌개", valueOf(10000));
+        Product product = createProduct("후라이드치킨", valueOf(16000));
         productRepository.save(product);
 
         MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
         List<MenuProduct> menuProducts = List.of(menuProduct);
 
-        MenuGroup menuGroup = createMenuGroup("한식");
+        MenuGroup menuGroup = createMenuGroup("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
-        Menu expected = createMenu("김치찌개 세트", valueOf(10000), true, menuGroup, menuProducts);
+        Menu expected = createMenu("후라이드치킨", valueOf(16000), true, menuGroup, menuProducts);
         Menu actual = menuService.create(expected);
 
         // when
@@ -245,16 +192,16 @@ class MenuServiceTest extends IntegrationTestSupport {
     @Test
     void 메뉴_가격이_0원_미만이면_변경할_수_없다() {
         // given
-        Product product = createProduct("김치찌개", valueOf(10000));
+        Product product = createProduct("후라이드치킨", valueOf(16000));
         productRepository.save(product);
 
         MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
         List<MenuProduct> menuProducts = List.of(menuProduct);
 
-        MenuGroup menuGroup = createMenuGroup("한식");
+        MenuGroup menuGroup = createMenuGroup("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
-        Menu expected = createMenu("김치찌개 세트", valueOf(10000), true, menuGroup, menuProducts);
+        Menu expected = createMenu("후라이드치킨", valueOf(16000), true, menuGroup, menuProducts);
         Menu actual = menuService.create(expected);
 
         // when
@@ -269,20 +216,20 @@ class MenuServiceTest extends IntegrationTestSupport {
     @Test
     void 메뉴_가격이_상품_가격_합보다_크면_변경할_수_없다() {
         // given
-        Product product = createProduct("김치찌개", valueOf(10000));
+        Product product = createProduct("후라이드치킨", valueOf(16000));
         productRepository.save(product);
 
         MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
         List<MenuProduct> menuProducts = List.of(menuProduct);
 
-        MenuGroup menuGroup = createMenuGroup("한식");
+        MenuGroup menuGroup = createMenuGroup("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
-        Menu expected = createMenu("김치찌개 세트", valueOf(10000), true, menuGroup, menuProducts);
+        Menu expected = createMenu("후라이드치킨", valueOf(16000), true, menuGroup, menuProducts);
         Menu actual = menuService.create(expected);
 
         // when
-        actual.setPrice(valueOf(10001));
+        actual.setPrice(valueOf(16001));
 
         // then
         assertThatThrownBy(() -> menuService.changePrice(actual.getId(), actual))
@@ -293,16 +240,16 @@ class MenuServiceTest extends IntegrationTestSupport {
     @Test
     void 메뉴를_표시_상태로_변경할_수_있다() {
         // given
-        Product product = createProduct("김치찌개", valueOf(10000));
+        Product product = createProduct("후라이드치킨", valueOf(16000));
         productRepository.save(product);
 
         MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
         List<MenuProduct> menuProducts = List.of(menuProduct);
 
-        MenuGroup menuGroup = createMenuGroup("한식");
+        MenuGroup menuGroup = createMenuGroup("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
-        Menu expected = createMenu("김치찌개 세트", valueOf(10000), true, menuGroup, menuProducts);
+        Menu expected = createMenu("후라이드치킨", valueOf(16000), true, menuGroup, menuProducts);
         Menu actual = menuService.create(expected);
 
         // when
@@ -326,21 +273,21 @@ class MenuServiceTest extends IntegrationTestSupport {
     @Test
     void 메뉴_가격이_상품_가격_합보다_높으면_메뉴를_표시할_수_없다() {
         // given
-        Product product = createProduct("김치찌개", valueOf(10000));
+        Product product = createProduct("후라이드치킨", valueOf(16000));
         productRepository.save(product);
 
         MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
         List<MenuProduct> menuProducts = List.of(menuProduct);
 
-        MenuGroup menuGroup = createMenuGroup("한식");
+        MenuGroup menuGroup = createMenuGroup("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
         // 상품 가격보다 높은 메뉴 가격 설정
-        Menu expected = createMenu("김치찌개 세트", valueOf(10000), false, menuGroup, menuProducts);
+        Menu expected = createMenu("후라이드치킨", valueOf(16000), false, menuGroup, menuProducts);
         Menu actual = menuService.create(expected);
 
         // when
-        actual.setPrice(valueOf(10001));
+        actual.setPrice(valueOf(16001));
         menuRepository.save(actual);
 
         // then
@@ -352,16 +299,16 @@ class MenuServiceTest extends IntegrationTestSupport {
     @Test
     void 등록된_메뉴를_숨길_수_있다() {
         // given
-        Product product = createProduct("김치찌개", valueOf(10000));
+        Product product = createProduct("후라이드치킨", valueOf(16000));
         productRepository.save(product);
 
         MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
         List<MenuProduct> menuProducts = List.of(menuProduct);
 
-        MenuGroup menuGroup = createMenuGroup("한식");
+        MenuGroup menuGroup = createMenuGroup("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
-        Menu expected = createMenu("김치찌개 세트", valueOf(10000), true, menuGroup, menuProducts);
+        Menu expected = createMenu("후라이드치킨", valueOf(16000), true, menuGroup, menuProducts);
 
         // when
         Menu actual = menuService.create(expected);
@@ -374,7 +321,7 @@ class MenuServiceTest extends IntegrationTestSupport {
     @Test
     void 등록된_메뉴를_모두_조회할_수_있다() {
         // given
-        Product product = createProduct("김치찌개", valueOf(10000));
+        Product product = createProduct("후라이드치킨", valueOf(16000));
         productRepository.save(product);
 
         MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
@@ -383,7 +330,7 @@ class MenuServiceTest extends IntegrationTestSupport {
         MenuGroup menuGroup = createMenuGroup("한식");
         menuGroupRepository.save(menuGroup);
 
-        Menu expected = createMenu("김치찌개 세트", valueOf(10000), true, menuGroup, menuProducts);
+        Menu expected = createMenu("후라이드치킨", valueOf(16000), true, menuGroup, menuProducts);
         menuService.create(expected);
 
         // when

@@ -1,41 +1,33 @@
 package kitchenpos.application;
 
-import kitchenpos.IntegrationTestSupport;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-class MenuGroupServiceTest extends IntegrationTestSupport {
 
-    @Autowired
+class MenuGroupServiceTest {
+
     private MenuGroupService menuGroupService;
-
-    @Autowired
     private MenuGroupRepository menuGroupRepository;
 
-    /**
-     * 매 테스트 실행 후 DB를 정리하여 일관된 테스트 환경을 유지한다.
-     */
-    @AfterEach
-    void tearDown() {
-        menuGroupRepository.deleteAllInBatch();
+    @BeforeEach
+    void setUp() {
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        menuGroupService = new MenuGroupService(menuGroupRepository);
     }
 
     @Test
     void 메뉴_그룹을_등록할_수_있다() {
         // given
-        final MenuGroup expected = createMenuGroupRequest("치킨");
+        final MenuGroup expected = createMenuGroupRequest("메인 메뉴");
         final MenuGroup actual = menuGroupService.create(expected);
 
         // when & then
@@ -59,8 +51,8 @@ class MenuGroupServiceTest extends IntegrationTestSupport {
     @Test
     void 메뉴_그룹의_목록을_조회할_수_있다() {
         // given
-        final MenuGroup expected1 = createMenuGroupRequest("치킨");
-        final MenuGroup expected2 = createMenuGroupRequest("피자");
+        final MenuGroup expected1 = createMenuGroupRequest("메인 메뉴");
+        final MenuGroup expected2 = createMenuGroupRequest("사이드 메뉴");
 
         // when
         menuGroupService.create(expected1);
