@@ -15,7 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -53,9 +52,8 @@ class ProductServiceTest extends IntegrationTestSupport {
         productRepository.deleteAllInBatch();
     }
 
-    @DisplayName("상품을 등록할 수 있다.")
     @Test
-    void createProduct_Success() {
+    void 상품을_등록할_수_있다() {
         // given
         Product request = burger();
 
@@ -69,9 +67,8 @@ class ProductServiceTest extends IntegrationTestSupport {
         assertThat(savedProduct.getPrice()).isEqualTo(BURGER_PRICE);
     }
 
-    @DisplayName("상품 가격을 입력하지 않으면 등록할 수 없다.")
     @Test
-    void createProduct_WhenPriceIsNull_ThrowsException() {
+    void 상품_가격을_입력하지_않으면_등록할_수_없다() {
         // given
         Product request = new Product();
         request.setName(burger().getName());
@@ -82,9 +79,8 @@ class ProductServiceTest extends IntegrationTestSupport {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품 가격이 0원 미만이면 등록할 수 없다.")
     @Test
-    void createProduct_WhenPriceIsNegative_ThrowsException() {
+    void 상품_가격이_0원_미만이면_등록할_수_없다() {
         // given
         Product request = new Product();
         request.setName(burger().getName());
@@ -96,9 +92,8 @@ class ProductServiceTest extends IntegrationTestSupport {
     }
 
 
-    @DisplayName("상품 이름이 존재하지 않으면 등록할 수 없다.")
     @Test
-    void createProduct_WhenNameIsNull_ThrowsException() {
+    void 상품_이름이_존재하지_않으면_등록할_수_없다() {
         // given
         Product request = new Product();
         request.setName(null);
@@ -109,9 +104,8 @@ class ProductServiceTest extends IntegrationTestSupport {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품 이름에 부적절한 단어(비속어)가 포함되면 등록할 수 없다.")
     @Test
-    void createProduct_WhenContainsProfanity_ThrowsException() {
+    void 상품_이름에_부적절한_단어가_포함되면_등록할_수_없다() {
         // given
         Product request = new Product();
         request.setName(PROFANITY);
@@ -127,9 +121,8 @@ class ProductServiceTest extends IntegrationTestSupport {
         verify(purgomalumClient, times(1)).containsProfanity(request.getName()); // API 호출되었는지 검증
     }
 
-    @DisplayName("상품을 등록할 때 이름에 부적절한 단어(비속어)가 포함되지 않으면 정상적으로 등록할 수 있다.")
     @Test
-    void createProduct_WhenNameIsValid_Success() {
+    void 상품을_등록할_때_이름에_부적절한_단어가_포함되지_않으면_정상적으로_등록할_수_있다() {
         // given
         Product request = burger();
 
@@ -143,9 +136,8 @@ class ProductServiceTest extends IntegrationTestSupport {
         verify(purgomalumClient, times(1)).containsProfanity(request.getName()); // API 호출되었는지 검증
     }
 
-    @DisplayName("상품의 가격을 변경할 수 있다.")
     @Test
-    void changeProductPrice_Success() {
+    void 상품의_가격을_변경할_수_있다() {
         // given
         Product request = burger();
         productRepository.save(request);
@@ -168,9 +160,8 @@ class ProductServiceTest extends IntegrationTestSupport {
             .isEqualTo(CHANGE_BURGER_PRICE.stripTrailingZeros()); // stripTrailingZeros()를 사용하면 소수점이 필요 없는 경우 자동으로 정리함
     }
 
-    @DisplayName("상품 가격 변경시 가격이 null 이면 변경할 수 없다.")
     @Test
-    void changeProductPrice_WhenPriceIsNull_ThrowsException() {
+    void 상품_가격_변경시_가격이_null이면_변경할_수_없다() {
         // given
         Product request = burger();
         productRepository.save(request);
@@ -186,9 +177,8 @@ class ProductServiceTest extends IntegrationTestSupport {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품 가격 변경시 가격이 0원 미만이면 변경할 수 없다.")
     @Test
-    void changeProductPrice_WhenPriceIsNegative_ThrowsException() {
+    void 상품_가격_변경시_가격이_0원_미만이면_변경할_수_없다() {
         // given
         Product request = burger();
         productRepository.save(request);
@@ -205,9 +195,8 @@ class ProductServiceTest extends IntegrationTestSupport {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("존재하지 않은 상품 ID로 가격을 변경할 수 없다.")
     @Test
-    void changeProductPrice_WhenProductNotFound_ThrowsException() {
+    void 존재하지_않은_상품_ID로_가격을_변경할_수_없다() {
         // given
         UUID nonExistentProductUd = UUID.randomUUID();
         BigDecimal changedPrice = BigDecimal.valueOf(10000);
@@ -220,9 +209,8 @@ class ProductServiceTest extends IntegrationTestSupport {
             .isInstanceOf(NoSuchElementException.class);
     }
 
-    @DisplayName("상품을 전체 조회할 수 있다.")
     @Test
-    void findAllProducts_Success() {
+    void 등록된_상품을_전체_조회할_수_있다() {
         // given
         Product burger = burger();
         Product pizza = pizza();

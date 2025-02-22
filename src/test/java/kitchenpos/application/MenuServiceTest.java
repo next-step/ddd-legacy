@@ -69,9 +69,8 @@ class MenuServiceTest extends IntegrationTestSupport {
         productRepository.deleteAllInBatch();
     }
 
-    @DisplayName("메뉴를 등록할 수 있다.")
     @Test
-    void createMenu_Success() {
+    void 메뉴를_등록할_수_있다() {
         // given
         Product product = createProduct("김치찌개", valueOf(10000));
         productRepository.save(product);
@@ -100,7 +99,7 @@ class MenuServiceTest extends IntegrationTestSupport {
 
     @DisplayName("메뉴에 가격이 0원 미만이면 등록할 수 없다.")
     @Test
-    void createMenu_WhenPriceIsNegative_ThrowsException() {
+    void 메뉴_가격이_0원_미만이면_등록할_수_없다() {
         // given
         Product product = createProduct("김치찌개", valueOf(-10000));
         productRepository.save(product);
@@ -119,9 +118,8 @@ class MenuServiceTest extends IntegrationTestSupport {
             .hasMessage("가격이 존재하거나 0원 이상이어야 합니다.");
     }
 
-    @DisplayName("특정 메뉴 그룹이 존재하지 않으면 등록할 수 없다.")
     @Test
-    void createMenu_WhenMenuGroupIsMissing_ThrowsException() {
+    void 특정_메뉴_그룹이_존재하지_않으면_등록할_수_없다() {
         // given
         Product product = createProduct("김치찌개", valueOf(10000));
         productRepository.save(product);
@@ -137,9 +135,8 @@ class MenuServiceTest extends IntegrationTestSupport {
             .hasMessage("메뉴는 특정 메뉴 그룹에 속해야 한다.");
     }
 
-    @DisplayName("메뉴에 포함된 상품이 없으면 등록할 수 없다.")
     @Test
-    void createMenu_WhenMenuProductsAreEmpty_ShouldThrowException() {
+    void 메뉴에_포함된_상품이_없으면_등록할_수_없다() {
         // given
         MenuGroup menuGroup = createMenuGroup("한식");
         menuGroupRepository.save(menuGroup);
@@ -154,9 +151,8 @@ class MenuServiceTest extends IntegrationTestSupport {
             .hasMessage("메뉴에 포함된 상품이 존재해야 합니다.");
     }
 
-    @DisplayName("메뉴에 등록된 상품의 수량이 0개 미만이면 등록할 수 없다.")
     @Test
-    void createMenu_WhenQuantityIsNegative_ThrowsException() {
+    void 메뉴에_등록된_상품의_수량이_0개_미만이면_등록할_수_없다() {
         // given
         Product product = createProduct("김치찌개", valueOf(10000));
         productRepository.save(product);
@@ -174,11 +170,10 @@ class MenuServiceTest extends IntegrationTestSupport {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 이름이 없으면(null, 빈 값) 등록할 수 없다.")
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "   "})
-    void createMenu_WhenMenuNameIsNull_ThrowsException(String invalidMenuName) {
+    void 메뉴_이름이_없으면_등록할_수_없다(String invalidMenuName) {
         // given
         Product product = createProduct("김치찌개", valueOf(10000));
         productRepository.save(product);
@@ -198,9 +193,8 @@ class MenuServiceTest extends IntegrationTestSupport {
             .hasMessage("올바른 메뉴 이름을 입력해야 합니다.");
     }
 
-    @DisplayName("메뉴 이름에 부적절한 단어가 포함되면 등록할 수 없다.")
     @Test
-    void createMenu_WhenContainsProfanity_ThrowsException() {
+    void 메뉴_이름에_부적절한_단어가_포함되면_등록할_수_없다() {
         // given
         Product product = createProduct("김치찌개", valueOf(10000));
         productRepository.save(product);
@@ -224,9 +218,8 @@ class MenuServiceTest extends IntegrationTestSupport {
             .hasMessage("올바른 메뉴 이름을 입력해야 합니다.");
     }
 
-    @DisplayName("메뉴에 있는 가격을 상품들의 총 가격 이하로 변경할 수 있다.")
     @Test
-    void changeMenuPrice_Success() {
+    void 메뉴에_있는_가격을_상품들의_총_가격_이하로_변경할_수_있다() {
         // given
         Product product = createProduct("김치찌개", valueOf(10000));
         productRepository.save(product);
@@ -249,9 +242,8 @@ class MenuServiceTest extends IntegrationTestSupport {
 
     }
 
-    @DisplayName("메뉴 가격이 0원 미만이면 변경할 수 없다.")
     @Test
-    void changeMenuPrice_WhenPriceIsNegative_ThrowsException() {
+    void 메뉴_가격이_0원_미만이면_변경할_수_없다() {
         // given
         Product product = createProduct("김치찌개", valueOf(10000));
         productRepository.save(product);
@@ -274,9 +266,8 @@ class MenuServiceTest extends IntegrationTestSupport {
             .hasMessage("메뉴 변경시 가격이 0원 이상이어야 합니다.");
     }
 
-    @DisplayName("메뉴 가격이 상품 가격 합보다 크면 변경할 수 없다.")
     @Test
-    void changeMenuPrice_WhenPriceExceedsSum_ShouldThrowException() {
+    void 메뉴_가격이_상품_가격_합보다_크면_변경할_수_없다() {
         // given
         Product product = createProduct("김치찌개", valueOf(10000));
         productRepository.save(product);
@@ -299,9 +290,8 @@ class MenuServiceTest extends IntegrationTestSupport {
             .hasMessage("메뉴 가격은 포함된 상품 가격 합보다 클 수 없습니다.");
     }
 
-    @DisplayName("메뉴를 표시 상태로 변경할 수 있다.")
     @Test
-    void displayMenu_Success() {
+    void 메뉴를_표시_상태로_변경할_수_있다() {
         // given
         Product product = createProduct("김치찌개", valueOf(10000));
         productRepository.save(product);
@@ -322,9 +312,8 @@ class MenuServiceTest extends IntegrationTestSupport {
         assertThat(displayMenu.isDisplayed()).isTrue();
     }
 
-    @DisplayName("존재하지 않는 메뉴를 표시할 수 없다.")
     @Test
-    void displayMenu_WhenMenuDoesNotExist_ShouldThrowException() {
+    void 존재하지_않는_메뉴를_표시할_수_없다() {
         // given
         UUID NonExistedMenuId = UUID.randomUUID();
 
@@ -334,9 +323,8 @@ class MenuServiceTest extends IntegrationTestSupport {
             .hasMessage("해당 ID의 메뉴가 존재하지 않습니다.");
     }
 
-    @DisplayName("메뉴 가격이 상품 가격 합보다 높으면 메뉴를 표시할 수 없다.")
     @Test
-    void displayMenu_WhenPriceExceedsSum_ShouldThrowException() {
+    void 메뉴_가격이_상품_가격_합보다_높으면_메뉴를_표시할_수_없다() {
         // given
         Product product = createProduct("김치찌개", valueOf(10000));
         productRepository.save(product);
@@ -361,9 +349,8 @@ class MenuServiceTest extends IntegrationTestSupport {
             .hasMessage("메뉴 가격이 포함된 상품 가격보다 높아 표시할 수 없습니다.");
     }
 
-    @DisplayName("등록된 메뉴를 숨길 수 있다.")
     @Test
-    void hideMenu_Success() {
+    void 등록된_메뉴를_숨길_수_있다() {
         // given
         Product product = createProduct("김치찌개", valueOf(10000));
         productRepository.save(product);
@@ -384,9 +371,8 @@ class MenuServiceTest extends IntegrationTestSupport {
         assertThat(hidMenu.isDisplayed()).isFalse();
     }
 
-    @DisplayName("등록된 메뉴를 모두 조회할 수 있다.")
     @Test
-    void findAllMenu_Success() {
+    void 등록된_메뉴를_모두_조회할_수_있다() {
         // given
         Product product = createProduct("김치찌개", valueOf(10000));
         productRepository.save(product);

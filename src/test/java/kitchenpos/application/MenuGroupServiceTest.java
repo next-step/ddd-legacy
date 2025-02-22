@@ -7,7 +7,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -33,9 +32,8 @@ class MenuGroupServiceTest extends IntegrationTestSupport {
         menuGroupRepository.deleteAllInBatch();
     }
 
-    @DisplayName("메뉴 그룹을 등록할 수 있다.")
     @Test
-    void createMenuGroup_Success() {
+    void 메뉴_그룹을_등록할_수_있다() {
         // given
         final MenuGroup expected = createMenuGroupRequest("치킨");
         final MenuGroup actual = menuGroupService.create(expected);
@@ -48,10 +46,9 @@ class MenuGroupServiceTest extends IntegrationTestSupport {
         );
     }
 
-    @DisplayName("메뉴 그룹의 이름이 존재하지 않으면 등록할 수 없다")
     @NullAndEmptySource
     @ParameterizedTest
-    void createMenuGroup_WhenNameIsNullOrEmpty_ThrowsException(final String name) {
+    void 메뉴_그룹의_이름이_존재하지_않으면_등록할_수_없다(final String name) {
         // given & when & then
         final MenuGroup expected = createMenuGroupRequest(name);
         assertThatThrownBy(() -> menuGroupService.create(expected))
@@ -59,9 +56,8 @@ class MenuGroupServiceTest extends IntegrationTestSupport {
             .hasMessage("메뉴 그룹의 이름이 존재해야 합니다.");
     }
 
-    @DisplayName("메뉴 그룹의 목록을 조회할 수 있다.")
     @Test
-    void findAllMenuGroups_Success() {
+    void 메뉴_그룹의_목록을_조회할_수_있다() {
         // given
         final MenuGroup expected1 = createMenuGroupRequest("치킨");
         final MenuGroup expected2 = createMenuGroupRequest("피자");
