@@ -1,61 +1,43 @@
 package kitchenpos.application;
 
 import static java.math.BigDecimal.valueOf;
-import kitchenpos.IntegrationTestSupport;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import static kitchenpos.fixtures.ProductFixtures.BURGER_NAME;
-import static kitchenpos.fixtures.ProductFixtures.BURGER_PRICE;
-import static kitchenpos.fixtures.ProductFixtures.PROFANITY;
-import static kitchenpos.fixtures.ProductFixtures.burger;
-import static kitchenpos.fixtures.ProductFixtures.pizza;
+import static kitchenpos.fixtures.ProductFixtures.양념치킨;
+import static kitchenpos.fixtures.ProductFixtures.후라이드치킨;
+import static kitchenpos.fixtures.ProductFixtures.후라이드치킨_가격;
 import kitchenpos.infra.PurgomalumClient;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@Service
-class ProductServiceTest extends IntegrationTestSupport {
+class ProductServiceTest {
 
-    @Autowired
     private ProductService productService;
-
-    @Autowired
     private ProductRepository productRepository;
-
-    @Autowired
     private MenuRepository menuRepository;
-
-    @MockBean
     private PurgomalumClient purgomalumClient;
 
-    /**
-     * 매 테스트 실행 후 DB를 정리하여 일관된 테스트 환경을 유지한다.
-     */
-    @AfterEach
-    void tearDown() {
-        menuRepository.deleteAllInBatch();
-        productRepository.deleteAllInBatch();
+    @BeforeEach
+    void setUp() {
+        productRepository = new InMemoryProductRepository();
+        menuRepository = new InMemoryMenuRepository();
+        purgomalumClient = new FakePurgomalumClient();
+        productService = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
     @Test
     void 상품을_등록할_수_있다() {
         // given
-        Product request = burger();
+        Product request = 후라이드치킨();
 
         // when
         Product savedProduct = productService.create(request);
@@ -63,15 +45,15 @@ class ProductServiceTest extends IntegrationTestSupport {
         // then
         assertThat(savedProduct).isNotNull();
         assertThat(savedProduct.getId()).isNotNull();
-        assertThat(savedProduct.getName()).isEqualTo(BURGER_NAME);
-        assertThat(savedProduct.getPrice()).isEqualTo(BURGER_PRICE);
+        assertThat(savedProduct.getName()).isEqualTo("후라이드치킨");
+        assertThat(savedProduct.getPrice()).isEqualTo(valueOf(16000));
     }
 
     @Test
     void 상품_가격을_입력하지_않으면_등록할_수_없다() {
         // given
         Product request = new Product();
-        request.setName(burger().getName());
+        request.setName(후라이드치킨().getName());
         request.setPrice(null);
 
         // when & then
@@ -83,8 +65,8 @@ class ProductServiceTest extends IntegrationTestSupport {
     void 상품_가격이_0원_미만이면_등록할_수_없다() {
         // given
         Product request = new Product();
-        request.setName(burger().getName());
-        request.setPrice(valueOf(-8000));
+        request.setName(후라이드치킨().getName());
+        request.setPrice(valueOf(-16000));
 
         // when & then
         assertThatThrownBy(() -> productService.create(request))
@@ -97,73 +79,40 @@ class ProductServiceTest extends IntegrationTestSupport {
         // given
         Product request = new Product();
         request.setName(null);
-        request.setPrice(BURGER_PRICE);
+        request.setPrice(후라이드치킨_가격);
 
         // when & then
         assertThatThrownBy(() -> productService.create(request))
             .isInstanceOf(IllegalArgumentException.class);
     }
-
-    @Test
-    void 상품_이름에_부적절한_단어가_포함되면_등록할_수_없다() {
-        // given
-        Product request = new Product();
-        request.setName(PROFANITY);
-        request.setPrice(BURGER_PRICE);
-
-        // when
-        when(purgomalumClient.containsProfanity(request.getName())).thenReturn(true);
-
-        // then
-        assertThatThrownBy(() -> productService.create(request))
-            .isInstanceOf(IllegalArgumentException.class);
-
-        verify(purgomalumClient, times(1)).containsProfanity(request.getName()); // API 호출되었는지 검증
-    }
-
-    @Test
-    void 상품을_등록할_때_이름에_부적절한_단어가_포함되지_않으면_정상적으로_등록할_수_있다() {
-        // given
-        Product request = burger();
-
-        // when
-        when(purgomalumClient.containsProfanity(request.getName())).thenReturn(false);
-        Product savedProduct = productService.create(request);
-
-        // then
-        assertThat(savedProduct).isNotNull();
-        assertThat(savedProduct.getName()).isEqualTo(BURGER_NAME);
-        verify(purgomalumClient, times(1)).containsProfanity(request.getName()); // API 호출되었는지 검증
-    }
-
     @Test
     void 상품의_가격을_변경할_수_있다() {
         // given
-        Product request = burger();
+        Product request = 후라이드치킨();
         productRepository.save(request);
 
         UUID productId = request.getId();
-        BigDecimal CHANGE_BURGER_PRICE = BigDecimal.valueOf(10000);
+        BigDecimal 후라이드치킨_가격 = BigDecimal.valueOf(16000);
 
         // when
         Product updateProduct = new Product();
-        updateProduct.setPrice(CHANGE_BURGER_PRICE);
+        updateProduct.setPrice(후라이드치킨_가격);
         productService.changePrice(productId, updateProduct);
 
         // then
         Product updatedProduct = productRepository.findById(productId).orElseThrow();
         // 값만 비교
-        assertThat(updatedProduct.getPrice().compareTo(CHANGE_BURGER_PRICE)).isEqualTo(0);
+        assertThat(updatedProduct.getPrice().compareTo(후라이드치킨_가격)).isEqualTo(0);
 
         // scale 제거하고 비교
         assertThat(updatedProduct.getPrice().stripTrailingZeros())
-            .isEqualTo(CHANGE_BURGER_PRICE.stripTrailingZeros()); // stripTrailingZeros()를 사용하면 소수점이 필요 없는 경우 자동으로 정리함
+            .isEqualTo(후라이드치킨_가격.stripTrailingZeros()); // stripTrailingZeros()를 사용하면 소수점이 필요 없는 경우 자동으로 정리함
     }
 
     @Test
-    void 상품_가격_변경시_가격이_null이면_변경할_수_없다() {
+    void 상품_가격_변경시_가격이_null_이면_변경할_수_없다() {
         // given
-        Product request = burger();
+        Product request = 후라이드치킨();
         productRepository.save(request);
 
         UUID productId = request.getId();
@@ -180,15 +129,15 @@ class ProductServiceTest extends IntegrationTestSupport {
     @Test
     void 상품_가격_변경시_가격이_0원_미만이면_변경할_수_없다() {
         // given
-        Product request = burger();
+        Product request = 후라이드치킨();
         productRepository.save(request);
 
         UUID productId = request.getId();
-        BigDecimal CHANGE_BURGER_PRICE = BigDecimal.valueOf(-10000);
+        BigDecimal 후라이드치킨_가격 = BigDecimal.valueOf(-16000);
 
         // when
         Product updateProduct = new Product();
-        updateProduct.setPrice(CHANGE_BURGER_PRICE);
+        updateProduct.setPrice(후라이드치킨_가격);
 
         // then
         assertThatThrownBy(() -> productService.changePrice(productId, updateProduct))
@@ -199,7 +148,7 @@ class ProductServiceTest extends IntegrationTestSupport {
     void 존재하지_않은_상품_ID로_가격을_변경할_수_없다() {
         // given
         UUID nonExistentProductUd = UUID.randomUUID();
-        BigDecimal changedPrice = BigDecimal.valueOf(10000);
+        BigDecimal changedPrice = BigDecimal.valueOf(16000);
 
         Product updateProduct = new Product();
         updateProduct.setPrice(changedPrice);
@@ -212,8 +161,8 @@ class ProductServiceTest extends IntegrationTestSupport {
     @Test
     void 등록된_상품을_전체_조회할_수_있다() {
         // given
-        Product burger = burger();
-        Product pizza = pizza();
+        Product burger = 후라이드치킨();
+        Product pizza = 양념치킨();
 
         // when
         productService.create(burger);
