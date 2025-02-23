@@ -27,15 +27,15 @@ class ProductServiceTest {
 
     private MenuRepository menuRepository;
 
-    private PurgomalumClient purgomalumClient;
+    private ProfanityChecker profanityChecker;
 
     private ProductService sut;
 
     public ProductServiceTest() {
         this.productRepository = new InmemoryProductRepository();
         this.menuRepository = new InmemoryMenuRepository();
-        this.purgomalumClient = new FakePurgomalumClient();
-        this.sut = new ProductService(productRepository, menuRepository, purgomalumClient);
+        this.profanityChecker = new FakeProfanityChecker();
+        this.sut = new ProductService(productRepository, menuRepository, profanityChecker);
     }
 
     @Nested

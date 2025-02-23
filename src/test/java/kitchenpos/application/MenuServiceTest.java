@@ -32,7 +32,7 @@ class MenuServiceTest {
 
     private ProductRepository productRepository;
 
-    private PurgomalumClient purgomalumClient;
+    private ProfanityChecker profanityChecker;
 
     private MenuService sut;
 
@@ -41,8 +41,8 @@ class MenuServiceTest {
         menuRepository = new InmemoryMenuRepository();
         menuGroupRepository = new InmemoryMenuGroupRepository();
         productRepository = new InmemoryProductRepository();
-        purgomalumClient = new FakePurgomalumClient();
-        sut = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+        profanityChecker = new FakeProfanityChecker();
+        sut = new MenuService(menuRepository, menuGroupRepository, productRepository, profanityChecker);
     }
 
 

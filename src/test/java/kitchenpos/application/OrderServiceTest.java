@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static kitchenpos.MenuFixture.*;
 import static kitchenpos.OrderFixture.*;
@@ -291,6 +292,15 @@ class OrderServiceTest {
             // then
             assertEquals(OrderStatus.ACCEPTED, acceptedOrder.getStatus());
             assertTrue(((FakeKitchenridersClient) kitchenridersClient).isRequestedDelivery());
+        }
+
+        @Test
+        @DisplayName("실패: 유효하지 않은 Order ID로 주문을 접수하면 OrderNotFoundException이 발생한다.")
+        void acceptOrder_fail_whenOrderNotFound() {
+            // given
+            UUID invalidOrderId = UUID.randomUUID();
+            // when & then
+            assertThrows(OrderNotFoundException.class, () -> sut.accept(invalidOrderId));
         }
     }
 

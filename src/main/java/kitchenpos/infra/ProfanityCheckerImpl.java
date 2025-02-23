@@ -8,15 +8,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 
 @Component
-public class PurgomalumClientImpl implements PurgomalumClient {
+public class ProfanityCheckerImpl implements ProfanityChecker {
 
     private final RestTemplate restTemplate;
 
-    public PurgomalumClientImpl(final RestTemplateBuilder restTemplateBuilder) {
+    public ProfanityCheckerImpl(final RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
     }
 
-    public boolean containsProfanity(final String text) {
+    public boolean contains(final String text) {
         final URI url = UriComponentsBuilder.fromUriString("https://www.purgomalum.com/service/containsprofanity")
                 .queryParam("text", text)
                 .build()
