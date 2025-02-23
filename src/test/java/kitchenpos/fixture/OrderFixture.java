@@ -1,4 +1,4 @@
-package kitchenpos;
+package kitchenpos.fixture;
 
 import kitchenpos.domain.*;
 import org.junit.jupiter.params.provider.Arguments;

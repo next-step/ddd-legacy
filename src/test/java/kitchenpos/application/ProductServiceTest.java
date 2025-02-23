@@ -13,9 +13,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static kitchenpos.MenuFixture.*;
-import static kitchenpos.MenuGroupFixture.*;
-import static kitchenpos.ProductFixture.*;
+import static kitchenpos.fixture.MenuFixture.*;
+import static kitchenpos.fixture.MenuGroupFixture.*;
+import static kitchenpos.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 

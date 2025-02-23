@@ -1,9 +1,8 @@
 package kitchenpos.application;
 
 import config.UnitTest;
-import kitchenpos.OrderFixture;
+import kitchenpos.fixture.OrderFixture;
 import kitchenpos.domain.*;
-import kitchenpos.infra.IdGenerator;
 import kitchenpos.infra.InmemoryOrderRepository;
 import kitchenpos.infra.InmemoryOrderTableRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +16,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.List;
 import java.util.UUID;
 
-import static kitchenpos.OrderTableFixture.*;
+import static kitchenpos.fixture.OrderTableFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 

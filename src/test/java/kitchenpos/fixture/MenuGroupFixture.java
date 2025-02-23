@@ -1,4 +1,4 @@
-package kitchenpos;
+package kitchenpos.fixture;
 
 import kitchenpos.domain.MenuGroup;
 

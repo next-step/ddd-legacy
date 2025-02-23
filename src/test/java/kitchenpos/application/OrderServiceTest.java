@@ -2,10 +2,6 @@ package kitchenpos.application;
 
 import config.UnitTest;
 import helper.PriceGenerator;
-import kitchenpos.MenuFixture;
-import kitchenpos.OrderFixture;
-import kitchenpos.OrderTableFixture;
-import kitchenpos.application.*;
 import kitchenpos.domain.*;
 import kitchenpos.domain.Order;
 import kitchenpos.infra.*;
@@ -13,14 +9,12 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static kitchenpos.MenuFixture.*;
-import static kitchenpos.OrderFixture.*;
-import static kitchenpos.OrderTableFixture.*;
+import static kitchenpos.fixture.MenuFixture.*;
+import static kitchenpos.fixture.OrderFixture.*;
+import static kitchenpos.fixture.OrderTableFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
