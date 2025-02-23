@@ -31,7 +31,12 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.mysql:mysql-connector-j")
+    // spring boot test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    // testcontainers - mysql
+    testImplementation("org.testcontainers:mysql:1.18.0")
+    testImplementation("org.testcontainers:junit-jupiter:1.18.0")
 }
 
 tasks.withType<KotlinCompile> {

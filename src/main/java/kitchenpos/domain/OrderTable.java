@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Table(name = "order_table")
@@ -56,5 +57,17 @@ public class OrderTable {
 
     public void setOccupied(final boolean occupied) {
         this.occupied = occupied;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OrderTable that)) return false;
+        return getNumberOfGuests() == that.getNumberOfGuests() && isOccupied() == that.isOccupied() && Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getNumberOfGuests(), isOccupied());
     }
 }

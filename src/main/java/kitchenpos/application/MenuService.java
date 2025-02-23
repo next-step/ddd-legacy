@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import io.micrometer.common.util.StringUtils;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -41,13 +42,13 @@ public class MenuService {
     public Menu create(final Menu request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("가격이 존재하거나 0원 이상이어야 합니다.");
         }
         final MenuGroup menuGroup = menuGroupRepository.findById(request.getMenuGroupId())
             .orElseThrow(NoSuchElementException::new);
         final List<MenuProduct> menuProductRequests = request.getMenuProducts();
         if (Objects.isNull(menuProductRequests) || menuProductRequests.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("메뉴에 포함된 상품이 존재해야 합니다.");
         }
         final List<Product> products = productRepository.findAllByIdIn(
             menuProductRequests.stream()
@@ -79,8 +80,8 @@ public class MenuService {
             throw new IllegalArgumentException();
         }
         final String name = request.getName();
-        if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
-            throw new IllegalArgumentException();
+        if (StringUtils.isBlank(name) || purgomalumClient.containsProfanity(name)) {
+            throw new IllegalArgumentException("올바른 메뉴 이름을 입력해야 합니다.");
         }
         final Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
@@ -96,12 +97,17 @@ public class MenuService {
     public Menu changePrice(final UUID menuId, final Menu request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("메뉴 변경시 가격이 0원 이상이어야 합니다.");
         }
         BigDecimal sum = BigDecimal.ZERO;
         final Menu menu = menuRepository.findById(menuId)
             .orElseThrow(NoSuchElementException::new);
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
+            Product product = menuProduct.getProduct();
+            if (Objects.isNull(product) || Objects.isNull(product.getPrice())) {
+                throw new IllegalArgumentException("상품 가격이 존재해야만 합니다.");
+            }
+
             sum = sum.add(
                 menuProduct.getProduct()
                     .getPrice()
@@ -109,7 +115,7 @@ public class MenuService {
             );
         }
         if (price.compareTo(sum) > 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("메뉴 가격은 포함된 상품 가격 합보다 클 수 없습니다.");
         }
         menu.setPrice(price);
         return menu;
@@ -118,7 +124,7 @@ public class MenuService {
     @Transactional
     public Menu display(final UUID menuId) {
         final Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchElementException("해당 ID의 메뉴가 존재하지 않습니다."));
         BigDecimal sum = BigDecimal.ZERO;
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
             sum = sum.add(
@@ -128,7 +134,7 @@ public class MenuService {
             );
         }
         if (menu.getPrice().compareTo(sum) > 0) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("메뉴 가격이 포함된 상품 가격보다 높아 표시할 수 없습니다.");
         }
         menu.setDisplayed(true);
         return menu;

@@ -1,0 +1,18 @@
+spring:
+    datasource:
+        url: jdbc:h2:mem:test;MODE=MySQL;DB_CLOSE_DELAY=-1
+        username: sa
+    flyway:
+        enabled: false
+    jpa:
+        hibernate:
+            ddl-auto: update
+        database-platform: org.hibernate.dialect.MySQLDialect
+        properties:
+            hibernate:
+                format_sql: true
+        show-sql: true
+logging:
+    level:
+        org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
