@@ -1,18 +1,19 @@
 package kitchenpos.infra;
 
 import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupIdGenerator;
 import kitchenpos.domain.MenuGroupRepository;
 
 import java.util.*;
 
 public class InmemoryMenuGroupRepository implements MenuGroupRepository {
 
-    private final IdGenerator idGenerator = UUID::randomUUID;
+    private final MenuGroupIdGenerator idGenerator = UUID::randomUUID;
     private final Map<UUID, MenuGroup> storage = new HashMap<>();
 
     @Override
     public MenuGroup save(MenuGroup menuGroup) {
-        UUID id = idGenerator.random();
+        UUID id = idGenerator.generateId();
         menuGroup.setId(id);
         storage.put(id, menuGroup);
         return menuGroup;

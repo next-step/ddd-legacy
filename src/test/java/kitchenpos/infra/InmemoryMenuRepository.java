@@ -1,6 +1,7 @@
 package kitchenpos.infra;
 
 import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuIdGenerator;
 import kitchenpos.domain.MenuRepository;
 
 import java.util.List;
@@ -10,12 +11,12 @@ import java.util.UUID;
 import java.util.*;
 
 public class InmemoryMenuRepository implements MenuRepository {
-    private final IdGenerator idGenerator = UUID::randomUUID;
+    private final MenuIdGenerator idGenerator = UUID::randomUUID;
     private final Map<UUID, Menu> store = new HashMap<>();
 
     @Override
     public Menu save(Menu menu) {
-        UUID id = idGenerator.random();
+        UUID id = idGenerator.generateId();
         menu.setId(id);
         store.put(id, menu);
         return menu;

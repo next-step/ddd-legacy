@@ -1,6 +1,7 @@
 package kitchenpos.infra;
 
 import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderTableIdGenerator;
 import kitchenpos.domain.OrderTableRepository;
 
 import java.util.*;
@@ -8,13 +9,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class InmemoryOrderTableRepository implements OrderTableRepository {
 
-    IdGenerator idGenerator = UUID::randomUUID;
+    OrderTableIdGenerator idGenerator = UUID::randomUUID;
     private final Map<UUID, OrderTable> store = new ConcurrentHashMap<>();
 
     @Override
     public OrderTable save(OrderTable orderTable) {
         if (orderTable.getId() == null) {
-            orderTable.setId(idGenerator.random());
+            orderTable.setId(idGenerator.generateId());
         }
         store.put(orderTable.getId(), orderTable);
         return orderTable;
