@@ -1,9 +1,13 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.fake.FakePurgomalumClient;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.repository.InMemoryMenuRepository;
+import kitchenpos.repository.InMemoryProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,9 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,20 +24,24 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatException;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 
-@SpringBootTest
 class ProductServiceTest {
 
-    @Autowired
     private ProductService productService;
 
-    @Autowired
     private ProductRepository productRepository;
 
-    @MockBean
+    private MenuRepository menuRepository;
+
     private PurgomalumClient purgomalumClient;
+
+    @BeforeEach
+    void setUp() {
+        productRepository = new InMemoryProductRepository();
+        menuRepository = new InMemoryMenuRepository();
+        purgomalumClient = new FakePurgomalumClient();
+        productService = new ProductService(productRepository, menuRepository, purgomalumClient);
+    }
 
     @Nested
     @DisplayName("상품 등록")
@@ -47,7 +52,6 @@ class ProductServiceTest {
         void testRegisterProduct() {
             // given
             final Product request = ProductFixture.createProductRequest("후라이드", BigDecimal.valueOf(16_000));
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
 
             // when
             final Product result = productService.create(request);
@@ -68,7 +72,6 @@ class ProductServiceTest {
         void testNullName(final String name) {
             // given
             final Product request = ProductFixture.createProductRequest(name, BigDecimal.valueOf(16_000));
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
 
             // when & then
             assertThatException()
@@ -82,7 +85,6 @@ class ProductServiceTest {
         void testPriceLessThanZero(final int price) {
             // given
             final Product request = ProductFixture.createProduct("후라이드", BigDecimal.valueOf(price));
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
 
             // when & then
             assertThatException()
@@ -95,7 +97,6 @@ class ProductServiceTest {
         void testInappropriateName() {
             // given
             final Product request = ProductFixture.createProduct("부적절한이름", BigDecimal.valueOf(1000));
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(true);
 
             // when & then
             assertThatException()
@@ -174,7 +175,7 @@ class ProductServiceTest {
             assertThat(result)
                     .hasSize(2)
                     .extracting(Product::getId)
-                    .containsExactly(ids.toArray(UUID[]::new));
+                    .containsExactlyInAnyOrder(ids.toArray(UUID[]::new));
         }
     }
 

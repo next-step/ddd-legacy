@@ -3,27 +3,30 @@ package kitchenpos.application;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.fixture.MenuGroupFixture;
+import kitchenpos.repository.InMemoryMenuGroupRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatException;
 
-@SpringBootTest
 class MenuGroupServiceTest {
 
-    @Autowired
     private MenuGroupService menuGroupService;
 
-    @Autowired
     private MenuGroupRepository menuGroupRepository;
+
+    @BeforeEach
+    void setup() {
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        menuGroupService = new MenuGroupService(menuGroupRepository);
+    }
 
     @Nested
     @DisplayName("메뉴 그룹 생성")
@@ -79,7 +82,7 @@ class MenuGroupServiceTest {
             assertThat(result)
                     .hasSize(2)
                     .extracting(MenuGroup::getId)
-                    .containsExactly(menuGroup1.getId(), menuGroup2.getId());
+                    .containsExactlyInAnyOrder(menuGroup1.getId(), menuGroup2.getId());
         }
     }
 

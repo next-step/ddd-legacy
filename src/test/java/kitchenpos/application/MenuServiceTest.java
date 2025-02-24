@@ -1,11 +1,15 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fake.FakePurgomalumClient;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.MenuProductFixture;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.repository.InMemoryMenuGroupRepository;
+import kitchenpos.repository.InMemoryMenuRepository;
+import kitchenpos.repository.InMemoryProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,9 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,26 +27,27 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatException;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 
-@SpringBootTest
 class MenuServiceTest {
 
-    @Autowired
     private MenuService menuService;
 
-    @Autowired
     private MenuRepository menuRepository;
 
-    @Autowired
     private ProductRepository productRepository;
 
-    @Autowired
     private MenuGroupRepository menuGroupRepository;
 
-    @MockBean
     private PurgomalumClient purgomalumClient;
+
+    @BeforeEach
+    void setup() {
+        menuRepository = new InMemoryMenuRepository();
+        productRepository = new InMemoryProductRepository();
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        purgomalumClient = new FakePurgomalumClient();
+        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+    }
 
     @Nested
     @DisplayName("메뉴 등록")
@@ -59,7 +61,6 @@ class MenuServiceTest {
             final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
             final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
             final Menu request = MenuFixture.createMenu("후라이드 치킨", BigDecimal.valueOf(16_000), List.of(menuProduct), menuGroup);
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
 
             // when
             final Menu result = menuService.create(request);
@@ -83,7 +84,6 @@ class MenuServiceTest {
             final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
             final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
             final Menu request = MenuFixture.createMenu(name, BigDecimal.valueOf(16_000), List.of(menuProduct), menuGroup);
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
 
             // when & then
             assertThatException()
@@ -100,7 +100,6 @@ class MenuServiceTest {
             final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
             final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
             final Menu request = MenuFixture.createMenu("후라이드치킨", BigDecimal.valueOf(price), List.of(menuProduct), menuGroup);
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
 
             // when & then
             assertThatException()
@@ -116,7 +115,6 @@ class MenuServiceTest {
             final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
             final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
             final Menu request = MenuFixture.createMenu("부적절한이름", BigDecimal.valueOf(16_000), List.of(menuProduct), menuGroup);
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(true);
 
             // when & then
             assertThatException()
@@ -132,7 +130,6 @@ class MenuServiceTest {
             final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
             final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
             final Menu request = MenuFixture.createMenu("후라이드 치킨", BigDecimal.valueOf(17_000), List.of(menuProduct), menuGroup);
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
 
             // when & then
             assertThatException()
@@ -154,8 +151,7 @@ class MenuServiceTest {
             final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
             final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
             final Menu request = MenuFixture.createMenu("후라이드 치킨", BigDecimal.valueOf(16_000), List.of(menuProduct), menuGroup);
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
-            final Menu menu = menuService.create(request);
+            final Menu menu = menuRepository.save(request);
 
             // when
             final Menu result = menuService.display(menu.getId());
@@ -176,15 +172,13 @@ class MenuServiceTest {
             final Product product = saveProduct("후라이드", BigDecimal.valueOf(16_000));
             final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
             final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
-            final Menu request = MenuFixture.createMenu("후라이드 치킨", BigDecimal.valueOf(16_000), List.of(menuProduct), menuGroup);
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
-            final Menu menu = menuService.create(request);
-            menu.setPrice(BigDecimal.valueOf(17_000));
+            final Menu request = MenuFixture.createMenu("후라이드 치킨", BigDecimal.valueOf(17_000), List.of(menuProduct), menuGroup);
+            final Menu menu = menuRepository.save(request);
 
             // when & then
             assertThatException()
                     .isThrownBy(() -> menuService.display(menu.getId()))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalStateException.class);
         }
     }
 
@@ -200,7 +194,6 @@ class MenuServiceTest {
             final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
             final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
             final Menu request = MenuFixture.createMenu("후라이드 치킨", BigDecimal.valueOf(16_000), List.of(menuProduct), menuGroup);
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
             final Menu menu = menuService.create(request);
             menuService.display(menu.getId());
 
@@ -230,7 +223,6 @@ class MenuServiceTest {
             final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
             final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
             final Menu request = MenuFixture.createMenu("후라이드 치킨", BigDecimal.valueOf(16_000), List.of(menuProduct), menuGroup);
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
             existingId = menuService.create(request).getId();
         }
 
@@ -279,25 +271,16 @@ class MenuServiceTest {
     @DisplayName("메뉴 조회")
     class FindAllMenus {
 
-        @BeforeEach
-        void setup() {
-            final Product product = saveProduct("후라이드", BigDecimal.valueOf(16_000));
-            final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
-            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
-            final Menu menu = MenuFixture.createMenu("후라이드 치킨", BigDecimal.valueOf(16_000), List.of(menuProduct), menuGroup);
-        }
-
         @Test
         @DisplayName("등록된 모든 메뉴의 목록을 조회한다.")
         void findAllMenusSuccess() {
             // given
-            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
             List<UUID> menuIds = IntStream.rangeClosed(1, 2).mapToObj(i -> {
                 final Product product = saveProduct(i, "후라이드", BigDecimal.valueOf(16_000));
                 final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
                 final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
                 final Menu menu = MenuFixture.createMenu("후라이드 치킨" + i, BigDecimal.valueOf(16_000), List.of(menuProduct), menuGroup);
-                return menuService.create(menu).getId();
+                return menuRepository.save(menu).getId();
             }).toList();
 
             // when
@@ -307,7 +290,7 @@ class MenuServiceTest {
             assertThat(result)
                     .hasSize(2)
                     .extracting(Menu::getId)
-                    .containsExactly(menuIds.toArray(UUID[]::new));
+                    .containsExactlyInAnyOrder(menuIds.toArray(UUID[]::new));
         }
     }
 
