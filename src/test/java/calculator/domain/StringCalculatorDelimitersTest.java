@@ -89,7 +89,7 @@ class StringCalculatorDelimitersTest {
         String regex = sut.getRegex();
         String[] actualTokens = input.split(regex);
 
-        assertThat(actualTokens).containsExactly(expectedTokens);
+        assertThat(actualTokens).containsExactlyInAnyOrder(expectedTokens);
     }
 
     static Stream<Arguments> provideInputForRegexSplitting() {

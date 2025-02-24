@@ -47,4 +47,35 @@ public class Product {
     public void setPrice(final BigDecimal price) {
         this.price = price;
     }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private final Product product;
+
+        public Builder() {
+            product = new Product();
+        }
+
+        public Builder id(UUID id) {
+            product.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            product.name = name;
+            return this;
+        }
+
+        public Builder price(BigDecimal price) {
+            product.price = price;
+            return this;
+        }
+
+        public Product build() {
+            return product;
+        }
+    }
 }

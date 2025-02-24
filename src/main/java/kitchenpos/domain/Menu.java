@@ -109,4 +109,56 @@ public class Menu {
     public void setMenuGroupId(final UUID menuGroupId) {
         this.menuGroupId = menuGroupId;
     }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private final Menu menu;
+
+        public Builder() {
+            menu = new Menu();
+        }
+
+        public Builder id(UUID id) {
+            menu.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            menu.name = name;
+            return this;
+        }
+
+        public Builder price(BigDecimal price) {
+            menu.price = price;
+            return this;
+        }
+
+        public Builder menuGroup(MenuGroup menuGroup) {
+            menu.menuGroup = menuGroup;
+            menu.menuGroupId = menuGroup.getId();
+            return this;
+        }
+
+        public Builder displayed(boolean displayed) {
+            menu.displayed = displayed;
+            return this;
+        }
+
+        public Builder menuProducts(List<MenuProduct> menuProducts) {
+            menu.menuProducts = menuProducts;
+            return this;
+        }
+
+        public Builder menuGroupId(UUID menuGroupId) {
+            menu.menuGroupId = menuGroupId;
+            return this;
+        }
+
+        public Menu build() {
+            return menu;
+        }
+    }
 }

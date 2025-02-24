@@ -57,4 +57,40 @@ public class OrderTable {
     public void setOccupied(final boolean occupied) {
         this.occupied = occupied;
     }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private final OrderTable orderTable;
+
+        public Builder() {
+            orderTable = new OrderTable();
+        }
+
+        public Builder id(UUID id) {
+            orderTable.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            orderTable.name = name;
+            return this;
+        }
+
+        public Builder numberOfGuests(int numberOfGuests) {
+            orderTable.numberOfGuests = numberOfGuests;
+            return this;
+        }
+
+        public Builder occupied(boolean occupied) {
+            orderTable.occupied = occupied;
+            return this;
+        }
+
+        public OrderTable build() {
+            return orderTable;
+        }
+    }
 }

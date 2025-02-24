@@ -81,4 +81,47 @@ public class OrderLineItem {
     public void setPrice(final BigDecimal price) {
         this.price = price;
     }
+
+    // Builder 생성 메서드
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private final OrderLineItem item;
+
+        public Builder() {
+            item = new OrderLineItem();
+        }
+
+        public Builder menu(Menu menu) {
+            item.menu = menu;
+            // 메뉴가 설정되면 menuId와 price 기본값을 설정
+            item.menuId = menu.getId();
+            if (item.price == null) {
+                item.price = menu.getPrice();
+            }
+            return this;
+        }
+
+        public Builder quantity(long quantity) {
+            item.quantity = quantity;
+            return this;
+        }
+
+        public Builder menuId(UUID menuId) {
+            item.menuId = menuId;
+            return this;
+        }
+
+        public Builder price(BigDecimal price) {
+            item.price = price;
+            return this;
+        }
+
+        public OrderLineItem build() {
+            // 필요한 유효성 검증 로직 추가 가능
+            return item;
+        }
+    }
 }

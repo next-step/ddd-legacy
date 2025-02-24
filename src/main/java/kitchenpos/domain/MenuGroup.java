@@ -35,4 +35,30 @@ public class MenuGroup {
     public void setName(final String name) {
         this.name = name;
     }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private final MenuGroup menuGroup;
+
+        public Builder() {
+            menuGroup = new MenuGroup();
+        }
+
+        public Builder id(UUID id) {
+            menuGroup.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            menuGroup.name = name;
+            return this;
+        }
+
+        public MenuGroup build() {
+            return menuGroup;
+        }
+    }
 }

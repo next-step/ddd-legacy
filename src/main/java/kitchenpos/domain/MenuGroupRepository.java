@@ -1,8 +1,17 @@
 package kitchenpos.domain;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public interface MenuGroupRepository extends JpaRepository<MenuGroup, UUID> {
+@Repository
+public interface MenuGroupRepository {
+    MenuGroup save(MenuGroup menuGroup);
+
+    List<MenuGroup> findAll();
+
+    Optional<MenuGroup> findById(UUID menuGroupId);
 }
+

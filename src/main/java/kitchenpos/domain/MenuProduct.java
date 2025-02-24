@@ -69,4 +69,35 @@ public class MenuProduct {
     public void setProductId(final UUID productId) {
         this.productId = productId;
     }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private final MenuProduct menuProduct;
+
+        public Builder() {
+            menuProduct = new MenuProduct();
+        }
+
+        public Builder product(Product product) {
+            menuProduct.product = product;
+            return this;
+        }
+
+        public Builder quantity(long quantity) {
+            menuProduct.quantity = quantity;
+            return this;
+        }
+
+        public Builder productId(UUID productId) {
+            menuProduct.productId = productId;
+            return this;
+        }
+
+        public MenuProduct build() {
+            return menuProduct;
+        }
+    }
 }
