@@ -123,7 +123,100 @@ class MenuServiceTest {
                     .isThrownBy(() -> menuService.create(request))
                     .isInstanceOf(IllegalArgumentException.class);
         }
+
+        @Test
+        @DisplayName("메뉴의 가격은 지정한 상품들의 가격 총합보다 작아야 한다.")
+        void testPriceLessThanSumOfProductPrices() {
+            // given
+            final Product product = saveProduct("후라이드", BigDecimal.valueOf(16_000));
+            final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
+            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
+            final Menu request = MenuFixture.createMenu("후라이드 치킨", BigDecimal.valueOf(17_000), List.of(menuProduct), menuGroup);
+            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
+
+            // when & then
+            assertThatException()
+                    .isThrownBy(() -> menuService.create(request))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
     }
+
+    @Nested
+    @DisplayName("메뉴 노출")
+    class DisplayMenu {
+
+        @Test
+        @DisplayName("지정한 메뉴를 노출한다.")
+        void testDisplayMenu() {
+            // given
+            final Product product = saveProduct("후라이드", BigDecimal.valueOf(16_000));
+            final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
+            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
+            final Menu request = MenuFixture.createMenu("후라이드 치킨", BigDecimal.valueOf(16_000), List.of(menuProduct), menuGroup);
+            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
+            final Menu menu = menuService.create(request);
+
+            // when
+            final Menu result = menuService.display(menu.getId());
+
+            // then
+            assertThat(result).isNotNull();
+            assertAll(
+                    () -> assertThat(result.getId()).isEqualTo(menu.getId()),
+                    () -> assertThat(result.getName()).isEqualTo(menu.getName()),
+                    () -> assertThat(result.getPrice()).isEqualByComparingTo(menu.getPrice())
+            );
+        }
+
+        @Test
+        @DisplayName("메뉴의 가격이 메뉴에 포함된 상품들의 총합보다 작은 경우에만 노출처리할 수 있다.")
+        void testDisplayMenuWithPriceLessThanSumOfProductPrices() {
+            // given
+            final Product product = saveProduct("후라이드", BigDecimal.valueOf(16_000));
+            final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
+            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
+            final Menu request = MenuFixture.createMenu("후라이드 치킨", BigDecimal.valueOf(16_000), List.of(menuProduct), menuGroup);
+            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
+            final Menu menu = menuService.create(request);
+            menu.setPrice(BigDecimal.valueOf(17_000));
+
+            // when & then
+            assertThatException()
+                    .isThrownBy(() -> menuService.display(menu.getId()))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("메뉴 숨김")
+    class HideMenu {
+
+        @Test
+        @DisplayName("지정한 메뉴를 숨김처리한다.")
+        void testHideMenu() {
+            // given
+            final Product product = saveProduct("후라이드", BigDecimal.valueOf(16_000));
+            final MenuGroup menuGroup = saveMenuGroup("한마리메뉴");
+            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
+            final Menu request = MenuFixture.createMenu("후라이드 치킨", BigDecimal.valueOf(16_000), List.of(menuProduct), menuGroup);
+            given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
+            final Menu menu = menuService.create(request);
+            menuService.display(menu.getId());
+
+            // when
+            final Menu result = menuService.hide(menu.getId());
+
+            // then
+            assertThat(result).isNotNull();
+            assertAll(
+                    () -> assertThat(result.getId()).isEqualTo(menu.getId()),
+                    () -> assertThat(result.getName()).isEqualTo(menu.getName()),
+                    () -> assertThat(result.getPrice()).isEqualByComparingTo(menu.getPrice())
+            );
+        }
+    }
+
 
     @Nested
     @DisplayName("메뉴 가격 변경")
