@@ -19,8 +19,24 @@ public class MenuFixture {
         menu.setMenuProducts(menuProducts);
         menu.setMenuGroup(menuGroup);
         menu.setMenuGroupId(menuGroup.getId());
+        menu.setDisplayed(true);
+        return menu;
+    }
+
+    public static Menu createMenu() {
+        return createMenu(BigDecimal.valueOf(16_000));
+    }
+
+    public static Menu createHiddenMenu() {
+        Menu menu = createMenu(BigDecimal.valueOf(16_000));
         menu.setDisplayed(false);
         return menu;
+    }
+
+    public static Menu createMenu(final BigDecimal price) {
+        final MenuGroup menuGroup = MenuGroupFixture.createMenuGroup("한마리메뉴");
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProduct();
+        return createMenu("후라이드치킨", price, List.of(menuProduct), menuGroup);
     }
 
     public static Menu createMenuRequest(final BigDecimal price) {
